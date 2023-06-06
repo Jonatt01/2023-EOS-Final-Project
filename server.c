@@ -21,12 +21,22 @@
 int sockfd, newsockfd;
 pid_t childpid;
 
+void create_semaphore()
+{
+
+}
+void create_msgQueue()
+{
+    
+}
+
+
 int socket_server()
 {
     
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len;
-    char buffer[MAX_BUFFER_SIZE];
+    char rcvBuffer[MAX_BUFFER_SIZE];
     char sendBuffer[MAX_BUFFER_SIZE];
     {
         // Create a TCP socket
@@ -76,18 +86,17 @@ int socket_server()
         {
 
             if (childpid == 0)
-            {
-                
+            {                
                 // 子程序，處理client的command，Read data from the client
                 while (1)
                 {
-                    memset(buffer, 0, MAX_BUFFER_SIZE);
+                    memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
                     memset(sendBuffer, 0, MAX_BUFFER_SIZE);
                     // read data frim client
-                    read(newsockfd, buffer, MAX_BUFFER_SIZE);
-                    if (strlen(buffer) > 0)
+                    read(newsockfd, rcvBuffer, MAX_BUFFER_SIZE);
+                    if (strlen(rcvBuffer) > 0)
                     {
-                        printf("Received message from client: %s\n", buffer);
+                        printf("Received message from client: %s\n", rcvBuffer);
                     }                  
                     strcat(sendBuffer,"received string .\n");
                     write(newsockfd, sendBuffer, strlen(sendBuffer) + 1);
