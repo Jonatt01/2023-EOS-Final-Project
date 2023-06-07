@@ -8,9 +8,11 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <sys/shm.h>
 #define MAX_BUFFER_SIZE 1024
 #define DEVICE_PORT 9090
 #define STATUS_PORT 9091
+#define SM_SIZE 256
 
 /*     創建 Msg Queue     */
 
@@ -22,7 +24,14 @@ struct message {
 };
 struct message msgQ;
 
+/*     創建 Shared memory     */
+key_t shmKey;
+int* shmemArr;
+int shmid;
+
+
 int serverSocket, clientSocket;
+int sockfd, connfd;
 
 void interrupt_handler(int signum){
 
@@ -32,16 +41,28 @@ void interrupt_handler(int signum){
         exit(1);
     }
     printf("MsgQ deleted!\n");
+
+    // 刪除 Shared memory
+    if (shmdt(shmemArr) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(shmid, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
     exit(EXIT_SUCCESS);
 
     close(clientSocket);
     close(serverSocket);
+    close(sockfd);
 
 }
 
 void* status_thread(void* arg)
 {
-    int sockfd, connfd;
     struct sockaddr_in serverAddr, clientAddr;
     char buffer[MAX_BUFFER_SIZE];
     int addrLen = sizeof(clientAddr);
@@ -78,7 +99,32 @@ void* status_thread(void* arg)
         perror("錯誤：無法接受連線請求");
         exit(1);
     }
+
+    /*                Shared Memory                */
+    {
+
+        shmKey = ftok(".", 'S');
+        if (shmKey == -1) {
+            perror("ftok");
+            exit(1);
+        }
+
+        shmid = shmget(shmKey, SM_SIZE * sizeof(int), IPC_CREAT | 0666);
+        if (shmid == -1) {
+            perror("shmget error");
+            exit(1);
+        }
+
+        shmemArr = (int*)shmat(shmid, NULL, 0);
+        if (shmemArr == (int*)-1) {
+            perror("shmat error");
+            exit(1);
+        }
+
+    }
+     /*                Shared Memory                */
     
+    signal(SIGINT,interrupt_handler);
     // 接收訊息並處理
     while (1) {
         memset(buffer, 0, MAX_BUFFER_SIZE);
@@ -89,7 +135,11 @@ void* status_thread(void* arg)
             exit(1);
         }
         
-        printf("接收到的訊息：%s", buffer);
+        if(strlen(buffer) > 0){
+            printf("接收到的訊息：%s", buffer);
+        }
+
+        //將狀態寫到shared memory
         
         if (strcmp(buffer, "exit\n") == 0) {
             break;
