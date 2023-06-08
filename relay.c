@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <sys/shm.h>
+#include <unistd.h> // for close
 #define MAX_BUFFER_SIZE 1024
 #define DEVICE_PORT 9090
 #define STATUS_PORT 9091

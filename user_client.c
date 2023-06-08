@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define PORT 8080
+#define PORT 8081
 #define MAX_BUFFER_SIZE 1024
 
 int main() {
@@ -46,7 +46,12 @@ int main() {
         memset(buffer,0,MAX_BUFFER_SIZE);
 
         //scanf(" %s",message);
-        fgets(message,sizeof(message),stdin);
+        //*********************************testing for authentication*********************************//
+        // send the user id to server
+        read(sockfd, buffer, MAX_BUFFER_SIZE);
+        printf("%s",buffer);
+        //fgets(message,sizeof(message),stdin);
+        scanf("%s",message);
         ssize_t num_bytes_written = write(sockfd, message, strlen(message));
         if (num_bytes_written == -1) {
             perror("Error: Failed to send data to server");
@@ -54,18 +59,36 @@ int main() {
             exit(EXIT_FAILURE);
         }
 
-        printf("Sent message to server: %s\n", message);
+        printf("Sent user id to server: %s\n", message);
 
-        // Receive data from the server
+        // read the enter password to server
+        memset(message,0,MAX_BUFFER_SIZE);
+        memset(buffer,0,MAX_BUFFER_SIZE);
+
+        read(sockfd, buffer, MAX_BUFFER_SIZE);
+        printf("%s",buffer);
+        // fgets(message,sizeof(message),stdin);
+        scanf("%s",message);
+        num_bytes_written = write(sockfd, message, strlen(message));
+        if (num_bytes_written == -1) {
+            perror("Error: Failed to send data to server");
+            close(sockfd);
+            exit(EXIT_FAILURE);
+        }
+        printf("Sent password to server: %s\n", message);        
+
+
+        // Receive successed or failed response from the server
+        memset(buffer,0,MAX_BUFFER_SIZE);
         ssize_t num_bytes_read = read(sockfd, buffer, MAX_BUFFER_SIZE);
         if (num_bytes_read == -1) {
             perror("Error: Failed to receive data from server");
             close(sockfd);
             exit(EXIT_FAILURE);
         }
+        printf("%s", buffer);
+        //*********************************end of authentication*********************************//
 
-        printf("%s\n", buffer);
-        //printf("\n");
     }
     
 

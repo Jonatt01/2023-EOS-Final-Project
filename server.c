@@ -15,33 +15,37 @@
 #include <netdb.h>
 #include <semaphore.h>
 
-#define MAX_BUFFER_SIZE 1024
-#define PORT 8080
+# include "authentication.h"
 
-int sockfd, newsockfd;
+#define MAX_BUFFER_SIZE 1024
+#define PORT 8081
+
+int serverfd, clinetfd;
+struct sockaddr_in server_addr, client_addr;
+socklen_t client_len;
+char rcvBuffer[MAX_BUFFER_SIZE];
+char sendBuffer[MAX_BUFFER_SIZE];
+
+
 pid_t childpid;
 
-void create_semaphore()
-{
+// void create_semaphore()
+// {
 
-}
-void create_msgQueue()
-{
+// }
+// void create_msgQueue()
+// {
     
-}
-
+// }
 
 int socket_server()
 {
     
-    struct sockaddr_in server_addr, client_addr;
-    socklen_t client_len;
-    char rcvBuffer[MAX_BUFFER_SIZE];
-    char sendBuffer[MAX_BUFFER_SIZE];
+
     {
         // Create a TCP socket
-        sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        if (sockfd == -1)
+        serverfd = socket(AF_INET, SOCK_STREAM, 0);
+        if (serverfd == -1)
         {
             perror("Error: Failed to create socket");
             exit(EXIT_FAILURE);
@@ -52,14 +56,14 @@ int socket_server()
         server_addr.sin_addr.s_addr = INADDR_ANY;
         server_addr.sin_port = htons(PORT);
 
-        if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
+        if (bind(serverfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
         {
             perror("Error: Failed to bind socket");
             exit(EXIT_FAILURE);
         }
 
         // Listen for incoming connections
-        if (listen(sockfd, 5) == -1)
+        if (listen(serverfd, 5) == -1)
         {
             perror("Error: Failed to listen for connections");
             exit(EXIT_FAILURE);
@@ -69,11 +73,20 @@ int socket_server()
         client_len = sizeof(client_addr);
     }
 
+    return serverfd;
+    
+}
+
+
+int main()
+{
+    serverfd = socket_server(); // open server
+
     while (1)
     {
 
-        newsockfd = accept(sockfd, (struct sockaddr *)&client_addr, &client_len);
-        if (newsockfd == -1)
+        clinetfd = accept(serverfd, (struct sockaddr *)&client_addr, &client_len);
+        if (clinetfd == -1)
         {
             perror("Error: Failed to accept connection");
             continue;
@@ -81,6 +94,17 @@ int socket_server()
 
         printf("New connection accepted from %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
+        int authenticate = 0; // 0 : failed, 1 : successful
+        authenticate = welcome(clinetfd);
+        
+        printf("authenticate result : %d\n",authenticate);
+        if(authenticate == 0){
+            printf("Wrong user password\n");
+            printf("Close socket to client\n");
+            close(clinetfd);
+            break;
+        }
+        
         childpid = fork();
         if (childpid >= 0)
         {
@@ -93,13 +117,13 @@ int socket_server()
                     memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
                     memset(sendBuffer, 0, MAX_BUFFER_SIZE);
                     // read data frim client
-                    read(newsockfd, rcvBuffer, MAX_BUFFER_SIZE);
+                    read(clinetfd, rcvBuffer, MAX_BUFFER_SIZE);
                     if (strlen(rcvBuffer) > 0)
                     {
                         printf("Received message from client: %s\n", rcvBuffer);
                     }                  
                     strcat(sendBuffer,"received string .\n");
-                    write(newsockfd, sendBuffer, strlen(sendBuffer) + 1);
+                    write(clinetfd, sendBuffer, strlen(sendBuffer) + 1);
                 }
             }
             else if (childpid > 0)
@@ -112,14 +136,8 @@ int socket_server()
             perror("fork error");
             exit(-1);
         }
-        close(newsockfd);
+        close(clinetfd);
     }
-    close(sockfd);
+    close(serverfd);
     return 0;
-}
-
-
-int main()
-{
-    socket_server();
 }
