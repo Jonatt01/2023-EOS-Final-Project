@@ -44,7 +44,7 @@ int welcome(int connfd){
             break;
         }
     }
-    printf("-----------------------\n");
+
     memset(rcv,0,BUFFERSIZE);// set the rcv char array to zero
 
     if(password == 0){
@@ -63,8 +63,8 @@ int welcome(int connfd){
             perror("Error: read()\n");
             exit(-1);
         }
-        printf("recv : %s .\n",rcv);
-        printf("password : %s .\n",password);
+        // printf("recv : %s .\n",rcv);
+        // printf("password : %s .\n",password);
         if(strcmp(rcv,password)==0){
             msglen = sprintf(snd,"Welcome %s!\n",name);
             if ((write(connfd,snd,msglen+1))==-1){

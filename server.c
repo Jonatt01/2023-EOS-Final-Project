@@ -18,7 +18,7 @@
 # include "authentication.h"
 
 #define MAX_BUFFER_SIZE 1024
-#define PORT 8081
+#define PORT 8080
 
 int serverfd, clinetfd;
 struct sockaddr_in server_addr, client_addr;
@@ -102,7 +102,7 @@ int main()
             printf("Wrong user password\n");
             printf("Close socket to client\n");
             close(clinetfd);
-            break;
+            continue;
         }
         
         childpid = fork();
