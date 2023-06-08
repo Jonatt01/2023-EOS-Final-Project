@@ -16,6 +16,7 @@
 #include <semaphore.h>
 
 # include "authentication.h"
+# include "create_table.h"
 
 #define MAX_BUFFER_SIZE 1024
 #define PORT 8080
@@ -29,6 +30,11 @@ char sendBuffer[MAX_BUFFER_SIZE];
 
 pid_t childpid;
 
+// parameters for device status shared memory
+key_t dev_status_key = 1234;
+extern int status_shm_id; // defined in create_table.c
+float* device_status;
+
 // void create_semaphore()
 // {
 
@@ -37,11 +43,10 @@ pid_t childpid;
 // {
     
 // }
+void interrupt_handler(int signum);
 
 int socket_server()
 {
-    
-
     {
         // Create a TCP socket
         serverfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -72,15 +77,22 @@ int socket_server()
         printf("Server is listening on port %d...\n", PORT);
         client_len = sizeof(client_addr);
     }
-
-    return serverfd;
-    
+    return serverfd;  
 }
 
 
 int main()
 {
     serverfd = socket_server(); // open server
+
+    // create shared status memory
+    device_status = create_status_table(dev_status_key);
+    
+    // print out the shared memory of device status for debugging
+    // for(int i=0;i<12;i++)
+    //     printf("%.2f ",*(device_status+i));
+    // printf("\n");
+
 
     while (1)
     {
@@ -140,4 +152,26 @@ int main()
     }
     close(serverfd);
     return 0;
+}
+
+
+void interrupt_handler(int signum){
+
+
+    // delete shared memory (device status)
+    if (shmdt(device_status) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(status_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+    close(clinetfd);
+    close(serverfd);
+
+    exit(EXIT_SUCCESS);
+
 }

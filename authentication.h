@@ -9,7 +9,7 @@
 int welcome(int connfd);
 
 /**
-* if first msg is "register <user>", then he would want to sign up a account
+* NOT DONE : if first msg is "register <user>", then he would want to sign up a account
 */
 void add_user(char* name, int password);
 
