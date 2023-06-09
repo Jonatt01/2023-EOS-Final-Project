@@ -17,6 +17,7 @@
 
 # include "authentication.h"
 # include "create_table.h"
+# include "translate.h"
 
 #define MAX_BUFFER_SIZE 1024
 #define PORT 8080
@@ -34,6 +35,10 @@ pid_t childpid;
 key_t dev_status_key = 1234;
 extern int status_shm_id; // defined in create_table.c
 float* device_status;
+
+key_t dev_status_key = 5678;
+extern int mode_shm_id; // defined in create_table.c
+float* user_mode;
 
 // void create_semaphore()
 // {
@@ -88,11 +93,12 @@ int main()
     // create shared status memory
     device_status = create_status_table(dev_status_key);
     
-    // print out the shared memory of device status for debugging
     // for(int i=0;i<12;i++)
     //     printf("%.2f ",*(device_status+i));
     // printf("\n");
 
+    // create user specific mode table
+    user_mode = create_mode_table(mode_key);
 
     while (1)
     {
@@ -134,8 +140,13 @@ int main()
                     {
                         printf("Received message from client: %s\n", rcvBuffer);
                     }                  
-                    strcat(sendBuffer,"received string .\n");
-                    write(clinetfd, sendBuffer, strlen(sendBuffer) + 1);
+                    // strcat(sendBuffer,"received string .\n");
+                    // write(clinetfd, sendBuffer, strlen(sendBuffer) + 1);
+
+                    // if user request to set their own mode
+                    if(strncmp(rcvBuffer,"mode",4)==0){
+                        printf("%d wants to set the user mode.\n",clinetfd);
+                    }
                 }
             }
             else if (childpid > 0)
@@ -168,6 +179,18 @@ void interrupt_handler(int signum){
         perror("shmctl");
         exit(1);
     }
+
+    // delete shared memory (user specific mode)
+    if (shmdt(user_mode) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(mode_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
 
     close(clinetfd);
     close(serverfd);

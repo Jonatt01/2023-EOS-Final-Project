@@ -8,5 +8,8 @@
 */
 int whichuser(char* name);
 
-
+/**
+* translate morning/afternoon/night to index of table
+*/
+int which_mode(char* timing);
 # endif

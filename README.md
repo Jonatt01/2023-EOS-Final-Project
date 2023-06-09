@@ -17,3 +17,7 @@
     - The flag to indicate whether the user is legal
     - "1" : legal, "0" : illegal
 ## tables
+
+## commands
+- change the user specific mode
+    - `mode afternoon | user Jonathan`
