@@ -1,4 +1,6 @@
 # FINAL PROJECT
+## system
+- 最多接受10個人註冊
 
 ## variable explaination
 
