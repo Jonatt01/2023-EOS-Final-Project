@@ -8,5 +8,8 @@
 */
 float* create_status_table(key_t key);
 
-
+/**
+* create user mode table
+*/
+float* create_mode_table(key_t key);
 # endif
