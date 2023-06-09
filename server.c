@@ -18,6 +18,7 @@
 # include "authentication.h"
 # include "create_table.h"
 # include "translate.h"
+# include "costimizer.h"
 
 #define MAX_BUFFER_SIZE 1024
 #define PORT 8080
@@ -34,11 +35,11 @@ pid_t childpid;
 // parameters for device status shared memory
 key_t dev_status_key = 1234;
 extern int status_shm_id; // defined in create_table.c
-float* device_status;
+int* device_status;
 
-key_t dev_status_key = 5678;
+key_t mode_key = 5678;
 extern int mode_shm_id; // defined in create_table.c
-float* user_mode;
+int* user_mode;
 
 // void create_semaphore()
 // {
@@ -130,6 +131,7 @@ int main()
             if (childpid == 0)
             {                
                 // 子程序，處理client的command，Read data from the client
+                int msglen = 0;
                 while (1)
                 {
                     memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
@@ -140,12 +142,30 @@ int main()
                     {
                         printf("Received message from client: %s\n", rcvBuffer);
                     }                  
-                    // strcat(sendBuffer,"received string .\n");
-                    // write(clinetfd, sendBuffer, strlen(sendBuffer) + 1);
 
                     // if user request to set their own mode
-                    if(strncmp(rcvBuffer,"mode",4)==0){
+                    if(strncmp(rcvBuffer,"setmode",7)==0){
                         printf("%d wants to set the user mode.\n",clinetfd);
+                        
+                        char username[64];
+                        char tmp[64];
+                        int mode = 0;
+                        int user = 0;
+                        char *token;
+
+                        token=strtok(rcvBuffer,"|"); // setmode
+                        token=strtok(NULL,"|"); // user Jonathan
+                        sscanf(token," %s %s",tmp,username);
+                        user = whichuser(username);
+                    
+                        token=strtok(NULL,"|"); // afternoon
+                        mode = whichmode(token);
+                        printf("\nmode : %d\n",mode);
+                        msglen = sprintf(sendBuffer,"%s start to set mode %s\n",username,token);
+                        write(clinetfd,sendBuffer,msglen+1);
+
+                        setmode(clinetfd, user_mode, user, mode);
+
                     }
                 }
             }

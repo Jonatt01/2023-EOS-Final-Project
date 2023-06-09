@@ -11,5 +11,7 @@ int whichuser(char* name);
 /**
 * translate morning/afternoon/night to index of table
 */
-int which_mode(char* timing);
+int whichmode(char* timing);
+
+void remove_spaces(char* s);
 # endif

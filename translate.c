@@ -10,14 +10,23 @@ int whichuser(char* name){
         return 1;
 }
 
-int which_mode(char* timing){
-    if(strcmp(name,"morning")==0){
+int whichmode(char* timing){
+    if(strcmp(timing,"morning")==0){
         return 0;
     }
-    else if(strcmp(name,"afternoon")==0){
+    else if(strcmp(timing,"afternoon")==0){
         return 1;
     }
-    else(strcmp(name,"night")==0){
+    else if(strcmp(timing,"night")==0){
         return 2;
     }
+}
+
+void remove_spaces(char* s) {
+    char* d = s;
+    do {
+        while (*d == ' ') {
+            ++d;
+        }
+    } while (*s++ = *d++);
 }

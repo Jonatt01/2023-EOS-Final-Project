@@ -18,6 +18,8 @@
     - "1" : legal, "0" : illegal
 ## tables
 
-## commands
+## commandss
+- set the mode
+    - `setmode | user Jonathan | afternoon`
 - change the user specific mode
     - `mode afternoon | user Jonathan`

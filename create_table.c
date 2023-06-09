@@ -9,16 +9,16 @@
 
 
 int status_shm_id;
-float *status_shm; // float because of the temperature might be float
+int *status_shm; // float because of the temperature might be float
 
-float* create_status_table(key_t key){
+int* create_status_table(key_t key){
 
     if ((status_shm_id = shmget(key, STATUS_SIZE, IPC_CREAT | 0666)) < 0)
     {
         perror("shmget");
         exit(-1);
     }
-    if ((status_shm = shmat(status_shm_id, NULL, 0)) == (float *) -1)
+    if ((status_shm = shmat(status_shm_id, NULL, 0)) == (int *) -1)
     {
         perror("shmat");
         exit(-1);
@@ -28,15 +28,15 @@ float* create_status_table(key_t key){
 }
 
 int mode_shm_id;
-float *mode_shm;
+int *mode_shm;
 
-float* create_mode_table(key_t key){
+int* create_mode_table(key_t key){
     if ((mode_shm_id = shmget(key, MODE_SIZE, IPC_CREAT | 0666)) < 0)
     {
         perror("shmget");
         exit(-1);
     }
-    if ((mode_shm = shmat(mode_shm_id, NULL, 0)) == (float *) -1)
+    if ((mode_shm = shmat(mode_shm_id, NULL, 0)) == (int *) -1)
     {
         perror("shmat");
         exit(-1);
