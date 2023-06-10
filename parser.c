@@ -67,3 +67,31 @@ Node* control_parser(int* ischange, int* change, int user){
 
     return head;
 }
+
+Node* reservation_parser(int* ischange, int* change, int user, int time){
+
+    Node* head = NULL;
+    for(int i=0;i<12;i++){
+        if(ischange[i] == 1){
+            Node* newNode = createNode();
+
+            newNode -> task.user = user;
+            newNode -> task.device = i + 1;
+            newNode -> task.reservation = 1;
+            newNode -> task.reservation_time = time;
+
+            if(i == 0 | i == 4 | i == 9){
+                newNode -> task.temp = change[i];
+            }
+            else{
+                newNode -> task.level = change[i];
+            }
+            insertAtEnd(&head, newNode);
+        }
+        else{
+            continue;
+        }
+    }
+
+    return head;
+}

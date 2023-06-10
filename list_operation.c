@@ -5,6 +5,7 @@ typedef struct Task {
     int priority;
     int user; // 1-10
     int reservation; // 0 or 1
+    int reservation_time; // minute
     int place; // useless
     int device; // 1-12
     int level; // for device except for air conditioner
@@ -27,6 +28,7 @@ Node* createNode() {
     newNode->task.priority = 1; // 0 is the highest
     newNode->task.user = 0;
     newNode->task.reservation = 0;
+    newNode->task.reservation_time = 0;
     newNode->task.place = 0;
     newNode->task.device = 0;
     newNode->task.level = 0;
@@ -61,7 +63,7 @@ void displayList(Node* head) {
     Node* current = head;
     printf("Task List:\n--------------------------\n");
     while (current != NULL) {
-        printf("device : %d , level : %d , temp : %d , priority : %d\n", current->task.device, current->task.level, current->task.temp, current->task.priority);
+        printf("device : %d , level : %d , temp : %d , reservation : %d , priority : %d\n", current->task.device, current->task.level, current->task.temp, current->task.reservation, current->task.priority);
         current = current->next;
     }
     printf("--------------------------\n");

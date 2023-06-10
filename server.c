@@ -207,7 +207,6 @@ int main()
                         // dispatcher(task_list_head,device_status);
 
                     }
-
                     // if emergency
                     else if(strncmp(rcvBuffer,"emergency",9)==0){
                         Node* newnode;
@@ -215,7 +214,7 @@ int main()
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
                     }
-
+                    // normal control command
                     else if(strncmp(rcvBuffer,"control",7)==0){
 
                         char username[64];
@@ -261,15 +260,54 @@ int main()
                         Node* newnode;
                         newnode = control_parser(ischange, device_report, user_index);
                         scheduler(&task_list_head,newnode);
-                        
+
                         displayList(task_list_head);
-
-
-
-
                     }
+                    // reservation
+                    else if(strncmp(rcvBuffer,"reservation",11)==0){
 
+                        char username[64];
+                        char tmp[64];
+                        char place[64];
+                        char device[64];
+                        char status[64];
+                        int user_index = 0;
+                        int device_index = 0;
+                        int time = 0;
 
+                        char *token;
+                        int ischange[12] = {0}; // 1 means user wants to change the status of this device 
+                        int device_report[12] = {0}; // changes for this command
+
+                        token=strtok(rcvBuffer,"|"); // reservation time
+                        sscanf(token,"%s %d",tmp,&time);
+
+                        token=strtok(NULL,"|"); // user Jonathan
+                        sscanf(token," %s %s",tmp,username);
+                        user_index = whichuser(username);
+
+                        token=strtok(NULL,"|"); // place device status
+                        do{
+                            memset(place,0,64);
+                            memset(device,0,64);
+                            memset(status,0,64);
+
+                            sscanf(token," %s %s %s",place, device, status);
+                            device_index = whichdevice(place,device);
+                            // printf("In server.c - place: %s, device: %s, status: %s, device index: %d.\n",place, device, status,device_index);
+                            ischange[device_index-1] = 1;
+                            device_report[device_index-1] = atoi(status);
+
+                            token=strtok(NULL,"|");
+                        }while(token != NULL);
+
+                        Node* newnode;
+                        newnode = reservation_parser(ischange, device_report, user_index, time);
+
+                        scheduler(&task_list_head,newnode);
+
+                        displayList(task_list_head);
+                    }
                     
                 }
             }

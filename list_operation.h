@@ -7,6 +7,7 @@ typedef struct Task {
     int priority;
     int user; // 1-10
     int reservation; // 0 or 1
+    int reservation_time; // minute
     int place; // useless
     int device; // 1-12
     int level; 

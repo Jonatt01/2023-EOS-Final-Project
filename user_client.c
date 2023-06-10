@@ -197,13 +197,13 @@ int main() {
 
     
     //*********************************start of emergency command*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"emergency earthquake");
-    write(sockfd,message,msglen+1);
-    printf("Sent emregency to server: %s\n", message);
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"emergency earthquake");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent emregency to server: %s\n", message);
 
-    sleep(1);
+    // sleep(1);
     //*********************************end of emergency command*********************************//   
 
     //*********************************start of control device command*********************************//
@@ -216,7 +216,15 @@ int main() {
     sleep(1);
     //*********************************end of control device command*********************************//   
 
+    //*********************************start of reservation command*********************************//
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"reservation | user Jonathan | bedroom airconditioner 30 | livingroom light 2");
+    write(sockfd,message,msglen+1);
+    printf("Sent reservation to server: %s\n", message);
 
+    sleep(1);
+    //*********************************end of reservation command*********************************// 
 
 
     // }

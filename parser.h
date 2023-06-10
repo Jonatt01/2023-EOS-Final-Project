@@ -18,4 +18,9 @@ Node* emergency_parser();
 */
 Node* control_parser(int* ischange, int* change, int user);
 
+/**
+* convert the reservation command to struct
+*/
+Node* reservation_parser(int* ischange, int* change, int user, int time);
+
 # endif
