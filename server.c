@@ -204,7 +204,7 @@ int main()
                     }
 
                     // if emergency
-                    else if(strncmp(rcvBuffer,"emergency",9) == 0){
+                    else if(strncmp(rcvBuffer,"emergency,9")==0){
                         Node* newnode;
                         newnode = emergency_parser();
                     }

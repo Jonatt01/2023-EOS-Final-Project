@@ -9,8 +9,9 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <sys/shm.h>
-#include <semaphore.h>
+#include <unistd.h> // for close
 #include <fcntl.h>
+#include <semaphore.h>
 
 #define MAX_BUFFER_SIZE 1024
 #define DEVICE_PORT 9090
