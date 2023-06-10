@@ -142,7 +142,9 @@ int main()
                     memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
                     memset(sendBuffer, 0, MAX_BUFFER_SIZE);
                     // read data from client
-                    printf("New loop...\n");
+                    if (strlen(rcvBuffer) > 0){
+                        printf("New loop...\n");
+                    }
                     read(clinetfd, rcvBuffer, MAX_BUFFER_SIZE);
                     if (strlen(rcvBuffer) > 0){
                         printf("Received message from client: %s\n", rcvBuffer);
@@ -187,7 +189,6 @@ int main()
                         token=strtok(rcvBuffer,"|"); // mode afternoon
                         sscanf(token,"%s %s",tmp,mode);
                         mode_index = whichmode(mode);
-                        printf("In server.c - mode_index: %d, mode: %s\n",mode_index,mode);
 
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
@@ -214,6 +215,62 @@ int main()
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
                     }
+
+                    else if(strncmp(rcvBuffer,"control",7)==0){
+
+                        char username[64];
+                        char tmp[64];
+                        char place[64];
+                        char device[64];
+                        char status[64];
+                        int user_index = 0;
+                        int device_index = 0;
+                        
+                        char *token;
+                        int ischange[12] = {0}; // 1 means user wants to change the status of this device 
+                        int device_report[12] = {0}; // changes for this command
+
+                        token=strtok(rcvBuffer,"|"); // control device
+
+                        token=strtok(NULL,"|"); // user Jonathan
+                        sscanf(token," %s %s",tmp,username);
+                        user_index = whichuser(username);
+                        // printf("In server.c - username: %s, user_index: %d.\n",username,user_index);
+                        printf("%s wants to control the devices.\n", username);
+                        
+                        token=strtok(NULL,"|"); // place device status
+                        do{
+                            memset(place,0,64);
+                            memset(device,0,64);
+                            memset(status,0,64);
+
+                            sscanf(token," %s %s %s",place, device, status);
+                            device_index = whichdevice(place,device);
+                            // printf("In server.c - place: %s, device: %s, status: %s, device index: %d.\n",place, device, status,device_index);
+                            ischange[device_index-1] = 1;
+                            device_report[device_index-1] = atoi(status);
+
+                            token=strtok(NULL,"|");
+                        }while(token != NULL);
+
+                        // printf("ischange\n");
+                        // print_int_table(ischange,1,12);
+                        // printf("device report\n");
+                        // print_int_table(device_report,1,12);
+
+                        Node* newnode;
+                        newnode = control_parser(ischange, device_report, user_index);
+                        scheduler(&task_list_head,newnode);
+                        
+                        displayList(task_list_head);
+
+
+
+
+                    }
+
+
+                    
                 }
             }
             else if (childpid > 0)

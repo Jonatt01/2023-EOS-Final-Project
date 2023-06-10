@@ -191,22 +191,31 @@ int main() {
     msglen = sprintf(message,"mode night | user Jonathan");
     write(sockfd,message,msglen+1);
     printf("Sent setmode to server: %s\n", message);
-    // //*********************************end of mode command*********************************//
 
-    // memset(message,0,MAX_BUFFER_SIZE);
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"mode night | user Jonathan");
-    // write(sockfd,message,msglen+1);
-    // printf("Sent setmode to server: %s\n", message);
+    sleep(1);
+    //*********************************end of mode command*********************************//
 
-
+    
     //*********************************start of emergency command*********************************//
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
     msglen = sprintf(message,"emergency earthquake");
     write(sockfd,message,msglen+1);
     printf("Sent emregency to server: %s\n", message);
-    //*********************************end of emergency command*********************************//    
+
+    sleep(1);
+    //*********************************end of emergency command*********************************//   
+
+    //*********************************start of control device command*********************************//
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"control device | user Jonathan | bedroom light 3 | livingroom light 2");
+    write(sockfd,message,msglen+1);
+    printf("Sent control to server: %s\n", message);
+
+    sleep(1);
+    //*********************************end of control device command*********************************//   
+
 
 
 

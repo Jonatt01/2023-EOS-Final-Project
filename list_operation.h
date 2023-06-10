@@ -7,9 +7,9 @@ typedef struct Task {
     int priority;
     int user; // 1-10
     int reservation; // 0 or 1
-    int place; // 0-3
-    int device; // 0-5
-    int level; // 0-3 for fan
+    int place; // useless
+    int device; // 1-12
+    int level; 
     int temp; // for air conditioner
     int duration;
     int calculate; // 0 or 1

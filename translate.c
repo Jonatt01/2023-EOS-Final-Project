@@ -22,6 +22,44 @@ int whichmode(char* timing){
     }
 }
 
+int whichdevice(char* place, char* device){
+
+    if(strcmp(place,"bedroom")==0){
+        if(strcmp(device,"airconditioner")==0)
+            return 1;
+        else if(strcmp(device,"light")==0)
+            return 2;
+        else if(strcmp(device,"fan")==0)
+            return 3;
+        else if(strcmp(device,"curtain")==0)
+            return 4;
+    }
+
+    if(strcmp(place,"livingroom")==0){
+        if(strcmp(device,"airconditioner")==0)
+            return 5;
+        else if(strcmp(device,"light")==0)
+            return 6;
+        else if(strcmp(device,"fan")==0)
+            return 7;
+        else if(strcmp(device,"curtain")==0)
+            return 8;
+    }
+
+    if(strcmp(place,"kitchen")==0)
+        return 9;
+
+    if(strcmp(place,"bathroom")==0){
+        if(strcmp(device,"airconditioner")==0)
+            return 10;
+        else if(strcmp(device,"light")==0)
+            return 11;
+    }
+
+    if(strcmp(place,"all")==0)
+        return 12;
+}
+
 void remove_spaces(char* s) {
     char* d = s;
     do {

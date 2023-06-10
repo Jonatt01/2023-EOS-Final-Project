@@ -25,9 +25,10 @@
     - `mode afternoon | user Jonathan`
 - emergency
     - `emergency earthquake`
-- reservation
-    - `reservation | user Jonathan | `
-
+- **reservation**
+    - `reservation | user Jonathan | bedroom light 3`
+- open device
+    - `control device | user Jonathan | bedroom light 3 | livingroom light 2`
 
 ## parser
 - output list of structures
