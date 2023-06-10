@@ -15,33 +15,52 @@
 #include <netdb.h>
 #include <semaphore.h>
 
+# include "authentication.h"
+# include "create_table.h"
+# include "translate.h"
+# include "costimizer.h"
+# include "parser.h"
+# include "scheduler.h"
+
 #define MAX_BUFFER_SIZE 1024
 #define PORT 8080
 
-int sockfd, newsockfd;
+
+
+Node* task_list_head = NULL; // the head of stuct list
+
+
+int serverfd, clinetfd;
+struct sockaddr_in server_addr, client_addr;
+socklen_t client_len;
+char rcvBuffer[MAX_BUFFER_SIZE];
+char sendBuffer[MAX_BUFFER_SIZE];
+
+
 pid_t childpid;
 
-void create_semaphore()
-{
+// parameters for device status shared memory
+key_t dev_status_key = 1234;
+extern int status_shm_id; // defined in create_table.c
+int* device_status;
 
-}
-void create_msgQueue()
-{
-    
-}
+key_t mode_key = 5678;
+extern int mode_shm_id; // defined in create_table.c
+int* user_mode;
 
+// void create_semaphore()
+// {
+
+// }
+
+void interrupt_handler(int signum);
 
 int socket_server()
 {
-    
-    struct sockaddr_in server_addr, client_addr;
-    socklen_t client_len;
-    char rcvBuffer[MAX_BUFFER_SIZE];
-    char sendBuffer[MAX_BUFFER_SIZE];
     {
         // Create a TCP socket
-        sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        if (sockfd == -1)
+        serverfd = socket(AF_INET, SOCK_STREAM, 0);
+        if (serverfd == -1)
         {
             perror("Error: Failed to create socket");
             exit(EXIT_FAILURE);
@@ -52,14 +71,14 @@ int socket_server()
         server_addr.sin_addr.s_addr = INADDR_ANY;
         server_addr.sin_port = htons(PORT);
 
-        if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
+        if (bind(serverfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
         {
             perror("Error: Failed to bind socket");
             exit(EXIT_FAILURE);
         }
 
         // Listen for incoming connections
-        if (listen(sockfd, 5) == -1)
+        if (listen(serverfd, 5) == -1)
         {
             perror("Error: Failed to listen for connections");
             exit(EXIT_FAILURE);
@@ -68,12 +87,29 @@ int socket_server()
         printf("Server is listening on port %d...\n", PORT);
         client_len = sizeof(client_addr);
     }
+    return serverfd;  
+}
+
+
+int main()
+{
+    serverfd = socket_server(); // open server
+
+    // create shared status memory
+    device_status = create_status_table(dev_status_key);
+    
+    // for(int i=0;i<12;i++)
+    //     printf("%.2f ",*(device_status+i));
+    // printf("\n");
+
+    // create user specific mode table
+    user_mode = create_mode_table(mode_key);
 
     while (1)
     {
 
-        newsockfd = accept(sockfd, (struct sockaddr *)&client_addr, &client_len);
-        if (newsockfd == -1)
+        clinetfd = accept(serverfd, (struct sockaddr *)&client_addr, &client_len);
+        if (clinetfd == -1)
         {
             perror("Error: Failed to accept connection");
             continue;
@@ -81,6 +117,17 @@ int socket_server()
 
         printf("New connection accepted from %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
+        // int authenticate = 0; // 0 : failed, 1 : successful
+        // authenticate = welcome(clinetfd);
+        
+        // printf("authenticate result : %d\n",authenticate);
+        // if(authenticate == 0){
+        //     printf("Wrong user password\n");
+        //     printf("Close socket to client\n");
+        //     close(clinetfd);
+        //     continue;
+        // }
+        
         childpid = fork();
         if (childpid >= 0)
         {
@@ -88,18 +135,79 @@ int socket_server()
             if (childpid == 0)
             {                
                 // 子程序，處理client的command，Read data from the client
+                int msglen = 0;
                 while (1)
                 {
                     memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
                     memset(sendBuffer, 0, MAX_BUFFER_SIZE);
-                    // read data frim client
-                    read(newsockfd, rcvBuffer, MAX_BUFFER_SIZE);
-                    if (strlen(rcvBuffer) > 0)
-                    {
+                    // read data from client
+                    read(clinetfd, rcvBuffer, MAX_BUFFER_SIZE);
+                    if (strlen(rcvBuffer) > 0){
                         printf("Received message from client: %s\n", rcvBuffer);
                     }                  
-                    strcat(sendBuffer,"received string .\n");
-                    write(newsockfd, sendBuffer, strlen(sendBuffer) + 1);
+
+                    // if user request to set their own mode
+                    if(strncmp(rcvBuffer,"setmode",7)==0){
+                        // printf("%d wants to set the user mode.\n",clinetfd);
+                        
+                        char username[64];
+                        char tmp[64];
+                        int mode = 0;
+                        int user = 0;
+                        char *token;
+
+                        token=strtok(rcvBuffer,"|"); // setmode
+                        token=strtok(NULL,"|"); // user Jonathan
+                        sscanf(token," %s %s",tmp,username);
+                        user = whichuser(username);
+                    
+                        token=strtok(NULL,"|"); // afternoon
+                        remove_spaces(token);
+                        mode = whichmode(token);
+                        printf("\nmode : %d\n",mode);
+                        printf(sendBuffer,"%s start to set mode%s\n",username,token);
+
+                        setmode(clinetfd, user_mode, user, mode);
+                        // printf("Array of user mode\n");
+                        // print_int_table(user_mode, 30, 12);
+
+                    }
+                    // if user want to set to specifc mode
+                    else if(strncmp(rcvBuffer,"mode",4)==0){
+
+                        char mode[64];
+                        char username[64];
+                        char tmp[64];
+                        int user_index = 0;
+                        int mode_index = 0;
+                        char *token;
+
+                        token=strtok(rcvBuffer,"|"); // mode afternoon
+                        sscanf(token,"%s %s",tmp,mode);
+                        mode_index = whichmode(mode);
+                        printf("In server.c - mode_index: %d, mode: %s\n",mode_index,mode);
+
+                        token=strtok(NULL,"|"); // user Jonathan
+                        sscanf(token," %s %s",tmp,username);
+                        user_index = whichuser(username);
+
+                        printf("%s wants to set to %s mode.\n",username, mode);
+
+                        Node* newnode;
+                        newnode = setmode_parser(user_index, mode_index, user_mode);
+                        // printf("In server.c - the device value of the head : %d\n",newnode->task.device);
+                        // printf("In server.c - the device value of the head->next : %d\n",newnode->next->task.device);
+
+                        scheduler(&task_list_head,newnode);
+                        displayList(task_list_head);
+
+                    }
+
+                    // if emergency
+                    else if(strncmp(rcvBuffer,"emergency",9) == 0){
+                        Node* newnode;
+                        newnode = emergency_parser();
+                    }
                 }
             }
             else if (childpid > 0)
@@ -112,14 +220,42 @@ int socket_server()
             perror("fork error");
             exit(-1);
         }
-        close(newsockfd);
+        close(clinetfd);
     }
-    close(sockfd);
+    close(serverfd);
     return 0;
 }
 
 
-int main()
-{
-    socket_server();
+void interrupt_handler(int signum){
+
+
+    // delete shared memory (device status)
+    if (shmdt(device_status) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(status_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+    // delete shared memory (user specific mode)
+    if (shmdt(user_mode) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(mode_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+
+    close(clinetfd);
+    close(serverfd);
+
+    exit(EXIT_SUCCESS);
+
 }

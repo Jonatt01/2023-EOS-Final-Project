@@ -11,6 +11,7 @@ int main() {
     int sockfd;
     struct sockaddr_in server_addr;
     char buffer[MAX_BUFFER_SIZE];
+    int msglen = 0;
 
     // Create a TCP socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -37,36 +38,172 @@ int main() {
     printf("Connected to server at %s:%d\n", "127.0.0.1", PORT);
 
 
-    while(1){
+    // while(1){
 
-        // Send data to the server
-        //char* message = "Hello, server!";
-        char message[MAX_BUFFER_SIZE];
-        memset(message,0,MAX_BUFFER_SIZE);
-        memset(buffer,0,MAX_BUFFER_SIZE);
+    // Send data to the server
+    //char* message = "Hello, server!";
+    char message[MAX_BUFFER_SIZE];
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
 
-        //scanf(" %s",message);
-        fgets(message,sizeof(message),stdin);
-        ssize_t num_bytes_written = write(sockfd, message, strlen(message));
-        if (num_bytes_written == -1) {
-            perror("Error: Failed to send data to server");
-            close(sockfd);
-            exit(EXIT_FAILURE);
-        }
+    //scanf(" %s",message);
+    //*********************************testing for authentication*********************************//
+    // // send the user id to server
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
+    // //fgets(message,sizeof(message),stdin);
+    // scanf("%s",message);
+    // ssize_t num_bytes_written = write(sockfd, message, strlen(message));
+    // if (num_bytes_written == -1) {
+    //     perror("Error: Failed to send data to server");
+    //     close(sockfd);
+    //     exit(EXIT_FAILURE);
+    // }
 
-        printf("Sent message to server: %s\n", message);
+    // printf("Sent user id to server: %s\n", message);
 
-        // Receive data from the server
-        ssize_t num_bytes_read = read(sockfd, buffer, MAX_BUFFER_SIZE);
-        if (num_bytes_read == -1) {
-            perror("Error: Failed to receive data from server");
-            close(sockfd);
-            exit(EXIT_FAILURE);
-        }
+    // // read the enter password to server
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
 
-        printf("%s\n", buffer);
-        //printf("\n");
-    }
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
+    // // fgets(message,sizeof(message),stdin);
+    // scanf("%s",message);
+    // num_bytes_written = write(sockfd, message, strlen(message));
+    // if (num_bytes_written == -1) {
+    //     perror("Error: Failed to send data to server");
+    //     close(sockfd);
+    //     exit(EXIT_FAILURE);
+    // }
+    // printf("Sent password to server: %s\n", message);        
+
+
+    // // Receive successed or failed response from the server
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // ssize_t num_bytes_read = read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // if (num_bytes_read == -1) {
+    //     perror("Error: Failed to receive data from server");
+    //     close(sockfd);
+    //     exit(EXIT_FAILURE);
+    // }
+    // printf("%s", buffer);
+    //*********************************end of authentication*********************************//
+
+    //*********************************start of personal setting*********************************//
+    memset(message,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"setmode | user Jonathan | night");
+    write(sockfd,message,msglen+1);
+
+    //********************set temp of bedroom********************//
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // the temperature of air conditioner
+    write(sockfd,message,msglen+1);
+
+    //********************set light of bedroom********************//
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // the brightness of air conditioner
+    write(sockfd,message,msglen+1);
+
+    //********************set fan of bedroom********************//
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // the level of fan
+    write(sockfd,message,msglen+1);
+
+    //********************set curtain of bedroom********************//
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // open or close of curtain
+    write(sockfd,message,msglen+1);
+
+    //********************set temp of living room********************//
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // the temperature of air conditioner
+    write(sockfd,message,msglen+1);
+
+    //********************set light of living room********************//
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // the brightness of light
+    write(sockfd,message,msglen+1);
+
+    //********************set fan of living room********************//
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // the level of fan
+    write(sockfd,message,msglen+1);
+
+    //********************set curtain of living room********************//
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // open or close of curtain
+    write(sockfd,message,msglen+1);
+
+    //********************set light of kitchen********************//
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // the brightness of light
+    write(sockfd,message,msglen+1);
+
+    //********************set temp of bathroom********************//
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // the temperature of air conditioner
+    write(sockfd,message,msglen+1);
+
+    //********************set light of bedroom********************//
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // the brightness of air conditioner
+    write(sockfd,message,msglen+1);
+
+    //*********************************end of personal setting*********************************//
+
+    //*********************************start of mode command*********************************//
+    memset(message,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"mode night | user Jonathan");
+    write(sockfd,message,msglen+1);
+    printf("Sent setmode to server: %s\n", message);
+    //*********************************end of mode command*********************************//
+
+
+    // end
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // enter the temperature of air conditioner
+    write(sockfd,message,msglen+1);
+    printf("Sent temperature to server: %s\n", message);
+
+
+    // }
     
 
     close(sockfd);
