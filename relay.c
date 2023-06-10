@@ -314,6 +314,7 @@ void *command_thread(void *arg)
                 strcat(commandBuffer," ");
                 memset(insert_str,0,strlen(insert_str));
             }
+            printf("In Relay.c , Relay -> Device commandBuffer = %s.\n",commandBuffer);
             // 透過socket轉送給device
             if (send(clientSocket, commandBuffer, strlen(commandBuffer)+1, 0) < 0)
             {

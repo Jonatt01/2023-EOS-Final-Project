@@ -1,9 +1,7 @@
-#include <stdio.h>
 
+# ifndef RESERVATION_H
+# define RESERVATION_H
 
+void device_reservation(int device_id,int duration,int *status_shm,int reservation_operation);
 
-void signal_handler(int signum);
-
-
-int device_reservation();
-
+#endif

@@ -21,6 +21,7 @@
 # include "costimizer.h"
 # include "parser.h"
 # include "scheduler.h"
+# include "dispatcher.h"
 
 #define MAX_BUFFER_SIZE 1024
 #define PORT 8080
@@ -201,10 +202,12 @@ int main()
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
 
+                        dispatcher(&task_list_head,device_status);
+
                     }
 
                     // if emergency
-                    else if(strncmp(rcvBuffer,"emergency,9")==0){
+                    else if(strncmp(rcvBuffer,"emergency",9)==0){
                         Node* newnode;
                         newnode = emergency_parser();
                     }

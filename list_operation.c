@@ -66,3 +66,10 @@ void displayList(Node* head) {
     }
     printf("--------------------------\n");
 }
+
+void removeHeadNode(Node** head) {
+        // 每操作完一次 head 後移
+        Node* temp = *head;
+        *head = (*head)->next;
+        free(temp); // 釋放NODE
+}

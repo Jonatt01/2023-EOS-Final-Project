@@ -8,7 +8,6 @@ clean:
 	rm user_client
 	rm server
 	rm relay
-	rm msgQsnd
 	rm device_client
 	rm deviceStatus_client
 

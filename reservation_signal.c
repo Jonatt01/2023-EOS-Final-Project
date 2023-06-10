@@ -6,21 +6,31 @@
 #include <sys/types.h>
 #include "dispatcher.h"
 
-int deviceID = 0;
-int device_status = 0; // 0表示設備關閉，1表示設備開啟
+#define OPEN 1
+#define CLOSE 0
 
-int device_reservation(int device_id,int duration)
+void device_reservation(int device_id, int duration, int *status_shm, int reservation_operation)
 {
     signal(SIGALRM, signal_handler); // 設定信號處理函數
 
     alarm(duration);
-    printf("設定裝置 %d , %d 秒後動作\n", deviceID,duration);
+    printf("設定裝置 %d , %d 秒後動作\n", device_id, duration);
 
     // 等待設備開啟
-    while (device_status == 0)
-    {
-        sleep(1);
-    }
 
-    return 1;
+    if (reservation_operation == OPEN)
+    {
+        while (status_shm[device_id - 1] == CLOSE) // 等待狀態變為 1 (OPEN)
+        {
+            sleep(1);
+        }
+    }
+    else
+    {
+        while (status_shm[device_id - 1] == OPEN) // 等待狀態變為 0 (CLOSE)
+        {
+            sleep(1);
+        }
+    }
 }
+

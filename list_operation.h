@@ -26,5 +26,6 @@ Node* createNode();
 void insertAtBeginning(Node** head,  Node* newNode);
 void insertAtEnd(Node** head,  Node* newNode);
 void displayList(Node* head);
+void removeHeadNode(Node** head);
 
 # endif
