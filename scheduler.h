@@ -2,7 +2,6 @@
 # define SCHEDULER_H
 
 
-
 /**
 * inset in the front or in the end of task list
 */
