@@ -49,6 +49,10 @@ key_t mode_key = 5678;
 extern int mode_shm_id; // defined in create_table.c
 int* user_mode;
 
+key_t use_time_key = 2468;
+extern int using_time_shm_id; // defined in create_table.c
+int* use_time;
+
 // void create_semaphore()
 // {
 
@@ -98,13 +102,10 @@ int main()
 
     // create shared status memory
     device_status = create_status_table(dev_status_key);
-    
-    // for(int i=0;i<12;i++)
-    //     printf("%.2f ",*(device_status+i));
-    // printf("\n");
-
     // create user specific mode table
     user_mode = create_mode_table(mode_key);
+    // create use time table
+    use_time = create_using_time_table(use_time_key);
 
     while (1)
     {
@@ -349,6 +350,17 @@ void interrupt_handler(int signum){
     }
 
     if (shmctl(mode_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+    // delete shared memory (use time)
+    if (shmdt(use_time) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(using_time_shm_id, IPC_RMID, NULL) == -1) {
         perror("shmctl");
         exit(1);
     }

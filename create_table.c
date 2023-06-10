@@ -44,3 +44,21 @@ int* create_mode_table(key_t key){
     memset(mode_shm,0,MODE_SIZE);
     return mode_shm;
 }
+
+int using_time_shm_id;
+int *using_time_shm;
+
+int* create_using_time_table(key_t key){
+    if ((using_time_shm_id = shmget(key, MODE_SIZE, IPC_CREAT | 0666)) < 0)
+    {
+        perror("shmget");
+        exit(-1);
+    }
+    if ((using_time_shm = shmat(using_time_shm_id, NULL, 0)) == (int *) -1)
+    {
+        perror("shmat");
+        exit(-1);
+    }
+    memset(using_time_shm,0,MODE_SIZE);
+    return using_time_shm;
+}
