@@ -4,8 +4,8 @@
 # include <sys/types.h> // key_t
 # include <sys/shm.h>
 
-# define STATUS_SIZE 12*sizeof(float)
-# define MODE_SIZE 30*12*sizeof(float)
+# define STATUS_SIZE 12*sizeof(int)
+# define MODE_SIZE 30*12*sizeof(int)
 
 
 int status_shm_id;

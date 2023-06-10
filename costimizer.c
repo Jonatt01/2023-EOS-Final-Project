@@ -13,11 +13,13 @@ void setmode(int connfd, int* user_mode, int user, int mode){
     memset(snd,0,BUFFERSIZE);// set the snd char array to zero
     memset(rcv,0,BUFFERSIZE);// set the rcv char array to zero
     
-    msglen = sprintf(snd,"Enter the Bedroom setting.\nTemperature of airconditioner : ");
+    msglen = sprintf(snd,"Enter the Bedroom setting.\nTemperature of airconditioner :");
     write(connfd,snd,msglen+1);
     read(connfd,rcv,BUFFERSIZE);
+    printf("user: %d, mode: %d\n",user,mode);
+    *(user_mode + mode*12 + user*36) = atoi(rcv);
 
-    *(user_mode + 36*user + 12*mode) = atoi(rcv);
     printf("changed air conditioner temperature : %d\n",*(user_mode + 36*user + 12*mode));
+
 
 }

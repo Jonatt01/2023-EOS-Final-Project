@@ -14,4 +14,6 @@ int whichuser(char* name);
 int whichmode(char* timing);
 
 void remove_spaces(char* s);
+
+void print_int_table(int* array, int col, int row);
 # endif

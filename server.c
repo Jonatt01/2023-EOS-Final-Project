@@ -113,16 +113,16 @@ int main()
 
         printf("New connection accepted from %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
-        int authenticate = 0; // 0 : failed, 1 : successful
-        authenticate = welcome(clinetfd);
+        // int authenticate = 0; // 0 : failed, 1 : successful
+        // authenticate = welcome(clinetfd);
         
-        printf("authenticate result : %d\n",authenticate);
-        if(authenticate == 0){
-            printf("Wrong user password\n");
-            printf("Close socket to client\n");
-            close(clinetfd);
-            continue;
-        }
+        // printf("authenticate result : %d\n",authenticate);
+        // if(authenticate == 0){
+        //     printf("Wrong user password\n");
+        //     printf("Close socket to client\n");
+        //     close(clinetfd);
+        //     continue;
+        // }
         
         childpid = fork();
         if (childpid >= 0)
@@ -136,7 +136,7 @@ int main()
                 {
                     memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
                     memset(sendBuffer, 0, MAX_BUFFER_SIZE);
-                    // read data frim client
+                    // read data from client
                     read(clinetfd, rcvBuffer, MAX_BUFFER_SIZE);
                     if (strlen(rcvBuffer) > 0)
                     {
@@ -161,10 +161,33 @@ int main()
                         token=strtok(NULL,"|"); // afternoon
                         mode = whichmode(token);
                         printf("\nmode : %d\n",mode);
-                        msglen = sprintf(sendBuffer,"%s start to set mode %s\n",username,token);
-                        write(clinetfd,sendBuffer,msglen+1);
+                        printf(sendBuffer,"%s start to set mode%s\n",username,token);
 
                         setmode(clinetfd, user_mode, user, mode);
+                        
+                        // print_int_table(user_mode, 30, 12);
+
+                    }
+                    // if user want to set to specifc mode
+                    else if(strncmp(rcvBuffer,"mode",4)==0){
+
+                        char mode[64];
+                        char username[64];
+                        char tmp[64];
+                        int user_index = 0;
+                        int mode_index = 0;
+                        char *token;
+
+                        token=strtok(rcvBuffer,"|"); // mode afternoon
+                        sscanf(token,"%s %s",tmp,mode);
+                        mode_index = whichmode(mode);
+
+                        token=strtok(NULL,"|"); // user Jonathan
+                        sscanf(token," %s %s",tmp,username);
+                        user_index = whichuser(username);
+
+                        printf("%s wants to set to %s mode.\n",mode, username);
+
 
                     }
                 }
