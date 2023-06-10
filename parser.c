@@ -28,7 +28,7 @@ Node* setmode_parser(int user, int mode, int* mode_table){
         insertAtEnd(&head, newNode);
 
     }
-    printf("In parser.c - the device value of the head : %d\n",head->task.device);
+    // printf("In parser.c - the device value of the head : %d\n",head->task.device);
     return head;
 
 }

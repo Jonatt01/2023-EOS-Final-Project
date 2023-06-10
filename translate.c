@@ -11,13 +11,13 @@ int whichuser(char* name){
 }
 
 int whichmode(char* timing){
-    if(strcmp(timing," morning")==0){
+    if(strcmp(timing,"morning")==0){
         return 0;
     }
-    else if(strcmp(timing," afternoon")==0){
+    else if(strcmp(timing,"afternoon")==0){
         return 1;
     }
-    else if(strcmp(timing," night")==0){
+    else if(strcmp(timing,"night")==0){
         return 2;
     }
 }

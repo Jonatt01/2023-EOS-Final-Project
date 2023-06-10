@@ -57,16 +57,12 @@ void insertAtEnd(Node** head, Node* newNode) {
     }
 }
 
-// void displayList(Node* head) {
-//     if (head == NULL) {
-//         printf("List is empty.\n");
-//     } else {
-//         Node* temp = head;
-//         printf("List: ");
-//         while (temp != NULL) {
-//             printf("%d ", temp->task.device);
-//             temp = temp->next;
-//         }
-//         printf("\n");
-//     }
-// }
+void displayList(Node* head) {
+    Node* current = head;
+    printf("Task List:\n--------------------------\n");
+    while (current != NULL) {
+        printf("device : %d , level : %d , temp : %d\n", current->task.device, current->task.level, current->task.temp);
+        current = current->next;
+    }
+    printf("--------------------------\n");
+}

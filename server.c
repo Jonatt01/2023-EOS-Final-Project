@@ -142,8 +142,7 @@ int main()
                     memset(sendBuffer, 0, MAX_BUFFER_SIZE);
                     // read data from client
                     read(clinetfd, rcvBuffer, MAX_BUFFER_SIZE);
-                    if (strlen(rcvBuffer) > 0)
-                    {
+                    if (strlen(rcvBuffer) > 0){
                         printf("Received message from client: %s\n", rcvBuffer);
                     }                  
 
@@ -163,12 +162,13 @@ int main()
                         user = whichuser(username);
                     
                         token=strtok(NULL,"|"); // afternoon
+                        remove_spaces(token);
                         mode = whichmode(token);
                         printf("\nmode : %d\n",mode);
                         printf(sendBuffer,"%s start to set mode%s\n",username,token);
 
                         setmode(clinetfd, user_mode, user, mode);
-                        
+                        // printf("Array of user mode\n");
                         // print_int_table(user_mode, 30, 12);
 
                     }
@@ -185,6 +185,7 @@ int main()
                         token=strtok(rcvBuffer,"|"); // mode afternoon
                         sscanf(token,"%s %s",tmp,mode);
                         mode_index = whichmode(mode);
+                        printf("In server.c - mode_index: %d, mode: %s\n",mode_index,mode);
 
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
@@ -194,17 +195,13 @@ int main()
 
                         Node* newnode;
                         newnode = setmode_parser(user_index, mode_index, user_mode);
-                        printf("End of parser.\n");
                         // printf("In server.c - the device value of the head : %d\n",newnode->task.device);
                         // printf("In server.c - the device value of the head->next : %d\n",newnode->next->task.device);
 
                         scheduler(&task_list_head,newnode);
-                        printf("End of scheduler.\n");
-                        
-                        // printf("In server.c - the device value of the head : %d\n",task_list_head->task.device);
+                        displayList(task_list_head);
 
                     }
-                    // printf("------------------------\n");
                 }
             }
             else if (childpid > 0)

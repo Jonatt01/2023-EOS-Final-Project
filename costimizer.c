@@ -13,7 +13,7 @@ void setmode(int connfd, int* user_mode, int user, int mode){
     memset(snd,0,BUFFERSIZE);// set the snd char array to zero
     memset(rcv,0,BUFFERSIZE);// set the rcv char array to zero
     
-    msglen = sprintf(snd,"Enter the Bedroom setting.\nTemperature of airconditioner :");
+    msglen = sprintf(snd,"Enter the Bedroom setting.\nTemperature of airconditioner : ");
     write(connfd,snd,msglen+1);
     read(connfd,rcv,BUFFERSIZE);
     printf("user: %d, mode: %d\n",user,mode);

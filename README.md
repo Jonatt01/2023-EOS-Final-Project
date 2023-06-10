@@ -28,17 +28,29 @@
 ## parser
 - output list of structures
 
+## scheduler 
+- insert the list of structures into the original task list
+
 ## mapping
 - number to devices
-    - 1: air conditioner
-    - 2: light
-    - 3: fan
-    - 4: curtain
-    - 5: door
+    - bedroom
+        - 1: air conditioner
+        - 2: light
+        - 3: fan
+        - 4: curtain
 
-- number to place
-    - 1: bedroom
-    - 2: living room
-    - 3: kitchen
-    - 4: bathroom
-    - 0: all (for doors)
+    - living room
+        - 5: air conditioner
+        - 6: light
+        - 7: fan
+        - 8: curtain
+
+    - kitchen
+        - 9: light
+
+    - bathroom
+        - 10: air conditioner
+        - 11: light
+
+    - special
+        - 12: doors
