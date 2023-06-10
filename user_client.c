@@ -38,71 +38,87 @@ int main() {
     printf("Connected to server at %s:%d\n", "127.0.0.1", PORT);
 
 
-    while(1){
+    // while(1){
 
-        // Send data to the server
-        //char* message = "Hello, server!";
-        char message[MAX_BUFFER_SIZE];
-        memset(message,0,MAX_BUFFER_SIZE);
-        memset(buffer,0,MAX_BUFFER_SIZE);
+    // Send data to the server
+    //char* message = "Hello, server!";
+    char message[MAX_BUFFER_SIZE];
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
 
-        //scanf(" %s",message);
-        //*********************************testing for authentication*********************************//
-        // // send the user id to server
-        // read(sockfd, buffer, MAX_BUFFER_SIZE);
-        // printf("%s",buffer);
-        // //fgets(message,sizeof(message),stdin);
-        // scanf("%s",message);
-        // ssize_t num_bytes_written = write(sockfd, message, strlen(message));
-        // if (num_bytes_written == -1) {
-        //     perror("Error: Failed to send data to server");
-        //     close(sockfd);
-        //     exit(EXIT_FAILURE);
-        // }
+    //scanf(" %s",message);
+    //*********************************testing for authentication*********************************//
+    // // send the user id to server
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
+    // //fgets(message,sizeof(message),stdin);
+    // scanf("%s",message);
+    // ssize_t num_bytes_written = write(sockfd, message, strlen(message));
+    // if (num_bytes_written == -1) {
+    //     perror("Error: Failed to send data to server");
+    //     close(sockfd);
+    //     exit(EXIT_FAILURE);
+    // }
 
-        // printf("Sent user id to server: %s\n", message);
+    // printf("Sent user id to server: %s\n", message);
 
-        // // read the enter password to server
-        // memset(message,0,MAX_BUFFER_SIZE);
-        // memset(buffer,0,MAX_BUFFER_SIZE);
+    // // read the enter password to server
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
 
-        // read(sockfd, buffer, MAX_BUFFER_SIZE);
-        // printf("%s",buffer);
-        // // fgets(message,sizeof(message),stdin);
-        // scanf("%s",message);
-        // num_bytes_written = write(sockfd, message, strlen(message));
-        // if (num_bytes_written == -1) {
-        //     perror("Error: Failed to send data to server");
-        //     close(sockfd);
-        //     exit(EXIT_FAILURE);
-        // }
-        // printf("Sent password to server: %s\n", message);        
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
+    // // fgets(message,sizeof(message),stdin);
+    // scanf("%s",message);
+    // num_bytes_written = write(sockfd, message, strlen(message));
+    // if (num_bytes_written == -1) {
+    //     perror("Error: Failed to send data to server");
+    //     close(sockfd);
+    //     exit(EXIT_FAILURE);
+    // }
+    // printf("Sent password to server: %s\n", message);        
 
 
-        // // Receive successed or failed response from the server
-        // memset(buffer,0,MAX_BUFFER_SIZE);
-        // ssize_t num_bytes_read = read(sockfd, buffer, MAX_BUFFER_SIZE);
-        // if (num_bytes_read == -1) {
-        //     perror("Error: Failed to receive data from server");
-        //     close(sockfd);
-        //     exit(EXIT_FAILURE);
-        // }
-        // printf("%s", buffer);
-        //*********************************end of authentication*********************************//
+    // // Receive successed or failed response from the server
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // ssize_t num_bytes_read = read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // if (num_bytes_read == -1) {
+    //     perror("Error: Failed to receive data from server");
+    //     close(sockfd);
+    //     exit(EXIT_FAILURE);
+    // }
+    // printf("%s", buffer);
+    //*********************************end of authentication*********************************//
 
-        memset(message,0,MAX_BUFFER_SIZE);
-        msglen = sprintf(message,"setmode | user Jonathan | night");
-        write(sockfd,message,msglen+1);
+    memset(message,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"setmode | user Jonathan | night");
+    write(sockfd,message,msglen+1);
 
-        memset(buffer,0,MAX_BUFFER_SIZE);
-        read(sockfd, buffer, MAX_BUFFER_SIZE);
-        printf("%s",buffer);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
 
-        scanf("%s",message); // the temperature of air conditioner
-        write(sockfd,message,msglen+1);
-        printf("Sent password to server: %s\n", message);
+    scanf("%s",message); // the temperature of air conditioner
+    write(sockfd,message,msglen+1);
+    printf("Sent temperature to server: %s\n", message);
 
-    }
+
+
+    memset(message,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"mode night | user Jonathan");
+    write(sockfd,message,msglen+1);
+    printf("Sent setmode to server: %s\n", message);
+
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message); // the temperature of air conditioner
+    write(sockfd,message,msglen+1);
+    printf("Sent temperature to server: %s\n", message);
+
+
+    // }
     
 
     close(sockfd);

@@ -1,5 +1,5 @@
 all:
-	gcc -o server server.c authentication.c create_table.c translate.c costimizer.c
+	gcc -o server server.c authentication.c create_table.c translate.c costimizer.c parser.c scheduler.c list_operation.c
 	gcc user_client.c -o user_client
 	gcc relay.c -o relay -lpthread
 	gcc msgQsnd.c -o msgQsnd

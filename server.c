@@ -19,9 +19,16 @@
 # include "create_table.h"
 # include "translate.h"
 # include "costimizer.h"
+# include "parser.h"
+# include "scheduler.h"
 
 #define MAX_BUFFER_SIZE 1024
 #define PORT 8080
+
+
+
+Node* task_list_head = NULL; // the head of stuct list
+
 
 int serverfd, clinetfd;
 struct sockaddr_in server_addr, client_addr;
@@ -45,10 +52,7 @@ int* user_mode;
 // {
 
 // }
-// void create_msgQueue()
-// {
-    
-// }
+
 void interrupt_handler(int signum);
 
 int socket_server()
@@ -145,7 +149,7 @@ int main()
 
                     // if user request to set their own mode
                     if(strncmp(rcvBuffer,"setmode",7)==0){
-                        printf("%d wants to set the user mode.\n",clinetfd);
+                        // printf("%d wants to set the user mode.\n",clinetfd);
                         
                         char username[64];
                         char tmp[64];
@@ -186,10 +190,21 @@ int main()
                         sscanf(token," %s %s",tmp,username);
                         user_index = whichuser(username);
 
-                        printf("%s wants to set to %s mode.\n",mode, username);
+                        printf("%s wants to set to %s mode.\n",username, mode);
 
+                        Node* newnode;
+                        newnode = setmode_parser(user_index, mode_index, user_mode);
+                        printf("End of parser.\n");
+                        // printf("In server.c - the device value of the head : %d\n",newnode->task.device);
+                        // printf("In server.c - the device value of the head->next : %d\n",newnode->next->task.device);
+
+                        scheduler(&task_list_head,newnode);
+                        printf("End of scheduler.\n");
+                        
+                        // printf("In server.c - the device value of the head : %d\n",task_list_head->task.device);
 
                     }
+                    // printf("------------------------\n");
                 }
             }
             else if (childpid > 0)

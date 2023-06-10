@@ -18,8 +18,27 @@
     - "1" : legal, "0" : illegal
 ## tables
 
-## commandss
+## commands
 - set the mode
     - `setmode | user Jonathan | afternoon`
 - change the user specific mode
     - `mode afternoon | user Jonathan`
+
+
+## parser
+- output list of structures
+
+## mapping
+- number to devices
+    - 1: air conditioner
+    - 2: light
+    - 3: fan
+    - 4: curtain
+    - 5: door
+
+- number to place
+    - 1: bedroom
+    - 2: living room
+    - 3: kitchen
+    - 4: bathroom
+    - 0: all (for doors)
