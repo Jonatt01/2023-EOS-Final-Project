@@ -25,6 +25,9 @@
     - `mode afternoon | user Jonathan`
 - emergency
     - `emergency earthquake`
+- reservation
+    - `reservation | user Jonathan | `
+
 
 ## parser
 - output list of structures

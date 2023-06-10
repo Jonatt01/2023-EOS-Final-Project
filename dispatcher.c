@@ -7,6 +7,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <time.h>
+# include <sys/shm.h>
 #include "reservation_signal.h"
 #include "list_operation.h"
 
@@ -109,7 +110,7 @@ int get_reservation_operation(Node *head)
     }
 }
 
-void dispatcher(Node *head, int status_shm)
+void dispatcher(Node *head, int* status_shm)
 {
     while (head != NULL)
     {

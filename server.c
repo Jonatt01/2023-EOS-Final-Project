@@ -60,7 +60,7 @@ int socket_server()
 {
     {
         // Create a TCP socket
-        serverfd = socket(AF_INET, SOCK_STREAM, 0);
+        serverfd = socket(AF_INET, SOCK_STREAM, 0); // PF_INET will cause a loop
         if (serverfd == -1)
         {
             perror("Error: Failed to create socket");
@@ -142,6 +142,7 @@ int main()
                     memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
                     memset(sendBuffer, 0, MAX_BUFFER_SIZE);
                     // read data from client
+                    printf("New loop...\n");
                     read(clinetfd, rcvBuffer, MAX_BUFFER_SIZE);
                     if (strlen(rcvBuffer) > 0){
                         printf("Received message from client: %s\n", rcvBuffer);
@@ -202,7 +203,7 @@ int main()
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
 
-                        dispatcher(&task_list_head,device_status);
+                        // dispatcher(task_list_head,device_status);
 
                     }
 
@@ -210,6 +211,8 @@ int main()
                     else if(strncmp(rcvBuffer,"emergency",9)==0){
                         Node* newnode;
                         newnode = emergency_parser();
+                        scheduler(&task_list_head,newnode);
+                        displayList(task_list_head);
                     }
                 }
             }
