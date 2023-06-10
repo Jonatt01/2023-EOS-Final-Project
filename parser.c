@@ -32,3 +32,12 @@ Node* setmode_parser(int user, int mode, int* mode_table){
     return head;
 
 }
+
+Node* emergency_parser(){
+
+    Node* newNode = createNode();
+    newNode -> task.priority = 0;
+    newNode->task.device = 12; // for doors
+
+    return newNode;
+}

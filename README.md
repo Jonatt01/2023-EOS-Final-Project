@@ -23,7 +23,8 @@
     - `setmode | user Jonathan | afternoon`
 - change the user specific mode
     - `mode afternoon | user Jonathan`
-
+- emergency
+    - `emergency earthquake`
 
 ## parser
 - output list of structures

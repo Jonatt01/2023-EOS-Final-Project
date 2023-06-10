@@ -202,6 +202,12 @@ int main()
                         displayList(task_list_head);
 
                     }
+
+                    // if emergency
+                    else if(strncmp(rcvBuffer,"emergency,9")==0){
+                        Node* newnode;
+                        newnode = emergency_parser();
+                    }
                 }
             }
             else if (childpid > 0)

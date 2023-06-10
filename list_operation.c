@@ -24,7 +24,7 @@ typedef struct Node {
 Node* createNode() {
     Node* newNode = (Node*)malloc(sizeof(Node));
 
-    newNode->task.priority = 1;
+    newNode->task.priority = 1; // 0 is the highest
     newNode->task.user = 0;
     newNode->task.reservation = 0;
     newNode->task.place = 0;
