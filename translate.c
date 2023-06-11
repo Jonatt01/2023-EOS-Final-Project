@@ -9,7 +9,7 @@ typedef struct user{
 
 int whichuser(char* name, User* users){
 
-    for(int i=0;i<numUsers;i++){
+    for(int i=0;i<10;i++){
         if(strcmp(name,users[i].id)==0){
             return i;
         }
