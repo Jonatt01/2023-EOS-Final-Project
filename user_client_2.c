@@ -48,75 +48,81 @@ int main() {
 
     //scanf(" %s",message);
 //*********************************start of registeration*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"register");
-    write(sockfd,message,msglen+1);
-    printf("Sent register to server: %s\n", message);
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"register");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent register to server: %s\n", message);
 
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer); // enter your id
-    scanf("%s",message);
-    write(sockfd, message, strlen(message)+1);
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer); // enter your id
+    // scanf("%s",message);
+    // write(sockfd, message, strlen(message)+1);
 
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer); // enter your password
-    scanf("%s",message);
-    write(sockfd, message, strlen(message)+1);
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer); // enter your password
+    // scanf("%s",message);
+    // write(sockfd, message, strlen(message)+1);
 
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer); // successful
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer); // successful
 
-    sleep(1);
+    // sleep(1);
 //*********************************end of registeration*********************************//
 
 //*********************************testing for authentication*********************************//
-    // // send the user id to server
-    // read(sockfd, buffer, MAX_BUFFER_SIZE);
-    // printf("%s",buffer);
-    // //fgets(message,sizeof(message),stdin);
-    // scanf("%s",message);
-    // ssize_t num_bytes_written = write(sockfd, message, strlen(message));
-    // if (num_bytes_written == -1) {
-    //     perror("Error: Failed to send data to server");
-    //     close(sockfd);
-    //     exit(EXIT_FAILURE);
-    // }
+    
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"login");
+    write(sockfd,message,msglen+1);
+    printf("Sent login to server: %s\n", message);
 
-    // printf("Sent user id to server: %s\n", message);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+    //fgets(message,sizeof(message),stdin);
+    scanf("%s",message);
+    ssize_t num_bytes_written = write(sockfd, message, strlen(message)); // send the user id to server
+    if (num_bytes_written == -1) {
+        perror("Error: Failed to send data to server");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
 
-    // // read the enter password to server
-    // memset(message,0,MAX_BUFFER_SIZE);
-    // memset(buffer,0,MAX_BUFFER_SIZE);
+    printf("Sent user id to server: %s\n", message);
 
-    // read(sockfd, buffer, MAX_BUFFER_SIZE);
-    // printf("%s",buffer);
-    // // fgets(message,sizeof(message),stdin);
-    // scanf("%s",message);
-    // num_bytes_written = write(sockfd, message, strlen(message));
-    // if (num_bytes_written == -1) {
-    //     perror("Error: Failed to send data to server");
-    //     close(sockfd);
-    //     exit(EXIT_FAILURE);
-    // }
-    // printf("Sent password to server: %s\n", message);        
+    // read the enter password to server
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+    // fgets(message,sizeof(message),stdin);
+    scanf("%s",message);
+    num_bytes_written = write(sockfd, message, strlen(message));
+    if (num_bytes_written == -1) {
+        perror("Error: Failed to send data to server");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+    printf("Sent password to server: %s\n", message);        
 
 
-    // // Receive successed or failed response from the server
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-    // ssize_t num_bytes_read = read(sockfd, buffer, MAX_BUFFER_SIZE);
-    // if (num_bytes_read == -1) {
-    //     perror("Error: Failed to receive data from server");
-    //     close(sockfd);
-    //     exit(EXIT_FAILURE);
-    // }
-    // printf("%s", buffer);
+    // Receive successed or failed response from the server
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    ssize_t num_bytes_read = read(sockfd, buffer, MAX_BUFFER_SIZE);
+    if (num_bytes_read == -1) {
+        perror("Error: Failed to receive data from server");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+    printf("%s", buffer);
 //*********************************end of authentication*********************************//
 
 //*********************************start of personal setting*********************************//
@@ -236,13 +242,13 @@ int main() {
 //*********************************end of emergency command*********************************//   
 
 //*********************************start of control device command*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"control device | user Jonathan | bedroom light 3 | livingroom light 2");
-    write(sockfd,message,msglen+1);
-    printf("Sent control to server: %s\n", message);
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"control device | user Jonathan | bedroom light 3 | livingroom light 2");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent control to server: %s\n", message);
 
-    sleep(1);
+    // sleep(1);
 //*********************************end of control device command*********************************//   
 
 //*********************************start of reservation command*********************************//
@@ -351,18 +357,18 @@ int main() {
     // sleep(1);
 //*********************************end of personal setting*********************************//    
 
-    //*********************************start of room command*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"room | user Jonathan | bedroom comfort | kitchen comfort");
-    write(sockfd,message,msglen+1);
-    printf("Sent control to server: %s\n", message);
+//*********************************start of room command*********************************//
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"room | user Jonathan | bedroom comfort | kitchen comfort");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent control to server: %s\n", message);
 
-    sleep(1);
-    //*********************************end of room command*********************************//  
+    // sleep(1);
+//*********************************end of room command*********************************//  
 
 
-    //*********************************start of control device command*********************************//
+//*********************************start of control device command*********************************//
     // memset(message,0,MAX_BUFFER_SIZE);
     // memset(buffer,0,MAX_BUFFER_SIZE);
     // msglen = sprintf(message,"control device | user Jonathan | bedroom light comfort | livingroom light comfort");
@@ -370,7 +376,7 @@ int main() {
     // printf("Sent control to server: %s\n", message);
 
     // sleep(1);
-    //*********************************end of control device command*********************************//  
+//*********************************end of control device command*********************************//  
     
     // }
     

@@ -25,7 +25,7 @@
 
 #define MAX_BUFFER_SIZE 1024
 #define PORT 8080
-
+# define MAXUSERNUM 10
 
 
 Node* task_list_head = NULL; // the head of stuct list
@@ -57,10 +57,19 @@ key_t preference_key = 3456;
 extern int preference_shm_id; // defined in create_table.c
 int* preference;
 
-// void create_semaphore()
-// {
+// parameters for semaphores
+int val_pref; // for checking semaphore value
+sem_t *preference_sem;
+preference_sem = sem_open("/SEM_PREFERENCE", O_CREAT, 0666, 1);
+if(data_sem == SEM_FAILED){
+    perror("Preference_sem init failed:");  
+    return -1;  
+}
 
-// }
+
+// authentication
+extern User users[MAXUSERNUM];
+
 
 void interrupt_handler(int signum);
 
@@ -125,16 +134,71 @@ int main()
 
         printf("New connection accepted from %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
-        // int authenticate = 0; // 0 : failed, 1 : successful
-        // authenticate = welcome(clientfd);
-        
-        // printf("authenticate result : %d\n",authenticate);
-        // if(authenticate == 0){
-        //     printf("Wrong user password\n");
-        //     printf("Close socket to client\n");
-        //     close(clientfd);
-        //     continue;
-        // }
+
+
+        memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
+        memset(sendBuffer, 0, MAX_BUFFER_SIZE);
+        // read data from client
+        read(clientfd, rcvBuffer, MAX_BUFFER_SIZE);
+        if (strlen(rcvBuffer) > 0){
+            printf("Received message from client: %s\n", rcvBuffer);
+        }
+
+        // register
+        if(strncmp(rcvBuffer,"register",8)==0){
+
+            int msglen = sprintf(sendBuffer,"Please enter your id : ");
+            if ((write(clientfd,sendBuffer,msglen+1))==-1){
+                perror("Error: write()\n");
+                exit(-1);
+            }
+            memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
+            read(clientfd, rcvBuffer, MAX_BUFFER_SIZE);
+
+            signup(rcvBuffer, clientfd);
+            // printUserTable(users);
+            continue;
+        }
+
+        if(strncmp(rcvBuffer,"login",5)==0){
+
+            int authenticate = 0; // 0 : failed, 1 : successful
+            authenticate = welcome(clientfd);
+            
+            printf("authenticate result : %d\n",authenticate);
+            if(authenticate == 0){
+                printf("Wrong user password\n");
+                printf("Close socket to client\n");
+                close(clientfd);
+                continue;
+            }
+        }
+
+        // delete user
+        if(strncmp(rcvBuffer,"delete",6)==0){
+
+            int msglen = sprintf(sendBuffer,"Please enter the id you want to delete : ");
+            if ((write(clientfd,sendBuffer,msglen+1))==-1){
+                perror("Error: write()\n");
+                exit(-1);
+            }
+            memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
+            read(clientfd, rcvBuffer, MAX_BUFFER_SIZE);
+
+            sem_wait(preference_sem);
+            sem_getvalue(data_sem,&val_pref);
+            printf("Begin deleteUser- preference sem value=%d, pid=%d\n",val_pref, getpid());
+            deleteUser(rcvBuffer, clientfd);
+            sem_post(preference_sem);
+            sem_getvalue(data_sem,&val_pref);
+            printf("After deleteUser- preference sem value=%d, pid=%d\n",val_pref, getpid());
+
+            printf("Successfully delete user %s.\n",rcvBuffer);
+            // printUserTable(users);
+            close(clientfd);
+            continue;
+        }
+
         
         childpid = fork();
         if (childpid >= 0)
@@ -170,7 +234,7 @@ int main()
                         token=strtok(rcvBuffer,"|"); // setmode
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
-                        user = whichuser(username);
+                        user = whichuser(username,users);
                     
                         token=strtok(NULL,"|"); // afternoon
                         remove_spaces(token);
@@ -199,7 +263,7 @@ int main()
 
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
-                        user_index = whichuser(username);
+                        user_index = whichuser(username,users);
 
                         printf("%s wants to set to %s mode.\n",username, mode);
 
@@ -240,7 +304,7 @@ int main()
 
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
-                        user_index = whichuser(username);
+                        user_index = whichuser(username,users);
                         // printf("In server.c - username: %s, user_index: %d.\n",username,user_index);
                         printf("%s wants to control the devices.\n", username);
                         
@@ -296,7 +360,7 @@ int main()
 
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
-                        user_index = whichuser(username);
+                        user_index = whichuser(username,users);
 
                         token=strtok(NULL,"|"); // place device status
                         do{
@@ -331,7 +395,7 @@ int main()
                         token=strtok(rcvBuffer,"|"); // preference
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
-                        user_index = whichuser(username);
+                        user_index = whichuser(username,users);
                         printf("%s start to set preference.\n",username);
 
                         setpreference(clientfd, preference, user_index);
@@ -355,7 +419,7 @@ int main()
                         token=strtok(rcvBuffer,"|"); // room
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
-                        user_index = whichuser(username);
+                        user_index = whichuser(username,users);
 
                         token=strtok(NULL,"|"); // bedroom comfort
 
@@ -391,6 +455,10 @@ int main()
         }
         close(clientfd);
     }
+    
+    // delete named POSIX semphore
+    sem_unlink("/SEM_PREFERENCE");
+    
     close(serverfd);
     return 0;
 }
@@ -442,6 +510,9 @@ void interrupt_handler(int signum){
         perror("shmctl");
         exit(1);
     }
+
+    // delete named POSIX semphore
+    sem_unlink("/SEM_PREFERENCE");
 
 
     close(clientfd);

@@ -4,7 +4,7 @@
 /**
 * translate user name to index of table
 */
-int whichuser(char* name);
+int whichuser(char* name, User* users);
 
 /**
 * translate morning/afternoon/night to index of table

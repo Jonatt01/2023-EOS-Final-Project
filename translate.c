@@ -2,12 +2,18 @@
 # include <stdlib.h>
 # include <string.h>
 
-int whichuser(char* name){
-    if(strcmp(name,"Jonathan")==0){
-        return 0;
+typedef struct user{
+    char id[20];
+    char password[20];
+}User;
+
+int whichuser(char* name, User* users){
+
+    for(int i=0;i<numUsers;i++){
+        if(strcmp(name,users[i].id)==0){
+            return i;
+        }
     }
-    else
-        return 1;
 }
 
 int whichmode(char* timing){

@@ -7,20 +7,19 @@
 # define MAXUSERNUM 10
 
 typedef struct user{
-    char* name;
-    char* password;
+    char id[20];
+    char password[20];
 }User;
 
-struct user users[MAXUSERNUM];
+User users[MAXUSERNUM];
+int numUsers = 0;
+
+char snd[BUFFERSIZE] = {0},rcv[BUFFERSIZE] = {0};
+int msglen = 0;
+
 
 // return 0 means authentication failed, 1 means successful
 int welcome(int connfd){
-
-    char snd[BUFFERSIZE] = {0},rcv[BUFFERSIZE] = {0};
-    int msglen = 0;
-
-    users[0].name = "Jonathan";
-    users[0].password = "12345";
 
     msglen = sprintf(snd,"Welcome to the smart home system!\nPlease enter your id : ");
     if ((write(connfd,snd,msglen+1))==-1){
@@ -33,13 +32,13 @@ int welcome(int connfd){
         exit(-1);
     }
     printf("received user id : %s\n",rcv);
+
     char* name = {0};
     char* password = {0};
-    // issue : error when compare with non0define index of users
-    for(int i=0;i<MAXUSERNUM;i++){
-        printf("receive id: %s .\n",rcv);
-        if(strcmp(rcv,users[i].name)==0){
-            name = users[i].name;
+
+    for(int i=0;i<numUsers;i++){
+        if(strcmp(rcv,users[i].id)==0){
+            name = users[i].id;
             password = users[i].password;
             break;
         }
@@ -82,4 +81,97 @@ int welcome(int connfd){
             return 0;
         }
     }
+}
+
+void signup(char* id, int connfd){
+
+    if (numUsers >= MAXUSERNUM){
+
+        memset(snd,0,BUFFERSIZE);
+        msglen = sprintf(snd,"Maximum number of users reached.\n");
+        write(connfd,snd,msglen+1);
+
+        printf("Maximum number of users reached.\n");
+        close(connfd);
+        return;
+    }
+
+    // Check if the user ID already exists
+    for (int i = 0; i < numUsers; i++){
+        if (strcmp(users[i].id, id) == 0){
+
+            msglen = sprintf(snd,"User ID '%s' already exists.\n",id);
+            write(connfd,snd,msglen+1);
+
+            printf("User ID '%s' already exists.\n", id);
+            close(connfd);
+            return;
+        }
+    }
+
+    memset(snd,0,BUFFERSIZE);
+    msglen = sprintf(snd,"Please set your password : ");
+    write(connfd,snd,msglen+1);
+
+    memset(rcv,0,BUFFERSIZE);
+    read(connfd,rcv,BUFFERSIZE);
+    
+    // Register the new user
+    strcpy(users[numUsers].id, id);
+    strcpy(users[numUsers].password, rcv);
+    numUsers++;
+
+    memset(snd,0,BUFFERSIZE);
+    msglen = sprintf(snd,"User registered successfully.\n");
+    if ((write(connfd,snd,msglen+1))==-1){
+        perror("Error: write()\n");
+        exit(-1);
+    }
+    printf("User registered successfully.\n");
+    close(connfd);
+
+}
+
+void deleteUser(char* id, int connfd){
+    int foundIndex = -1;
+
+    // Find the user index based on the ID
+    for (int i = 0; i < numUsers; i++){
+        if (strcmp(users[i].id, id) == 0){
+            foundIndex = i;
+            break;
+        }
+    }
+
+    if (foundIndex == -1){
+        printf("User ID '%s' not found.\n", id);
+        return;
+    }
+
+    // Shift the remaining users to remove the user from the table
+    for (int i = foundIndex; i < numUsers - 1; i++){
+        strcpy(users[i].id, users[i + 1].id);
+        strcpy(users[i].password, users[i + 1].password);
+    }
+
+    numUsers--;
+
+    memset(snd,0,BUFFERSIZE);
+    msglen = sprintf(snd,"Successfully delete user %s.\n", id);
+    write(connfd,snd,msglen+1);
+
+
+    printf("User deleted successfully.\n");
+}
+
+
+void printUserTable(User* users){
+
+    printf("User ID\t\tPassword\n");
+    printf("-------\t\t--------\n");
+
+    for (int i = 0; i < numUsers; i++){
+        printf("%s\t\t%s\n", users[i].id, users[i].password);
+    }
+    printf("\n");
 }
