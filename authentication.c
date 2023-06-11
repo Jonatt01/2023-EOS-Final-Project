@@ -128,11 +128,10 @@ void signup(char* id, int connfd){
         exit(-1);
     }
     printf("User registered successfully.\n");
-    close(connfd);
 
 }
 
-void deleteUser(char* id, int connfd){
+void deleteUser(char* id, int connfd, int* preference, int* mode){
     int foundIndex = -1;
 
     // Find the user index based on the ID
@@ -153,6 +152,32 @@ void deleteUser(char* id, int connfd){
         strcpy(users[i].id, users[i + 1].id);
         strcpy(users[i].password, users[i + 1].password);
     }
+    memset(users[numUsers - 1].id,0,20);
+    memset(users[numUsers - 1].password,0,20);
+
+    // adjust the preference table
+    for(int i = foundIndex; i < numUsers - 1; i++){
+        for(int j = 0; j < 12; j++){
+            *(preference + i*12 + j) = *(preference + (i+1)*12 + j);
+        }
+    }
+    for(int j = 0; j<12; j++){
+        *(preference + (numUsers - 1)*12 + j) = 0;
+    }
+    
+    // adjust the mode table
+    for(int i = foundIndex; i< numUsers - 1; i++){
+        for(int j = 0; j < 12; j++){
+            *(mode + i*36 + j) = *(mode + (i+1)*36 + j);
+            *(mode + i*36 + 12 + j) = *(mode + (i+1)*36 + 12 + j);
+            *(mode + i*36 + 24 + j) = *(mode + (i+1)*36 + 12 + j);
+        }
+    }
+    for(int j = 0; j < 12; j++){
+        *(mode + (numUsers - 1)*36 + j) = 0;
+        *(mode + (numUsers - 1)*36 + 12 + j) = 0;
+        *(mode + (numUsers - 1)*36 + 24 + j) = 0;
+    }
 
     numUsers--;
 
@@ -170,7 +195,7 @@ void printUserTable(User* users){
     printf("User ID\t\tPassword\n");
     printf("-------\t\t--------\n");
 
-    for (int i = 0; i < numUsers; i++){
+    for (int i = 0; i < 10; i++){
         printf("%s\t\t%s\n", users[i].id, users[i].password);
     }
     printf("\n");

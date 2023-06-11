@@ -236,13 +236,13 @@ int main() {
 //*********************************end of emergency command*********************************//   
 
 //*********************************start of control device command*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"control device | user Jonathan | bedroom light 3 | livingroom light 2");
-    write(sockfd,message,msglen+1);
-    printf("Sent control to server: %s\n", message);
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"control device | user Jonathan | bedroom light 3 | livingroom light 2");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent control to server: %s\n", message);
 
-    sleep(1);
+    // sleep(1);
 //*********************************end of control device command*********************************//   
 
 //*********************************start of reservation command*********************************//
@@ -351,15 +351,15 @@ int main() {
     // sleep(1);
 //*********************************end of personal setting*********************************//    
 
-    //*********************************start of room command*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"room | user Jonathan | bedroom comfort | kitchen comfort");
-    write(sockfd,message,msglen+1);
-    printf("Sent control to server: %s\n", message);
+//*********************************start of room command*********************************//
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"room | user Jonathan | bedroom comfort | kitchen comfort");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent control to server: %s\n", message);
 
-    sleep(1);
-    //*********************************end of room command*********************************//  
+    // sleep(1);
+//*********************************end of room command*********************************//  
 
 
 //*********************************start of control device command*********************************//

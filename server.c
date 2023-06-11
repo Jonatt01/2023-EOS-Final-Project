@@ -61,7 +61,8 @@ int* preference;
 int val_pref; // for checking semaphore value
 sem_t *preference_sem;
 
-
+int val_mode; // for checking semaphore value
+sem_t *mode_sem;
 
 // authentication
 extern User users[MAXUSERNUM];
@@ -124,6 +125,12 @@ int main()
         perror("Preference_sem init failed:");  
         return -1;  
     }
+    // Create POSIX semaphore for mode table
+    mode_sem = sem_open("/SEM_MODE", O_CREAT, 0666, 1);
+    if(mode_sem == SEM_FAILED){
+        perror("Mode_sem init failed:");  
+        return -1;  
+    }
 
     while (1)
     {
@@ -176,32 +183,6 @@ int main()
                 continue;
             }
         }
-
-        // delete user
-        if(strncmp(rcvBuffer,"delete",6)==0){
-
-            int msglen = sprintf(sendBuffer,"Please enter the id you want to delete : ");
-            if ((write(clientfd,sendBuffer,msglen+1))==-1){
-                perror("Error: write()\n");
-                exit(-1);
-            }
-            memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
-            read(clientfd, rcvBuffer, MAX_BUFFER_SIZE);
-
-            sem_wait(preference_sem);
-            sem_getvalue(preference_sem,&val_pref);
-            printf("Begin deleteUser- preference sem value=%d, pid=%d\n",val_pref, getpid());
-            deleteUser(rcvBuffer, clientfd);
-            sem_post(preference_sem);
-            sem_getvalue(preference_sem,&val_pref);
-            printf("After deleteUser- preference sem value=%d, pid=%d\n",val_pref, getpid());
-
-            printf("Successfully delete user %s.\n",rcvBuffer);
-            // printUserTable(users);
-            close(clientfd);
-            continue;
-        }
-
         
         childpid = fork();
         if (childpid >= 0)
@@ -231,21 +212,25 @@ int main()
                         char username[64];
                         char tmp[64];
                         int mode = 0;
-                        int user = 0;
+                        int user_index = 0;
                         char *token;
 
                         token=strtok(rcvBuffer,"|"); // setmode
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
-                        user = whichuser(username,users);
-                    
+                        user_index = whichuser(username,users);
+                        if(user_index == 11){
+                            printf("User not found!\n");
+                            break;
+                        }
+
                         token=strtok(NULL,"|"); // afternoon
                         remove_spaces(token);
                         mode = whichmode(token);
                         printf("\nmode : %d\n",mode);
                         printf("%s start to set mode%s\n",username,token);
 
-                        setmode(clientfd, user_mode, user, mode);
+                        setmode(clientfd, user_mode, user_index, mode);
                         // printf("Array of user mode\n");
                         // print_int_table(user_mode, 30, 12);
 
@@ -267,6 +252,10 @@ int main()
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
                         user_index = whichuser(username,users);
+                        if(user_index == 11){
+                            printf("User not found!\n");
+                            break;
+                        }
 
                         printf("%s wants to set to %s mode.\n",username, mode);
 
@@ -308,6 +297,11 @@ int main()
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
                         user_index = whichuser(username,users);
+                        printf("user index: %d\n",user_index);
+                        if(user_index == 11){
+                            printf("User not found!\n");
+                            break;
+                        }
                         // printf("In server.c - username: %s, user_index: %d.\n",username,user_index);
                         printf("%s wants to control the devices.\n", username);
                         
@@ -341,7 +335,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(task_list_head,device_status);
+                        // dispatcher(task_list_head,device_status);
                     }
                     // reservation
                     else if(strncmp(rcvBuffer,"reservation",11)==0){
@@ -400,6 +394,11 @@ int main()
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
                         user_index = whichuser(username,users);
+                        if(user_index == 11){
+                            printf("User not found!\n");
+                            break;
+                        }
+
                         printf("%s start to set preference.\n",username);
 
                         setpreference(clientfd, preference, user_index);
@@ -424,6 +423,10 @@ int main()
                         token=strtok(NULL,"|"); // user Jonathan
                         sscanf(token," %s %s",tmp,username);
                         user_index = whichuser(username,users);
+                        if(user_index == 11){
+                            printf("User not found!\n");
+                            break;
+                        }
 
                         token=strtok(NULL,"|"); // bedroom comfort
 
@@ -444,6 +447,41 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
+                    }
+                    // delete user
+                    else if(strncmp(rcvBuffer,"delete",6)==0){
+
+                        int msglen = sprintf(sendBuffer,"Please enter the id you want to delete : ");
+                        if ((write(clientfd,sendBuffer,msglen+1))==-1){
+                            perror("Error: write()\n");
+                            exit(-1);
+                        }
+                        memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
+                        read(clientfd, rcvBuffer, MAX_BUFFER_SIZE);
+
+
+                        // print_int_table(preference, 10, 12);
+                        sem_wait(preference_sem);
+                        sem_getvalue(preference_sem,&val_pref);
+                        printf("Begin deleteUser - preference sem value=%d, pid=%d\n",val_pref, getpid());
+                        sem_wait(mode_sem);
+                        sem_getvalue(mode_sem,&val_mode);
+                        printf("Begin deleteUser - mode sem value=%d, pid=%d\n",val_mode, getpid());
+                        
+                        print_int_table(user_mode, 30, 12);
+                        deleteUser(rcvBuffer, clientfd, preference, user_mode);
+                        print_int_table(user_mode, 30, 12);
+
+                        sem_post(mode_sem);
+                        sem_getvalue(mode_sem,&val_mode);
+                        printf("After deleteUser - mode sem value=%d, pid=%d\n",val_mode, getpid());
+                        sem_post(preference_sem);
+                        sem_getvalue(preference_sem,&val_pref);
+                        printf("After deleteUser - preference sem value=%d, pid=%d\n",val_pref, getpid());
+
+                        // print_int_table(preference, 10, 12);
+                        printf("Successfully delete user %s.\n",rcvBuffer);
+                        // printUserTable(users);
                     }
                 }
             }
@@ -517,6 +555,9 @@ void interrupt_handler(int signum){
 
     // delete named POSIX semphore
     sem_unlink("/SEM_PREFERENCE");
+
+    // delete named POSIX semphore
+    sem_unlink("/SEM_MODE");
 
 
     close(clientfd);
