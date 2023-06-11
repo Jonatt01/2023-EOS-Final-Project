@@ -18,4 +18,9 @@ int* create_mode_table(key_t key);
 */
 int* create_using_time_table(key_t key);
 
+/**
+* create preference table
+*/
+int* create_preference_table(key_t key);
+
 # endif

@@ -23,4 +23,9 @@ Node* control_parser(int* ischange, int* change, int user);
 */
 Node* reservation_parser(int* ischange, int* change, int user, int time);
 
+/**
+* convert the room comfort command to struct
+*/
+Node* room_preference_parser(int* ischange, int* change, int user, int time);
+
 # endif

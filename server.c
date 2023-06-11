@@ -31,7 +31,7 @@
 Node* task_list_head = NULL; // the head of stuct list
 
 
-int serverfd, clinetfd;
+int serverfd, clientfd;
 struct sockaddr_in server_addr, client_addr;
 socklen_t client_len;
 char rcvBuffer[MAX_BUFFER_SIZE];
@@ -40,7 +40,7 @@ char sendBuffer[MAX_BUFFER_SIZE];
 
 pid_t childpid;
 
-// parameters for device status shared memory
+// parameters for shared memory
 key_t dev_status_key = 1234;
 extern int status_shm_id; // defined in create_table.c
 int* device_status;
@@ -52,6 +52,10 @@ int* user_mode;
 key_t use_time_key = 2468;
 extern int using_time_shm_id; // defined in create_table.c
 int* use_time;
+
+key_t preference_key = 3456;
+extern int preference_shm_id; // defined in create_table.c
+int* preference;
 
 // void create_semaphore()
 // {
@@ -106,12 +110,14 @@ int main()
     user_mode = create_mode_table(mode_key);
     // create use time table
     use_time = create_using_time_table(use_time_key);
+    // create preference table
+    preference = create_preference_table(preference_key);
 
     while (1)
     {
 
-        clinetfd = accept(serverfd, (struct sockaddr *)&client_addr, &client_len);
-        if (clinetfd == -1)
+        clientfd = accept(serverfd, (struct sockaddr *)&client_addr, &client_len);
+        if (clientfd == -1)
         {
             perror("Error: Failed to accept connection");
             continue;
@@ -120,13 +126,13 @@ int main()
         printf("New connection accepted from %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
         // int authenticate = 0; // 0 : failed, 1 : successful
-        // authenticate = welcome(clinetfd);
+        // authenticate = welcome(clientfd);
         
         // printf("authenticate result : %d\n",authenticate);
         // if(authenticate == 0){
         //     printf("Wrong user password\n");
         //     printf("Close socket to client\n");
-        //     close(clinetfd);
+        //     close(clientfd);
         //     continue;
         // }
         
@@ -146,14 +152,14 @@ int main()
                     if (strlen(rcvBuffer) > 0){
                         printf("New loop...\n");
                     }
-                    read(clinetfd, rcvBuffer, MAX_BUFFER_SIZE);
+                    read(clientfd, rcvBuffer, MAX_BUFFER_SIZE);
                     if (strlen(rcvBuffer) > 0){
                         printf("Received message from client: %s\n", rcvBuffer);
                     }                  
 
-                    // if user request to set their own mode
+                    // set their own mode
                     if(strncmp(rcvBuffer,"setmode",7)==0){
-                        // printf("%d wants to set the user mode.\n",clinetfd);
+                        // printf("%d wants to set the user mode.\n",clientfd);
                         
                         char username[64];
                         char tmp[64];
@@ -170,14 +176,14 @@ int main()
                         remove_spaces(token);
                         mode = whichmode(token);
                         printf("\nmode : %d\n",mode);
-                        printf(sendBuffer,"%s start to set mode%s\n",username,token);
+                        printf("%s start to set mode%s\n",username,token);
 
-                        setmode(clinetfd, user_mode, user, mode);
+                        setmode(clientfd, user_mode, user, mode);
                         // printf("Array of user mode\n");
                         // print_int_table(user_mode, 30, 12);
 
                     }
-                    // if user want to set to specifc mode
+                    // set to specifc mode
                     else if(strncmp(rcvBuffer,"mode",4)==0){
 
                         char mode[64];
@@ -208,7 +214,7 @@ int main()
                         // dispatcher(task_list_head,device_status);
 
                     }
-                    // if emergency
+                    // emergency
                     else if(strncmp(rcvBuffer,"emergency",9)==0){
                         Node* newnode;
                         newnode = emergency_parser();
@@ -246,11 +252,16 @@ int main()
 
                             sscanf(token," %s %s %s",place, device, status);
                             device_index = whichdevice(place,device);
-                            // printf("In server.c - place: %s, device: %s, status: %s, device index: %d.\n",place, device, status,device_index);
-                            ischange[device_index-1] = 1;
-                            device_report[device_index-1] = atoi(status);
 
+                            ischange[device_index-1] = 1;
+                            if(strncmp(status,"comfort",7)==0){
+                                device_report[device_index-1] = *(preference + 12*user_index + device_index - 1);
+                            }else{
+                                device_report[device_index-1] = atoi(status);
+                            }
+                
                             token=strtok(NULL,"|");
+                
                         }while(token != NULL);
 
                         // printf("ischange\n");
@@ -309,7 +320,47 @@ int main()
 
                         displayList(task_list_head);
                     }
-                    
+                    // set preference table
+                    else if(strncmp(rcvBuffer,"preference",10)==0){
+
+                        char username[64];
+                        char tmp[64];
+                        int user_index = 0;
+                        char *token;
+
+                        token=strtok(rcvBuffer,"|"); // preference
+                        token=strtok(NULL,"|"); // user Jonathan
+                        sscanf(token," %s %s",tmp,username);
+                        user_index = whichuser(username);
+                        printf("%s start to set preference.\n",username);
+
+                        setpreference(clientfd, preference, user_index);
+                        printf("%s end of seting preference.\n",username);
+                        // print_int_table(preference, 10, 12);       
+                    }
+                    // set room to comfort
+                    else if(strncmp(rcvBuffer,"room",4)==0){
+
+                        char username[64];
+                        char tmp[64];
+                        char place[64];
+                        char status[64];
+                        int user_index = 0;
+                        char *token;
+                        
+
+                        token=strtok(rcvBuffer,"|"); // room
+                        token=strtok(NULL,"|"); // user Jonathan
+                        sscanf(token," %s %s",tmp,username);
+                        user_index = whichuser(username);
+
+                        token=strtok(NULL,"|"); // bedroom comfort
+                        sscanf(token," %s %s",place,status);
+
+                        Node* newnode;
+                        newnode = room_preference_parser();
+
+                    }
                 }
             }
             else if (childpid > 0)
@@ -322,7 +373,7 @@ int main()
             perror("fork error");
             exit(-1);
         }
-        close(clinetfd);
+        close(clientfd);
     }
     close(serverfd);
     return 0;
@@ -365,8 +416,19 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
+    // delete shared memory (use time)
+    if (shmdt(preference) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
 
-    close(clinetfd);
+    if (shmctl(preference_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+
+    close(clientfd);
     close(serverfd);
 
     exit(EXIT_SUCCESS);

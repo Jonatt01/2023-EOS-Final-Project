@@ -6,7 +6,8 @@
 
 # define STATUS_SIZE 12*sizeof(int)
 # define MODE_SIZE 30*12*sizeof(int)
-
+# define USE_TIME_SIZE 12*sizeof(int)
+# define PREFERENCE_SIZE 10*12*sizeof(int)
 
 int status_shm_id;
 int *status_shm; // float because of the temperature might be float
@@ -49,7 +50,7 @@ int using_time_shm_id;
 int *using_time_shm;
 
 int* create_using_time_table(key_t key){
-    if ((using_time_shm_id = shmget(key, MODE_SIZE, IPC_CREAT | 0666)) < 0)
+    if ((using_time_shm_id = shmget(key, USE_TIME_SIZE, IPC_CREAT | 0666)) < 0)
     {
         perror("shmget");
         exit(-1);
@@ -59,6 +60,25 @@ int* create_using_time_table(key_t key){
         perror("shmat");
         exit(-1);
     }
-    memset(using_time_shm,0,MODE_SIZE);
+    memset(using_time_shm,0,USE_TIME_SIZE);
     return using_time_shm;
+}
+
+int preference_shm_id;
+int *preference_shm;
+
+int* create_preference_table(key_t key){
+    if ((preference_shm_id = shmget(key, PREFERENCE_SIZE, IPC_CREAT | 0666)) < 0)
+    {
+        perror("shmget");
+        exit(-1);
+    }
+    if ((preference_shm = shmat(preference_shm_id, NULL, 0)) == (int *) -1)
+    {
+        perror("shmat");
+        exit(-1);
+    }
+    memset(preference_shm,0,PREFERENCE_SIZE);
+    return preference_shm;
+
 }

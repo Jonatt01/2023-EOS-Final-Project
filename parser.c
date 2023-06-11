@@ -95,3 +95,7 @@ Node* reservation_parser(int* ischange, int* change, int user, int time){
 
     return head;
 }
+
+Node* room_preference_parser(int* ischange, int* change, int user, int time){
+    ;
+}

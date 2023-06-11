@@ -83,3 +83,82 @@ void setmode(int connfd, int* user_mode, int user, int mode){
     printf("Lights brightness : %d\n",*(user_mode + 36*user + 12*mode + 10));   
 
 }
+
+void setpreference(int connfd, int* preference, int user){
+
+    char snd[BUFFERSIZE] = {0},rcv[BUFFERSIZE] = {0};
+    int msglen = 0;
+
+    memset(snd,0,BUFFERSIZE);// set the snd char array to zero
+    memset(rcv,0,BUFFERSIZE);// set the rcv char array to zero
+    
+    msglen = sprintf(snd,"Start of the Bedroom setting.\nTemperature of airconditioner : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,BUFFERSIZE);
+    *(preference + user*12) = atoi(rcv);
+    printf("Air conditioner temperature : %d\n",*(preference + user*12));
+
+    msglen = sprintf(snd,"Brightness of lights (0-5) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,BUFFERSIZE);
+    *(preference + user*12 + 1) = atoi(rcv);
+    printf("Lights brightness : %d\n",*(preference + user*12 + 1));
+
+    msglen = sprintf(snd,"Level of fan (0-3) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,BUFFERSIZE);
+    *(preference + user*12 + 2) = atoi(rcv);
+    printf("Fan level : %d\n",*(preference + user*12 + 2));
+
+    msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,BUFFERSIZE);
+    *(preference + user*12 + 3) = atoi(rcv);
+    printf("Changed curtain level : %d\n",*(preference + user*12 + 3));
+
+    // living room
+    msglen = sprintf(snd,"Start of the Living room setting.\nTemperature of airconditioner : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,BUFFERSIZE);
+    *(preference + user*12 + 4) = atoi(rcv);
+    printf("Air conditioner temperature : %d\n",*(preference + user*12 + 4));
+
+    msglen = sprintf(snd,"Brightness of lights (0-5) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,BUFFERSIZE);
+    *(preference + user*12 + 5) = atoi(rcv);
+    printf("Lights brightness : %d\n",*(preference + user*12 + 5));
+
+    msglen = sprintf(snd,"Level of fan (0-3) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,BUFFERSIZE);
+    *(preference + user*12 + 6) = atoi(rcv);
+    printf("Fan level : %d\n",*(preference + user*12 + 6));
+
+    msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,BUFFERSIZE);
+    *(preference + user*12 + 7) = atoi(rcv);
+    printf("Changed curtain level : %d\n",*(preference + user*12 + 7)); 
+
+    // kitchen
+    msglen = sprintf(snd,"Start of the Kitchen setting.\nBrightness of lights (0-5) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,BUFFERSIZE);
+    *(preference + user*12 + 8) = atoi(rcv);
+    printf("Lights brightness : %d\n",*(preference + user*12 + 8));
+
+    // bathroom
+    msglen = sprintf(snd,"Start of the Bathroom setting.\nTemperature of airconditioner : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,BUFFERSIZE);
+    *(preference + user*12 + 9) = atoi(rcv);
+    printf("Air conditioner temperature : %d\n",*(preference + user*12 + 9));
+
+    msglen = sprintf(snd,"Brightness of lights (0-5) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,BUFFERSIZE);
+    *(preference + user*12 + 10) = atoi(rcv);
+    printf("Lights brightness : %d\n",*(preference + user*12 + 10));   
+
+}
