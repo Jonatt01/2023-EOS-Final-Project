@@ -8,6 +8,7 @@
 # define MODE_SIZE 30*12*sizeof(int)
 # define USE_TIME_SIZE 12*sizeof(int)
 # define PREFERENCE_SIZE 10*12*sizeof(int)
+# define STATISTIC_SIZE 
 
 int status_shm_id;
 int *status_shm; // float because of the temperature might be float

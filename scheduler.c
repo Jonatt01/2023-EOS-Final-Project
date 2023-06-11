@@ -11,5 +11,4 @@ void scheduler(Node** task_list_head, Node* head){
     else{
         insertAtEnd(task_list_head, head);
     }
-
 }

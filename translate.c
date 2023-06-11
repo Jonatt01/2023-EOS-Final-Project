@@ -2,12 +2,18 @@
 # include <stdlib.h>
 # include <string.h>
 
-int whichuser(char* name){
-    if(strcmp(name,"Jonathan")==0){
-        return 0;
+typedef struct user{
+    char id[20];
+    char password[20];
+}User;
+
+int whichuser(char* name, User* users){
+
+    for(int i=0;i<numUsers;i++){
+        if(strcmp(name,users[i].id)==0){
+            return i;
+        }
     }
-    else
-        return 1;
 }
 
 int whichmode(char* timing){
@@ -58,6 +64,21 @@ int whichdevice(char* place, char* device){
 
     if(strcmp(place,"all")==0)
         return 12;
+}
+
+int whichplace(char* place){
+    if(strcmp(place,"bedroom")==0){
+        return 0;
+    }
+    if(strcmp(place,"livingroom")==0){
+        return 1;
+    }
+    if(strcmp(place,"kitchen")==0){
+        return 2;
+    }
+    if(strcmp(place,"bathrooom")==0){
+        return 3;
+    }
 }
 
 void remove_spaces(char* s) {

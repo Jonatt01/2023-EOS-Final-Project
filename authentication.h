@@ -1,6 +1,10 @@
 # ifndef AUTHENTICATION_H
 # define AUTHENTICATION_H
 
+typedef struct user{
+    char id[20];
+    char password[20];
+}User;
 
 
 /**
@@ -9,9 +13,12 @@
 int welcome(int connfd);
 
 /**
-* NOT DONE : if first msg is "register <user>", then he would want to sign up a account
+* NOT DONE : if first msg is "register <user> <password>", then he would want to sign up a account
 */
-void add_user(char* name, int password);
+void signup(char* name, int connfd);
 
-// int find
+
+void deleteUser(char* id, int connfd);
+
+void printUserTable(User* users);
 # endif

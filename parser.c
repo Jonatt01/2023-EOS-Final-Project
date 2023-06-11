@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <unistd.h>
 
 # include "list_operation.h"
 
@@ -96,6 +96,78 @@ Node* reservation_parser(int* ischange, int* change, int user, int time){
     return head;
 }
 
-Node* room_preference_parser(int* ischange, int* change, int user, int time){
-    ;
+Node* room_preference_parser(int* ischange, int user, int* preference){
+
+    Node* head = NULL;
+
+    for(int i=0;i<4;i++){
+        if(ischange[i]==1){
+
+            if(i==0){
+                // set bedroom
+                for(int j=0;j<4;j++){
+                    Node* newNode = createNode();
+
+                    newNode -> task.user = user;
+                    newNode -> task.device = j+1;
+
+                    if(j == 0){
+                        newNode -> task.temp = *(preference + user*12 + j);
+                    }
+                    else{
+                        newNode -> task.level = *(preference + user*12 + j);
+                    }
+                    insertAtEnd(&head, newNode);
+                }
+            }
+            else if(i==1){
+                // set livingroom
+                for(int j=0;j<4;j++){
+                    Node* newNode = createNode();
+
+                    newNode -> task.user = user;
+                    newNode -> task.device = j+5;
+
+                    if(j == 0){
+                        newNode -> task.temp = *(preference + user*12 + j + 4);
+                    }
+                    else{
+                        newNode -> task.level = *(preference + user*12 + j + 4);
+                    }
+                    insertAtEnd(&head, newNode);
+                }
+            }
+            else if(i==2){
+                // set kitchen
+                Node* newNode = createNode();
+                newNode -> task.user = user;
+                newNode -> task.device = 9;
+                newNode -> task.level = *(preference + user*12 + 8);
+
+                insertAtEnd(&head, newNode);
+            }
+            else{
+                // set bathroom
+                for(int j=0;j<2;j++){
+                    Node* newNode = createNode();
+
+                    newNode -> task.user = user;
+                    newNode -> task.device = j+5;
+
+                    if(j == 0){
+                        newNode -> task.temp = *(preference + user*12 + j + 9);
+                    }
+                    else{
+                        newNode -> task.level = *(preference + user*12 + j + 9);
+                    }
+                    insertAtEnd(&head, newNode);
+                }
+            }
+        }
+        else{
+            continue;
+        }
+    }
+
+    return head;
 }

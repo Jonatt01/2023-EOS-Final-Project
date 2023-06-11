@@ -26,6 +26,10 @@ Node* reservation_parser(int* ischange, int* change, int user, int time);
 /**
 * convert the room comfort command to struct
 */
+<<<<<<< HEAD
 Node* room_preference_parser();
+=======
+Node* room_preference_parser(int* ischange, int user, int* preference);
+>>>>>>> 3f5d8542b3e2ab6da36a1b68546ac28649c12c11
 
 # endif

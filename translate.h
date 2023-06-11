@@ -4,7 +4,7 @@
 /**
 * translate user name to index of table
 */
-int whichuser(char* name);
+int whichuser(char* name, User* users);
 
 /**
 * translate morning/afternoon/night to index of table
@@ -12,6 +12,8 @@ int whichuser(char* name);
 int whichmode(char* timing);
 
 int whichdevice(char* place, char* device);
+
+int whichplace(char* place);
 
 void remove_spaces(char* s);
 

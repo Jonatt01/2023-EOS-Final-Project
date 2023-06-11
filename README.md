@@ -1,7 +1,7 @@
 # FINAL PROJECT
 ## system
 - 最多接受10個人註冊
-
+- user id length < 20, password length < 20 
 ## variable explaination
 
 ### server
@@ -19,6 +19,12 @@
 ## tables
 
 ## commands
+- register id
+    - `register`
+- log in
+    - `login`
+- delete user id
+    - `delete`
 - set the mode
     - `setmode | user Jonathan | afternoon`
 - set preference
@@ -29,7 +35,7 @@
     - `emergency earthquake`
 - open device
     - `control device | user Jonathan | bedroom light 3 | livingroom light 2`
-- **set place to comfort**
+- set place to comfort
     - `room | user Jonathan | bedroom comfort | bathroom comfort`
 - open device with comfort
     - `control device | user Jonathan | bedroom light comfort | kitchen light comfort`
