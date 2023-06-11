@@ -288,6 +288,15 @@ void *command_thread(void *arg)
                 status_shm[msgQ.data[DEVICE_ID] - 1] = msgQ.data[TEMP];
             }
         }
+        else if(msgQ.data[DEVICE_ID] == 12) // emergency
+        {
+            sendToDevice = 1;
+            status_shm[msgQ.data[DEVICE_ID] - 1] = 1;
+            for(int i=0;i<11;i++){
+                status_shm[i] = 0;
+            }
+            status_shm[7] = 1; // 地震時窗簾打開
+        }
         else
         {
             if (status_shm[msgQ.data[DEVICE_ID] - 1] != msgQ.data[LEVEL]) // 確認共享內存和要設定的值是否一樣

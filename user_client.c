@@ -351,11 +351,7 @@ int main() {
     // sleep(1);
 //*********************************end of personal setting*********************************//    
 
-<<<<<<< HEAD
-    //*********************************start of room command*********************************//
-=======
 //*********************************start of room command*********************************//
->>>>>>> 3bff1df453dc4ab4b9ba40f319868e6fa26f8eef
     // memset(message,0,MAX_BUFFER_SIZE);
     // memset(buffer,0,MAX_BUFFER_SIZE);
     // msglen = sprintf(message,"room | user Jonathan | bedroom comfort | kitchen comfort");
@@ -363,11 +359,7 @@ int main() {
     // printf("Sent control to server: %s\n", message);
 
     // sleep(1);
-<<<<<<< HEAD
-    //*********************************end of room command*********************************//  
-=======
 //*********************************end of room command*********************************//  
->>>>>>> 3bff1df453dc4ab4b9ba40f319868e6fa26f8eef
 
 
 //*********************************start of control device command*********************************//
