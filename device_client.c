@@ -26,7 +26,7 @@ int main() {
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(PORT);
 
-    if (inet_pton(AF_INET, "172.20.10.4", &server_addr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, "127.0.0.1", &server_addr.sin_addr) <= 0) {
         perror("Error: Invalid address/ Address not supported");
         exit(EXIT_FAILURE);
     }
@@ -61,20 +61,20 @@ int main() {
         //int id;
 
         // 讀取字符串 "/dev/etx_device" 並存儲在 path 中 , 大小為 sizeof(path) -1 (最後一個為結尾符)
-        snprintf(path, sizeof(path), "/dev/etx_device");
-        fd = open(path, O_WRONLY);
-        if (fd < 0) {
-            perror("Error opening GPIO pin");
-            exit(EXIT_FAILURE);
-        }
+        // snprintf(path, sizeof(path), "/dev/etx_device");
+        // fd = open(path, O_WRONLY);
+        // if (fd < 0) {
+        //     perror("Error opening GPIO pin");
+        //     exit(EXIT_FAILURE);
+        // }
 
-        printf("buffer = %s , ready to write.\n",buffer);
-        if (write(fd, buffer, sizeof(buffer)) < 0) {
-            perror("write, set pin output");
-            exit(EXIT_FAILURE);
-        }
+        // printf("buffer = %s , ready to write.\n",buffer);
+        // if (write(fd, buffer, sizeof(buffer)) < 0) {
+        //     perror("write, set pin output");
+        //     exit(EXIT_FAILURE);
+        // }
 
-        printf("write succesfully\n");
+        // printf("write succesfully\n");
 
 
     }    

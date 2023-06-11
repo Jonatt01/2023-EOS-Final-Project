@@ -9,12 +9,12 @@
 #define OPEN 1
 #define CLOSE 0
 
-void device_reservation(int device_id, int duration, int *status_shm, int reservation_operation)
+void device_reservation(int device_id, int reservation_time, int *status_shm, int reservation_operation)
 {
     signal(SIGALRM, signal_handler); // 設定信號處理函數
 
-    alarm(duration);
-    printf("設定裝置 %d , %d 秒後動作\n", device_id, duration);
+    alarm(reservation_time);
+    printf("設定裝置 %d , %d 秒後動作\n", device_id, reservation_time);
 
     // 等待設備開啟
 
@@ -32,5 +32,7 @@ void device_reservation(int device_id, int duration, int *status_shm, int reserv
             sleep(1);
         }
     }
+    
+    printf("設備 %d 預定完成，狀態已設定為 %d !\n", device_id, reservation_operation);
 }
 

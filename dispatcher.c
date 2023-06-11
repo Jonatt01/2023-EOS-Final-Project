@@ -65,6 +65,12 @@ void signal_handler(int signum)
         
         // signal send 給 relay
         // 將要signal給Relay的資料，放進msgQ中
+        msgQ_key = MSG_Q_KEY;
+        msg_queue_id = msgget(msgQ_key, IPC_CREAT | 0666); // get msgQ
+        if (msg_queue_id == -1)
+        {
+            perror("msgget error");
+        }
         struct message msg;
         msg.msg_type = MSG_TYPE;
         msg.data[DEVICE_ID] = reservation_data[DEVICE_ID];
@@ -77,18 +83,18 @@ void signal_handler(int signum)
             perror("msgsnd");
             exit(1);
         }
-        printf("設備 %d 預定完成，狀態已設定為 %d !\n", reservation_device_id, reservation_operation);
+        //printf("設備 %d 預定完成，狀態已設定為 %d !\n", reservation_device_id, reservation_operation);
     }
 }
 
 int get_command_type(Node *head)
 {
 
-    if (head->task.device != 0)
+    if (head->task.device != 0 && head->task.reservation == 0)
     {
         return RELAY;
     }
-    if (head->task.reservation == 1)
+    if (head->task.reservation == 1 && head->task.device != 0)
     {
         return RESERVATION;
     }
@@ -120,6 +126,7 @@ void dispatcher(Node *head, int* status_shm)
         command_type = get_command_type(head);
         reservation_operation = get_reservation_operation(head);
         printf("command type = %d\n",command_type);
+        printf("device_id = %d\n",head->task.device);
         switch (command_type)
         {
         case RELAY:
@@ -158,8 +165,9 @@ void dispatcher(Node *head, int* status_shm)
                 reservation_data[DEVICE_ID] = head->task.device;
                 reservation_data[LEVEL] = head->task.level;
                 reservation_data[TEMP] = head->task.temp;
-                reservation_data[DURATION] = head->task.duration;
-                device_reservation(head->task.device, head->task.duration, status_shm, reservation_operation);
+                reservation_data[DURATION] = head->task.reservation_time;
+                device_reservation(head->task.device, head->task.reservation_time, status_shm, reservation_operation);
+                exit(EXIT_SUCCESS);
             }
             else
             {

@@ -387,6 +387,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
+                        dispatcher(task_list_head,device_status);
                     }
                     // set preference table
                     else if(strncmp(rcvBuffer,"preference",10)==0){

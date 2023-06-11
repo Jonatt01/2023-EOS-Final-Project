@@ -252,13 +252,13 @@ int main() {
 //*********************************end of control device command*********************************//   
 
 //*********************************start of reservation command*********************************//
-    // memset(message,0,MAX_BUFFER_SIZE);
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"reservation | user Jonathan | bedroom airconditioner 30 | livingroom light 2");
-    // write(sockfd,message,msglen+1);
-    // printf("Sent reservation to server: %s\n", message);
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"reservation 10 | user Jonathan | bedroom airconditioner 30 | livingroom light 2");
+    write(sockfd,message,msglen+1);
+    printf("Sent reservation to server: %s\n", message);
 
-    // sleep(1);
+    sleep(1);
 //*********************************end of reservation command*********************************// 
 
 //*********************************start of preference setting*********************************//
