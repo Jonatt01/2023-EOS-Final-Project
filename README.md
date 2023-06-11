@@ -35,12 +35,13 @@
     - `emergency earthquake`
 - open device
     - `control device | user Jonathan | bedroom light 3 | livingroom light 2`
-- set place to comfort
+- set place to **comfort**
     - `room | user Jonathan | bedroom comfort | bathroom comfort`
 - open device with comfort
     - `control device | user Jonathan | bedroom light comfort | kitchen light comfort`
 - reservation
     - `reservation 30 | user Jonathan | bedroom light 3 | livingroom light 2`
+    - `reservation 30 | user Jonathan | bathroom light comfort | livingroom light 2`
 
 
 ## parser

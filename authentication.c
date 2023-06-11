@@ -48,6 +48,7 @@ int welcome(int connfd){
 
     if(password == 0){
         msglen = sprintf(snd,"No user found!\n");
+        write(connfd,snd,msglen+1);
         return 0;
     }
     else{

@@ -230,7 +230,16 @@ int main()
                         printf("\nmode : %d\n",mode);
                         printf("%s start to set mode%s\n",username,token);
 
+                        sem_wait(mode_sem);
+                        // sem_getvalue(mode_sem,&val_mode);
+                        // printf("Begin setmode - mode sem value=%d, pid=%d\n",val_mode, getpid());
+
                         setmode(clientfd, user_mode, user_index, mode);
+
+                        sem_post(mode_sem);
+                        // sem_getvalue(mode_sem,&val_mode);
+                        // printf("After setmode - mode sem value=%d, pid=%d\n",val_mode, getpid());
+
                         // printf("Array of user mode\n");
                         // print_int_table(user_mode, 30, 12);
 
@@ -260,7 +269,16 @@ int main()
                         printf("%s wants to set to %s mode.\n",username, mode);
 
                         Node* newnode;
+
+                        sem_wait(mode_sem);
+                        // sem_getvalue(mode_sem,&val_mode);
+                        // printf("Begin mode - mode sem value=%d, pid=%d\n",val_mode, getpid());
+
                         newnode = setmode_parser(user_index, mode_index, user_mode);
+
+                        sem_post(mode_sem);
+                        // sem_getvalue(mode_sem,&val_mode);
+                        // printf("After mode - mode sem value=%d, pid=%d\n",val_mode, getpid());
                         // printf("In server.c - the device value of the head : %d\n",newnode->task.device);
                         // printf("In server.c - the device value of the head->next : %d\n",newnode->next->task.device);
 
@@ -315,9 +333,22 @@ int main()
                             device_index = whichdevice(place,device);
 
                             ischange[device_index-1] = 1;
+
+                            sem_wait(preference_sem);
+                            // sem_getvalue(preference_sem,&val_pref);
+                            // printf("Begin - preference sem value=%d, pid=%d\n",val_pref, getpid());
+
                             if(strncmp(status,"comfort",7)==0){
                                 device_report[device_index-1] = *(preference + 12*user_index + device_index - 1);
+
+                                sem_post(preference_sem);
+                                // sem_getvalue(preference_sem,&val_pref);
+                                // printf("After - preference sem value=%d, pid=%d\n",val_pref, getpid());
                             }else{
+                                sem_post(preference_sem);
+                                // sem_getvalue(preference_sem,&val_pref);
+                                // printf("After - preference sem value=%d, pid=%d\n",val_pref, getpid());
+
                                 device_report[device_index-1] = atoi(status);
                             }
                 
@@ -370,7 +401,24 @@ int main()
                             device_index = whichdevice(place,device);
                             // printf("In server.c - place: %s, device: %s, status: %s, device index: %d.\n",place, device, status,device_index);
                             ischange[device_index-1] = 1;
-                            device_report[device_index-1] = atoi(status);
+
+                            sem_wait(preference_sem);
+                            // sem_getvalue(preference_sem,&val_pref);
+                            // printf("Begin - preference sem value=%d, pid=%d\n",val_pref, getpid());
+
+                            if(strncmp(status,"comfort",7)==0){
+                                device_report[device_index-1] = *(preference + 12*user_index + device_index - 1);
+
+                                sem_post(preference_sem);
+                                // sem_getvalue(preference_sem,&val_pref);
+                                // printf("After - preference sem value=%d, pid=%d\n",val_pref, getpid());
+                            }else{
+                                sem_post(preference_sem);
+                                // sem_getvalue(preference_sem,&val_pref);
+                                // printf("After - preference sem value=%d, pid=%d\n",val_pref, getpid());
+
+                                device_report[device_index-1] = atoi(status);
+                            }
 
                             token=strtok(NULL,"|");
                         }while(token != NULL);
@@ -401,7 +449,16 @@ int main()
 
                         printf("%s start to set preference.\n",username);
 
+                        sem_wait(preference_sem);
+                        // sem_getvalue(preference_sem,&val_pref);
+                        // printf("Begin preference setting - preference sem value=%d, pid=%d\n",val_pref, getpid());
+
                         setpreference(clientfd, preference, user_index);
+
+                        sem_post(preference_sem);
+                        // sem_getvalue(preference_sem,&val_pref);
+                        // printf("After preference setting - preference sem value=%d, pid=%d\n",val_pref, getpid());
+
                         printf("%s end of seting preference.\n",username);
                         // print_int_table(preference, 10, 12);       
                     }
@@ -443,7 +500,17 @@ int main()
                         
 
                         Node* newnode;
+
+                        sem_wait(preference_sem);
+                        // sem_getvalue(preference_sem,&val_pref);
+                        // printf("Begin room setting - preference sem value=%d, pid=%d\n",val_pref, getpid());
+
                         newnode = room_preference_parser(roomisset, user_index, preference);
+
+                        sem_post(preference_sem);
+                        // sem_getvalue(preference_sem,&val_pref);
+                        // printf("After room setting - preference sem value=%d, pid=%d\n",val_pref, getpid());
+
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
@@ -462,25 +529,24 @@ int main()
 
                         // print_int_table(preference, 10, 12);
                         sem_wait(preference_sem);
-                        sem_getvalue(preference_sem,&val_pref);
-                        printf("Begin deleteUser - preference sem value=%d, pid=%d\n",val_pref, getpid());
+                        // sem_getvalue(preference_sem,&val_pref);
+                        // printf("Begin deleteUser - preference sem value=%d, pid=%d\n",val_pref, getpid());
                         sem_wait(mode_sem);
-                        sem_getvalue(mode_sem,&val_mode);
-                        printf("Begin deleteUser - mode sem value=%d, pid=%d\n",val_mode, getpid());
-                        
-                        print_int_table(user_mode, 30, 12);
+                        // sem_getvalue(mode_sem,&val_mode);
+                        // printf("Begin deleteUser - mode sem value=%d, pid=%d\n",val_mode, getpid());
+
+                        // print_int_table(user_mode, 30, 12);
                         deleteUser(rcvBuffer, clientfd, preference, user_mode);
-                        print_int_table(user_mode, 30, 12);
+                        // print_int_table(user_mode, 30, 12);
 
                         sem_post(mode_sem);
-                        sem_getvalue(mode_sem,&val_mode);
-                        printf("After deleteUser - mode sem value=%d, pid=%d\n",val_mode, getpid());
+                        // sem_getvalue(mode_sem,&val_mode);
+                        // printf("After deleteUser - mode sem value=%d, pid=%d\n",val_mode, getpid());
                         sem_post(preference_sem);
-                        sem_getvalue(preference_sem,&val_pref);
-                        printf("After deleteUser - preference sem value=%d, pid=%d\n",val_pref, getpid());
+                        // sem_getvalue(preference_sem,&val_pref);
+                        // printf("After deleteUser - preference sem value=%d, pid=%d\n",val_pref, getpid());
 
                         // print_int_table(preference, 10, 12);
-                        printf("Successfully delete user %s.\n",rcvBuffer);
                         // printUserTable(users);
                     }
                 }
