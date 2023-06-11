@@ -214,11 +214,7 @@ int main() {
 
 //*********************************end of personal setting*********************************//
 
-<<<<<<< HEAD
-    //*********************************start of mode command*********************************//
-=======
 //*********************************start of mode command*********************************//
->>>>>>> 3f5d8542b3e2ab6da36a1b68546ac28649c12c11
     // memset(message,0,MAX_BUFFER_SIZE);
     // memset(buffer,0,MAX_BUFFER_SIZE);
     // msglen = sprintf(message,"mode night | user Jonathan");
@@ -226,11 +222,7 @@ int main() {
     // printf("Sent setmode to server: %s\n", message);
 
     // sleep(1);
-<<<<<<< HEAD
-    //*********************************end of mode command*********************************//
-=======
 //*********************************end of mode command*********************************//
->>>>>>> 3f5d8542b3e2ab6da36a1b68546ac28649c12c11
 
     
 //*********************************start of emergency command*********************************//
@@ -243,11 +235,7 @@ int main() {
     // sleep(1);
 //*********************************end of emergency command*********************************//   
 
-<<<<<<< HEAD
-    // //*********************************start of control device command*********************************//
-=======
 //*********************************start of control device command*********************************//
->>>>>>> 3f5d8542b3e2ab6da36a1b68546ac28649c12c11
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
     msglen = sprintf(message,"control device | user Jonathan | bedroom light 3 | livingroom light 2");
@@ -255,15 +243,9 @@ int main() {
     printf("Sent control to server: %s\n", message);
 
     sleep(1);
-<<<<<<< HEAD
-    // //*********************************end of control device command*********************************//   
-
-    // //*********************************start of reservation command*********************************//
-=======
 //*********************************end of control device command*********************************//   
 
 //*********************************start of reservation command*********************************//
->>>>>>> 3f5d8542b3e2ab6da36a1b68546ac28649c12c11
     // memset(message,0,MAX_BUFFER_SIZE);
     // memset(buffer,0,MAX_BUFFER_SIZE);
     // msglen = sprintf(message,"reservation | user Jonathan | bedroom airconditioner 30 | livingroom light 2");
@@ -271,15 +253,9 @@ int main() {
     // printf("Sent reservation to server: %s\n", message);
 
     // sleep(1);
-<<<<<<< HEAD
-    // //*********************************end of reservation command*********************************// 
-
-    // //*********************************start of preference setting*********************************//
-=======
 //*********************************end of reservation command*********************************// 
 
 //*********************************start of preference setting*********************************//
->>>>>>> 3f5d8542b3e2ab6da36a1b68546ac28649c12c11
     // memset(message,0,MAX_BUFFER_SIZE);
     // msglen = sprintf(message,"preference | user Jonathan");
     // write(sockfd,message,msglen+1);
@@ -373,17 +349,6 @@ int main() {
     // write(sockfd,message,msglen+1);
     
     // sleep(1);
-<<<<<<< HEAD
-    // //*********************************end of personal setting*********************************//    
-
-    // //*********************************start of control device command*********************************//
-    // memset(message,0,MAX_BUFFER_SIZE);
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"control device | user Jonathan | bedroom light comfort | livingroom light comfort");
-    // write(sockfd,message,msglen+1);
-    // printf("Sent control to server: %s\n", message);
-
-=======
 //*********************************end of personal setting*********************************//    
 
     //*********************************start of room command*********************************//
@@ -404,7 +369,6 @@ int main() {
     // write(sockfd,message,msglen+1);
     // printf("Sent control to server: %s\n", message);
 
->>>>>>> 3f5d8542b3e2ab6da36a1b68546ac28649c12c11
     // sleep(1);
     //*********************************end of control device command*********************************//  
     
