@@ -60,11 +60,7 @@ int* preference;
 // parameters for semaphores
 int val_pref; // for checking semaphore value
 sem_t *preference_sem;
-preference_sem = sem_open("/SEM_PREFERENCE", O_CREAT, 0666, 1);
-if(data_sem == SEM_FAILED){
-    perror("Preference_sem init failed:");  
-    return -1;  
-}
+
 
 
 // authentication
@@ -121,6 +117,13 @@ int main()
     use_time = create_using_time_table(use_time_key);
     // create preference table
     preference = create_preference_table(preference_key);
+
+    // Create POSIX semaphore for preference table
+    preference_sem = sem_open("/SEM_PREFERENCE", O_CREAT, 0666, 1);
+    if(preference_sem == SEM_FAILED){
+        perror("Preference_sem init failed:");  
+        return -1;  
+    }
 
     while (1)
     {
@@ -186,11 +189,11 @@ int main()
             read(clientfd, rcvBuffer, MAX_BUFFER_SIZE);
 
             sem_wait(preference_sem);
-            sem_getvalue(data_sem,&val_pref);
+            sem_getvalue(preference_sem,&val_pref);
             printf("Begin deleteUser- preference sem value=%d, pid=%d\n",val_pref, getpid());
             deleteUser(rcvBuffer, clientfd);
             sem_post(preference_sem);
-            sem_getvalue(data_sem,&val_pref);
+            sem_getvalue(preference_sem,&val_pref);
             printf("After deleteUser- preference sem value=%d, pid=%d\n",val_pref, getpid());
 
             printf("Successfully delete user %s.\n",rcvBuffer);

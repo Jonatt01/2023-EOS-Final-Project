@@ -362,7 +362,7 @@ int main() {
     //*********************************end of room command*********************************//  
 
 
-    //*********************************start of control device command*********************************//
+//*********************************start of control device command*********************************//
     // memset(message,0,MAX_BUFFER_SIZE);
     // memset(buffer,0,MAX_BUFFER_SIZE);
     // msglen = sprintf(message,"control device | user Jonathan | bedroom light comfort | livingroom light comfort");
@@ -370,7 +370,7 @@ int main() {
     // printf("Sent control to server: %s\n", message);
 
     // sleep(1);
-    //*********************************end of control device command*********************************//  
+//*********************************end of control device command*********************************//  
     
     // }
     
