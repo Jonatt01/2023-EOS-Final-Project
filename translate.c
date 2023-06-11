@@ -60,6 +60,21 @@ int whichdevice(char* place, char* device){
         return 12;
 }
 
+int whichplace(char* place){
+    if(strcmp(place,"bedroom")==0){
+        return 0;
+    }
+    if(strcmp(place,"livingroom")==0){
+        return 1;
+    }
+    if(strcmp(place,"kitchen")==0){
+        return 2;
+    }
+    if(strcmp(place,"bathrooom")==0){
+        return 3;
+    }
+}
+
 void remove_spaces(char* s) {
     char* d = s;
     do {

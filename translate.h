@@ -13,6 +13,8 @@ int whichmode(char* timing);
 
 int whichdevice(char* place, char* device);
 
+int whichplace(char* place);
+
 void remove_spaces(char* s);
 
 void print_int_table(int* array, int col, int row);

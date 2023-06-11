@@ -346,7 +346,10 @@ int main()
                         char place[64];
                         char status[64];
                         int user_index = 0;
+                        int place_index = 0;
                         char *token;
+
+                        int roomisset[4] = {0}; // 1: the room has to set to comfort
                         
 
                         token=strtok(rcvBuffer,"|"); // room
@@ -355,11 +358,24 @@ int main()
                         user_index = whichuser(username);
 
                         token=strtok(NULL,"|"); // bedroom comfort
-                        sscanf(token," %s %s",place,status);
+
+                        do{
+
+                            sscanf(token," %s %s",place,status);
+                            
+                            place_index = whichplace(place);
+                            roomisset[place_index] = 1;
+
+                            token=strtok(NULL,"|");
+                
+                        }while(token != NULL);
+                        
 
                         Node* newnode;
-                        newnode = room_preference_parser();
+                        newnode = room_preference_parser(roomisset, user_index, preference);
+                        scheduler(&task_list_head,newnode);
 
+                        displayList(task_list_head);
                     }
                 }
             }
