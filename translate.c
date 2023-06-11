@@ -14,6 +14,7 @@ int whichuser(char* name, User* users){
             return i;
         }
     }
+    return 11; // means no this user
 }
 
 int whichmode(char* timing){

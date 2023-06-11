@@ -78,77 +78,52 @@ int main() {
 
 //*********************************testing for authentication*********************************//
     
-    // memset(message,0,MAX_BUFFER_SIZE);
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"login");
-    // write(sockfd,message,msglen+1);
-    // printf("Sent login to server: %s\n", message);
-
-    // read(sockfd, buffer, MAX_BUFFER_SIZE);
-    // printf("%s",buffer);
-    // //fgets(message,sizeof(message),stdin);
-    // scanf("%s",message);
-    // ssize_t num_bytes_written = write(sockfd, message, strlen(message)); // send the user id to server
-    // if (num_bytes_written == -1) {
-    //     perror("Error: Failed to send data to server");
-    //     close(sockfd);
-    //     exit(EXIT_FAILURE);
-    // }
-
-    // printf("Sent user id to server: %s\n", message);
-
-    // // read the enter password to server
-    // memset(message,0,MAX_BUFFER_SIZE);
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-
-    // read(sockfd, buffer, MAX_BUFFER_SIZE);
-    // printf("%s",buffer);
-    // // fgets(message,sizeof(message),stdin);
-    // scanf("%s",message);
-    // num_bytes_written = write(sockfd, message, strlen(message));
-    // if (num_bytes_written == -1) {
-    //     perror("Error: Failed to send data to server");
-    //     close(sockfd);
-    //     exit(EXIT_FAILURE);
-    // }
-    // printf("Sent password to server: %s\n", message);        
-
-
-    // // Receive successed or failed response from the server
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-    // ssize_t num_bytes_read = read(sockfd, buffer, MAX_BUFFER_SIZE);
-    // if (num_bytes_read == -1) {
-    //     perror("Error: Failed to receive data from server");
-    //     close(sockfd);
-    //     exit(EXIT_FAILURE);
-    // }
-    // printf("%s", buffer);
-//*********************************end of authentication*********************************//
-
-//*********************************start of deletion*********************************//
-
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"delete");
+    msglen = sprintf(message,"login");
     write(sockfd,message,msglen+1);
-    printf("Sent delete to server: %s\n", message);
+    printf("Sent login to server: %s\n", message);
 
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
     read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer); // enter your id
+    printf("%s",buffer);
+
     scanf("%s",message);
-    write(sockfd, message, strlen(message)+1);
+    ssize_t num_bytes_written = write(sockfd, message, strlen(message)); // send the user id to server
+    if (num_bytes_written == -1) {
+        perror("Error: Failed to send data to server");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
 
+    printf("Sent user id to server: %s\n", message);
+
+    // read the enter password to server
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
+
     read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer); // successful
+    printf("%s",buffer);
 
-    sleep(1);
+    scanf("%s",message);
+    num_bytes_written = write(sockfd, message, strlen(message));
+    if (num_bytes_written == -1) {
+        perror("Error: Failed to send data to server");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+    printf("Sent password to server: %s\n", message);        
 
 
-//*********************************end of deletion*********************************//
+    // Receive successed or failed response from the server
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    ssize_t num_bytes_read = read(sockfd, buffer, MAX_BUFFER_SIZE);
+    if (num_bytes_read == -1) {
+        perror("Error: Failed to receive data from server");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+    printf("%s", buffer);
+//*********************************end of authentication*********************************//
 
 
 //*********************************start of personal setting*********************************//
@@ -247,16 +222,15 @@ int main() {
 //*********************************end of personal setting*********************************//
 
 //*********************************start of mode command*********************************//
-    // memset(message,0,MAX_BUFFER_SIZE);
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"mode night | user Jonathan");
-    // write(sockfd,message,msglen+1);
-    // printf("Sent setmode to server: %s\n", message);
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"mode night | user Jonathan");
+    write(sockfd,message,msglen+1);
+    printf("Sent setmode to server: %s\n", message);
 
-    // sleep(1);
+    sleep(1);
 //*********************************end of mode command*********************************//
 
-    
 //*********************************start of emergency command*********************************//
     // memset(message,0,MAX_BUFFER_SIZE);
     // memset(buffer,0,MAX_BUFFER_SIZE);
@@ -403,7 +377,40 @@ int main() {
 
     // sleep(1);
 //*********************************end of control device command*********************************//  
-    
+
+//*********************************start of deletion*********************************//
+
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"delete");
+    write(sockfd,message,msglen+1);
+    printf("Sent delete to server: %s\n", message);
+
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer); // enter your id
+    scanf("%s",message);
+    write(sockfd, message, strlen(message)+1);
+
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer); // successful
+
+    sleep(1);
+
+//*********************************end of deletion*********************************//
+
+//*********************************start of control device command*********************************//
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"control device | user Jonathan | bedroom light comfort | livingroom light comfort");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent control to server: %s\n", message);
+
+    // sleep(1);
+//*********************************end of control device command*********************************//  
     // }
     
 

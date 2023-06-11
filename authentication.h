@@ -18,7 +18,7 @@ int welcome(int connfd);
 void signup(char* name, int connfd);
 
 
-void deleteUser(char* id, int connfd);
+void deleteUser(char* id, int connfd, int* preference, int* mode);
 
 void printUserTable(User* users);
 # endif
