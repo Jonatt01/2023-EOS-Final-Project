@@ -114,16 +114,18 @@ void dispatcher(Node *head, int* status_shm)
 {
     while (head != NULL)
     {
+        printf("Strating dispatch ..\n");
         // 判斷進入哪個流程，分為 relay、reservation、calculate
         int command_type = -1;
-        get_command_type(head);
+        command_type = get_command_type(head);
         reservation_operation = get_reservation_operation(head);
-
+        printf("command type = %d\n",command_type);
         switch (command_type)
         {
         case RELAY:
+            printf("command for RELAY\n");
             msgQ_key = MSG_Q_KEY;
-            msg_queue_id = msgget(msgQ_key, 0666); // get msgQ
+            msg_queue_id = msgget(msgQ_key, IPC_CREAT | 0666); // get msgQ
             if (msg_queue_id == -1)
             {
                 perror("msgget error");
@@ -136,12 +138,17 @@ void dispatcher(Node *head, int* status_shm)
             msg.data[LEVEL] = head->task.level;
             msg.data[TEMP] = head->task.temp;
             msg.data[DURATION] = head->task.duration;
-
+            printf("msg.data[DEVICE_ID] = %d\n",msg.data[DEVICE_ID]);
+            printf("msg.data[LEVEL] = %d\n",msg.data[LEVEL]);
+            printf("msg.data[TEMP] = %d\n", msg.data[TEMP]);
+            printf("msg.data[DURATION] = %d\n",msg.data[DURATION]);
+           
             if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1)
             {
-                perror("msgsnd");
+                perror("msgsnd error");
                 exit(1);
             }
+            printf("msgQ command send!\n");
             break;
         case RESERVATION:
             reservaion_child = fork();

@@ -35,7 +35,7 @@ struct message // msgQ message format
     int data[4];
 };
 struct message msgQ;
-
+#define MSG_Q_KEY 1111
 /*     創建 Shared memory     */
 key_t status_shm_key = 1234;
 int *status_shm;
@@ -130,7 +130,7 @@ void *status_thread(void *arg)
 
     /*                Shared Memory                */
     {
-        status_shm_id = shmget(status_shm_key, STATUS_SIZE * sizeof(int), IPC_CREAT | 0666);
+        status_shm_id = shmget(status_shm_key, STATUS_SIZE, IPC_CREAT | 0666);
         if (status_shm_id == -1)
         {
             perror("shmget error");
@@ -183,12 +183,8 @@ void *command_thread(void *arg)
 
     { // 獲得 msgQ 參數
         // 產生唯一的 key
-        msgQkey = ftok(".", 'a');
-        if (msgQkey == -1)
-        {
-            perror("ftok");
-            exit(1);
-        }
+        msgQkey = MSG_Q_KEY;
+
         // 創建訊息佇列
         msgQid = msgget(msgQkey, IPC_CREAT | 0666);
         if (msgQid == -1)
@@ -203,7 +199,7 @@ void *command_thread(void *arg)
     }
 
     { // 獲得 shm 參數
-        status_shm_id = shmget(status_shm_key, STATUS_SIZE * sizeof(int), IPC_CREAT | 0666);
+        status_shm_id = shmget(status_shm_key, STATUS_SIZE, IPC_CREAT | 0666);
         if (status_shm_id == -1)
         {
             perror("shmget error");
@@ -259,7 +255,7 @@ void *command_thread(void *arg)
             printf("Device connection successful!\n");
         }
     }
-
+    printf("Start receive msgQ data ..\n");
     // 接收msgQ裡面的device command
     signal(SIGINT, interrupt_handler);
     while (1)
@@ -305,11 +301,22 @@ void *command_thread(void *arg)
         if(sendToDevice){
             // 讀取共享內存，製作新的指令，將處理過後的指令內容到socket buffer EX: 23 0 0 2 1 0 3 1 0 ...
             memset(commandBuffer,0,strlen(commandBuffer));
-            char insert_str[2];
+            char insert_str[3];
 
             for(int i=0;i<STATUS_SHM_LENGTH;i++)
             {
-                sprintf(insert_str, "%d", status_shm[i]);
+                if(i == 0 || i == 4 || i == 9){ // aircon特殊情況 為0(關閉)時補0 EX:0->00
+                    if(status_shm[i] == 0){
+                        strcpy(insert_str, "00");
+                    }
+                    else{
+                        sprintf(insert_str, "%d", status_shm[i]);
+                    }
+                }
+                else{
+                    sprintf(insert_str, "%d", status_shm[i]);
+                }
+                //sprintf(insert_str, "%d", status_shm[i]);
                 strcat(commandBuffer,insert_str);
                 strcat(commandBuffer," ");
                 memset(insert_str,0,strlen(insert_str));

@@ -274,6 +274,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
+                        dispatcher(task_list_head,device_status);
                     }
                     // reservation
                     else if(strncmp(rcvBuffer,"reservation",11)==0){

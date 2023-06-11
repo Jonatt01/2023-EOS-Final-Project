@@ -3,15 +3,17 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-
+#include <sys/stat.h>
+#include <fcntl.h>
 #define PORT 9090
-#define MAX_BUFFER_SIZE 1024
+#define MAX_BUFFER_SIZE 50
+#define PATH_SIZE 20
 
 int main() {
     int sockfd;
     struct sockaddr_in server_addr;
-    char buffer[MAX_BUFFER_SIZE];
-
+    char buffer[50];
+    char path[PATH_SIZE];
     // Create a TCP socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
@@ -24,7 +26,7 @@ int main() {
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(PORT);
 
-    if (inet_pton(AF_INET, "127.0.0.1", &server_addr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, "172.20.10.4", &server_addr.sin_addr) <= 0) {
         perror("Error: Invalid address/ Address not supported");
         exit(EXIT_FAILURE);
     }
@@ -54,15 +56,27 @@ int main() {
         }
 
         printf("received command : %s\n",buffer);
-        // sprintf(message,"Device received msg Ack\n");
-        // ssize_t num_bytes_written = write(sockfd, message, strlen(message));
-        // if (num_bytes_written == -1) {
-        //     perror("Error: Failed to send data to server");
-        //     close(sockfd);
-        //     exit(EXIT_FAILURE);
-        // }
 
-        // printf("Sent message to server: %s\n", message);
+        int fd = 0;
+        //int id;
+
+        // 讀取字符串 "/dev/etx_device" 並存儲在 path 中 , 大小為 sizeof(path) -1 (最後一個為結尾符)
+        snprintf(path, sizeof(path), "/dev/etx_device");
+        fd = open(path, O_WRONLY);
+        if (fd < 0) {
+            perror("Error opening GPIO pin");
+            exit(EXIT_FAILURE);
+        }
+
+        printf("buffer = %s , ready to write.\n",buffer);
+        if (write(fd, buffer, sizeof(buffer)) < 0) {
+            perror("write, set pin output");
+            exit(EXIT_FAILURE);
+        }
+
+        printf("write succesfully\n");
+
+
     }    
 
     close(sockfd);
