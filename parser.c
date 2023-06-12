@@ -42,7 +42,7 @@ Node* emergency_parser(){
     return newNode;
 }
 
-Node* control_parser(int* ischange, int* change, int user){
+Node* control_parser(int* ischange, int* change, int user, int duration){
 
     Node* head = NULL;
     for(int i=0;i<12;i++){
@@ -51,6 +51,9 @@ Node* control_parser(int* ischange, int* change, int user){
 
             newNode -> task.user = user;
             newNode -> task.device = i + 1;
+            if(duration != 0){
+                newNode -> task.duration = duration;
+            }
 
             if(i == 0 | i == 4 | i == 9){
                 newNode -> task.temp = change[i];
@@ -96,7 +99,7 @@ Node* reservation_parser(int* ischange, int* change, int user, int time){
     return head;
 }
 
-Node* room_preference_parser(int* ischange, int user, int* preference){
+Node* room_preference_parser(int* ischange, int user, int* preference, int duration){
 
     Node* head = NULL;
 
@@ -110,6 +113,9 @@ Node* room_preference_parser(int* ischange, int user, int* preference){
 
                     newNode -> task.user = user;
                     newNode -> task.device = j+1;
+                    if(duration != 0){
+                        newNode -> task.duration = duration;
+                    }
 
                     if(j == 0){
                         newNode -> task.temp = *(preference + user*12 + j);
@@ -127,7 +133,9 @@ Node* room_preference_parser(int* ischange, int user, int* preference){
 
                     newNode -> task.user = user;
                     newNode -> task.device = j+5;
-
+                    if(duration != 0){
+                        newNode -> task.duration = duration;
+                    }
                     if(j == 0){
                         newNode -> task.temp = *(preference + user*12 + j + 4);
                     }
@@ -142,6 +150,10 @@ Node* room_preference_parser(int* ischange, int user, int* preference){
                 Node* newNode = createNode();
                 newNode -> task.user = user;
                 newNode -> task.device = 9;
+                if(duration != 0){
+                    newNode -> task.duration = duration;
+                }
+                
                 newNode -> task.level = *(preference + user*12 + 8);
 
                 insertAtEnd(&head, newNode);
@@ -153,6 +165,9 @@ Node* room_preference_parser(int* ischange, int user, int* preference){
 
                     newNode -> task.user = user;
                     newNode -> task.device = j+5;
+                    if(duration != 0){
+                        newNode -> task.duration = duration;
+                    }
 
                     if(j == 0){
                         newNode -> task.temp = *(preference + user*12 + j + 9);

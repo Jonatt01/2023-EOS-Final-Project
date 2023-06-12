@@ -6,7 +6,7 @@
 
 # define STATUS_SIZE 12*sizeof(int)
 # define MODE_SIZE 30*12*sizeof(int)
-# define USE_TIME_SIZE 12*sizeof(int)
+# define USE_TIME_SIZE 2*12*sizeof(int)
 # define PREFERENCE_SIZE 10*12*sizeof(int)
 # define TEMP_SIZE 3*sizeof(int)
 # define STATISTIC_SIZE 

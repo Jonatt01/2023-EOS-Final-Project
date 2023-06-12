@@ -57,6 +57,10 @@ key_t preference_key = 3456;
 extern int preference_shm_id; // defined in create_table.c
 int* preference;
 
+key_t temperature_key = 4567;
+extern int temperature_shm_id; // defined in create_table.c
+int* temperature;
+
 // parameters for semaphores
 int val_pref; // for checking semaphore value
 sem_t *preference_sem;
@@ -66,6 +70,9 @@ sem_t *mode_sem;
 
 int val_using_time; // for checking sempahore value
 sem_t *using_time_sem;
+
+int value_temperature;
+sem_t *temperature_sem;
 
 // authentication
 extern User users[MAXUSERNUM];
@@ -122,6 +129,8 @@ int main()
     use_time = create_using_time_table(use_time_key);
     // create preference table
     preference = create_preference_table(preference_key);
+    // create temperature table
+    temperature = create_temperature_table(temperature_key);
 
     // Create POSIX semaphore for preference table
     preference_sem = sem_open("/SEM_PREFERENCE", O_CREAT, 0666, 1);
@@ -136,9 +145,15 @@ int main()
         return -1;  
     }
     // Create POSIX semaphore for using time table
-    mode_sem = sem_open("/SEM_TIME", O_CREAT, 0666, 1);
-    if(mode_sem == SEM_FAILED){
+    using_time_sem = sem_open("/SEM_TIME", O_CREAT, 0666, 1);
+    if(using_time_sem == SEM_FAILED){
         perror("Time_sem init failed:");  
+        return -1;  
+    }
+    // Create POSIX semaphore for temperature table
+    temperature_sem = sem_open("/SEM_TEMP", O_CREAT, 0666, 1);
+    if(temperature_sem == SEM_FAILED){
+        perror("Temp_sem init failed:");  
         return -1;  
     }
 
@@ -317,6 +332,7 @@ int main()
                         char place[64];
                         char device[64];
                         char status[64];
+                        int duration = 0;
                         int user_index = 0;
                         int device_index = 0;
                         
@@ -334,6 +350,10 @@ int main()
                             printf("User not found!\n");
                             break;
                         }
+
+                        token=strtok(NULL,"|"); // duration 30
+                        sscanf(token," %s %d",tmp,&duration);
+
                         // printf("In server.c - username: %s, user_index: %d.\n",username,user_index);
                         printf("%s wants to control the devices.\n", username);
                         
@@ -376,7 +396,7 @@ int main()
                         // print_int_table(device_report,1,12);
 
                         Node* newnode;
-                        newnode = control_parser(ischange, device_report, user_index);
+                        newnode = control_parser(ischange, device_report, user_index, duration);
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
@@ -487,6 +507,7 @@ int main()
                         char tmp[64];
                         char place[64];
                         char status[64];
+                        int duration;
                         int user_index = 0;
                         int place_index = 0;
                         char *token;
@@ -502,6 +523,9 @@ int main()
                             printf("User not found!\n");
                             break;
                         }
+
+                        token=strtok(NULL,"|"); // duration 30
+                        sscanf(token," %s %d",tmp,&duration);
 
                         token=strtok(NULL,"|"); // bedroom comfort
 
@@ -523,7 +547,7 @@ int main()
                         // sem_getvalue(preference_sem,&val_pref);
                         // printf("Begin room setting - preference sem value=%d, pid=%d\n",val_pref, getpid());
 
-                        newnode = room_preference_parser(roomisset, user_index, preference);
+                        newnode = room_preference_parser(roomisset, user_index, preference,duration);
 
                         sem_post(preference_sem);
                         // sem_getvalue(preference_sem,&val_pref);
@@ -795,6 +819,18 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
+    // delete shared memory (use time)
+    if (shmdt(temperature) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(temperature_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+
     // delete named POSIX semphore
     sem_unlink("/SEM_PREFERENCE");
 
@@ -804,6 +840,8 @@ void interrupt_handler(int signum){
     // delete named POSIX semaphore
     sem_unlink("/SEM_TIME");
 
+    // delete named POSIX semaphore
+    sem_unlink("/SEM_TEMP");
 
     close(clientfd);
     close(serverfd);
