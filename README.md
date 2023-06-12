@@ -42,7 +42,12 @@
 - reservation
     - `reservation 30 | user Jonathan | bedroom light 3 | livingroom light 2`
     - `reservation 30 | user Jonathan | bathroom light comfort | livingroom light 2`
-
+- **calculate**
+    - `calculate bill`
+- **search**
+    - `search | light | using time`
+- **device status**
+    - `device status | bedroom light`
 
 ## parser
 - output list of structures
