@@ -36,7 +36,7 @@
 - open device (`duration 0` means do not set with duration)
     - `control device | user Jonathan | duration 20 | bedroom light 3 | livingroom light 2`
     - `control device | user Jonathan | duration 0 | bedroom light comfort | kitchen light comfort`
-- set place to comfort
+- set place to comfort (`duration 0` means do not set with duration)
     - `room | user Jonathan | duration 20 | bedroom comfort | bathroom comfort`
 - reservation
     - `reservation 30 | user Jonathan | bedroom light 3 | livingroom light 2`
