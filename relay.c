@@ -314,7 +314,7 @@ void *command_thread(void *arg)
 
             for(int i=0;i<STATUS_SHM_LENGTH;i++)
             {
-                if(i == 0 || i == 4 || i == 9){ // aircon特殊情況 為0(關閉)時補0 EX:0->00
+                if(i == 0 || i == 4 || i == 9){ // aircon device 的特殊情況 為0(關閉)時補0 EX:0->00
                     if(status_shm[i] == 0){
                         strcpy(insert_str, "00");
                     }
