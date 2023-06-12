@@ -23,4 +23,6 @@ int* create_using_time_table(key_t key);
 */
 int* create_preference_table(key_t key);
 
+int* create_temperature_table(key_t key);
+
 # endif
