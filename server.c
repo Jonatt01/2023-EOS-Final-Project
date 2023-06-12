@@ -67,7 +67,8 @@ sem_t *mode_sem;
 // authentication
 extern User users[MAXUSERNUM];
 
-
+void mode_settingmsg(int connfd, int* table);
+void preference_settingmsgs(int connfd, int* table);
 void interrupt_handler(int signum);
 
 int socket_server()
@@ -228,13 +229,17 @@ int main()
                         remove_spaces(token);
                         mode = whichmode(token);
                         printf("\nmode : %d\n",mode);
-                        printf("%s start to set mode%s\n",username,token);
 
+                        printf("%s start to set mode %s\n",username,token);
+
+                        int settable[12] = {0};
+                        mode_settingmsg(clientfd, settable);
+                        
                         sem_wait(mode_sem);
                         // sem_getvalue(mode_sem,&val_mode);
                         // printf("Begin setmode - mode sem value=%d, pid=%d\n",val_mode, getpid());
 
-                        setmode(clientfd, user_mode, user_index, mode);
+                        setmode(user_mode, user_index, mode, settable);
 
                         sem_post(mode_sem);
                         // sem_getvalue(mode_sem,&val_mode);
@@ -450,11 +455,14 @@ int main()
 
                         printf("%s start to set preference.\n",username);
 
+                        int settable[12] = {0}; // temp storage of what user set
+                        preference_settingmsgs(clientfd, settable);
+
                         sem_wait(preference_sem);
                         // sem_getvalue(preference_sem,&val_pref);
                         // printf("Begin preference setting - preference sem value=%d, pid=%d\n",val_pref, getpid());
 
-                        setpreference(clientfd, preference, user_index);
+                        setpreference(preference, user_index, settable);
 
                         sem_post(preference_sem);
                         // sem_getvalue(preference_sem,&val_pref);
@@ -572,6 +580,162 @@ int main()
     return 0;
 }
 
+void mode_settingmsg(int connfd, int* table){
+
+    char snd[MAX_BUFFER_SIZE] = {0},rcv[MAX_BUFFER_SIZE] = {0};
+    int msglen = 0;
+
+    memset(snd,0,MAX_BUFFER_SIZE);// set the snd char array to zero
+    memset(rcv,0,MAX_BUFFER_SIZE);// set the rcv char array to zero
+    
+    msglen = sprintf(snd,"Start of the Bedroom setting.\nTemperature of airconditioner : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,MAX_BUFFER_SIZE);
+    table[0] = atoi(rcv);
+    printf("Air conditioner temperature : %d\n",*(table));
+
+    msglen = sprintf(snd,"Brightness of lights (0-5) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,MAX_BUFFER_SIZE);
+    table[1] = atoi(rcv);
+    printf("Lights brightness : %d\n",*(table + 1));
+
+    msglen = sprintf(snd,"Level of fan (0-3) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,MAX_BUFFER_SIZE);
+    table[2] = atoi(rcv);
+    printf("Fan level : %d\n",*(table + 2));
+
+    msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,MAX_BUFFER_SIZE);
+    table[3] = atoi(rcv);
+    printf("Changed curtain level : %d\n",*(table + 3));
+
+    // living room
+    msglen = sprintf(snd,"Start of the Living room setting.\nTemperature of airconditioner : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,MAX_BUFFER_SIZE);
+    table[4] = atoi(rcv);
+    printf("Air conditioner temperature : %d\n",*(table + 4));
+
+    msglen = sprintf(snd,"Brightness of lights (0-5) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,MAX_BUFFER_SIZE);
+    table[5] = atoi(rcv);
+    printf("Lights brightness : %d\n",*(table + 5));
+
+    msglen = sprintf(snd,"Level of fan (0-3) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,MAX_BUFFER_SIZE);
+    table[6] = atoi(rcv);
+    printf("Fan level : %d\n",*(table + 6));
+
+    msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,MAX_BUFFER_SIZE);
+    table[7] = atoi(rcv);
+    printf("Changed curtain level : %d\n",*(table + 7)); 
+
+    // kitchen
+    msglen = sprintf(snd,"Start of the Kitchen setting.\nBrightness of lights (0-5) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,MAX_BUFFER_SIZE);
+    table[8] = atoi(rcv);
+    printf("Lights brightness : %d\n",*(table + 8));
+
+    // bathroom
+    msglen = sprintf(snd,"Start of the Bathroom setting.\nTemperature of airconditioner : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,MAX_BUFFER_SIZE);
+    table[9] = atoi(rcv);
+    printf("Air conditioner temperature : %d\n",*(table + 9));
+
+    msglen = sprintf(snd,"Brightness of lights (0-5) : ");
+    write(connfd,snd,msglen+1);
+    read(connfd,rcv,MAX_BUFFER_SIZE);
+    table[10] = atoi(rcv);
+    printf("Lights brightness : %d\n",*(table + 10));
+
+}
+
+void preference_settingmsgs(int connfd, int* table){
+    
+    char snd[MAX_BUFFER_SIZE] = {0},rcv[MAX_BUFFER_SIZE] = {0};
+    int msglen = 0;
+    
+    memset(rcv, 0, MAX_BUFFER_SIZE);
+    memset(snd, 0, MAX_BUFFER_SIZE);
+    msglen = sprintf(snd,"Start of the Bedroom setting.\nTemperature of airconditioner : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[0] = atoi(rcv);
+    printf("Air conditioner temperature : %d\n",*(table));
+
+    msglen = sprintf(snd,"Brightness of lights (0-5) : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[1] = atoi(rcv);
+    printf("Lights brightness : %d\n",*(table + 1));
+
+    msglen = sprintf(snd,"Level of fan (0-3) : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[2] = atoi(rcv);
+    printf("Fan level : %d\n",*(table + 2));
+
+    msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[3] = atoi(rcv);
+    printf("Changed curtain level : %d\n",*(table + 3));
+
+    // living room
+    msglen = sprintf(snd,"Start of the Living room setting.\nTemperature of airconditioner : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[4] = atoi(rcv);
+    printf("Air conditioner temperature : %d\n",*(table + 4));
+
+    msglen = sprintf(snd,"Brightness of lights (0-5) : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[5] = atoi(rcv);
+    printf("Lights brightness : %d\n",*(table + 5));
+
+    msglen = sprintf(snd,"Level of fan (0-3) : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[6] = atoi(rcv);
+    printf("Fan level : %d\n",*(table + 6));
+
+    msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[7] = atoi(rcv);
+    printf("Changed curtain level : %d\n",*(table + 7)); 
+
+    // kitchen
+    msglen = sprintf(snd,"Start of the Kitchen setting.\nBrightness of lights (0-5) : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[8] = atoi(rcv);
+    printf("Lights brightness : %d\n",*(table + 8));
+
+    // bathroom
+    msglen = sprintf(snd,"Start of the Bathroom setting.\nTemperature of airconditioner : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[9] = atoi(rcv);
+    printf("Air conditioner temperature : %d\n",*(table + 9));
+
+    msglen = sprintf(snd,"Brightness of lights (0-5) : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[10] = atoi(rcv);
+    printf("Lights brightness : %d\n",*(table + 10));   
+
+}
 
 void interrupt_handler(int signum){
 

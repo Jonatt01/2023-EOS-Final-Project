@@ -6,11 +6,11 @@
 /**
 * the set mode procedure (after confirming the username and mode)
 */
-void setmode(int connfd, int* user_mode, int user, int mode);
+void setmode(int* user_mode, int user, int mode, int* settable);
 
 /**
 * the set preference table
 */
-void setpreference(int connfd, int* preference, int user);
+void setpreference(int* preference, int user, int* settable);
 
 # endif
