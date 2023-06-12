@@ -8,6 +8,7 @@
 # define MODE_SIZE 30*12*sizeof(int)
 # define USE_TIME_SIZE 12*sizeof(int)
 # define PREFERENCE_SIZE 10*12*sizeof(int)
+# define TEMP_SIZE 3*sizeof(int)
 # define STATISTIC_SIZE 
 
 int status_shm_id;
@@ -81,5 +82,24 @@ int* create_preference_table(key_t key){
     }
     memset(preference_shm,0,PREFERENCE_SIZE);
     return preference_shm;
+
+}
+
+int temperature_shm_id;
+int *temperature_shm;
+
+int* create_temperature_table(key_t key){
+    if ((temperature_shm_id = shmget(key, TEMP_SIZE, IPC_CREAT | 0666)) < 0)
+    {
+        perror("shmget");
+        exit(-1);
+    }
+    if ((temperature_shm = shmat(temperature_shm_id, NULL, 0)) == (int *) -1)
+    {
+        perror("shmat");
+        exit(-1);
+    }
+    memset(temperature_shm,0,TEMP_SIZE);
+    return temperature_shm;
 
 }

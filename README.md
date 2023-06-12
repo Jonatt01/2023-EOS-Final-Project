@@ -55,6 +55,18 @@
 ## scheduler 
 - insert the list of structures into the original task list
 
+## recommand condition
+- temperature is higher than his comfort
+    - server will check the temperature in shared memory to decide whether recommand the user to open the aircondition (2 temperature)
+- device using more than user wish
+    - tell the user about this situation
+    - recommand the user to turn off the device
+- simultaneously opening device more than user wish
+    - tell the user about this situation
+
+## bill calculate
+- WATT * sec * money a degree
+
 ## mapping
 - number to devices
     - bedroom

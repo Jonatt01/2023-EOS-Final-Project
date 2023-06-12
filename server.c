@@ -567,6 +567,8 @@ int main()
                         // print_int_table(preference, 10, 12);
                         // printUserTable(users);
                     }
+
+                    
                 }
             }
             else if (childpid > 0)
