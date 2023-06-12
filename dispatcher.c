@@ -23,6 +23,10 @@
 
 #define STATUS_SIZE 12 * sizeof(int)
 
+# define AIRCONDITION_WATT 5
+# define LIGHT_WATT 1
+# define FAN_WATT 2
+
 int reservation_device_id = 0;
 int reservation_operation = -1;
 int reservation_data[4];

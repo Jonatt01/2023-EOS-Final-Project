@@ -64,6 +64,9 @@ sem_t *preference_sem;
 int val_mode; // for checking semaphore value
 sem_t *mode_sem;
 
+int val_using_time; // for checking sempahore value
+sem_t *using_time_sem;
+
 // authentication
 extern User users[MAXUSERNUM];
 
@@ -130,6 +133,12 @@ int main()
     mode_sem = sem_open("/SEM_MODE", O_CREAT, 0666, 1);
     if(mode_sem == SEM_FAILED){
         perror("Mode_sem init failed:");  
+        return -1;  
+    }
+    // Create POSIX semaphore for using time table
+    mode_sem = sem_open("/SEM_TIME", O_CREAT, 0666, 1);
+    if(mode_sem == SEM_FAILED){
+        perror("Time_sem init failed:");  
         return -1;  
     }
 
@@ -558,6 +567,8 @@ int main()
                         // print_int_table(preference, 10, 12);
                         // printUserTable(users);
                     }
+
+                    
                 }
             }
             else if (childpid > 0)
@@ -789,6 +800,9 @@ void interrupt_handler(int signum){
 
     // delete named POSIX semphore
     sem_unlink("/SEM_MODE");
+
+    // delete named POSIX semaphore
+    sem_unlink("/SEM_TIME");
 
 
     close(clientfd);
