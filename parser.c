@@ -153,7 +153,7 @@ Node* room_preference_parser(int* ischange, int user, int* preference, int durat
                 if(duration != 0){
                     newNode -> task.duration = duration;
                 }
-                
+
                 newNode -> task.level = *(preference + user*12 + 8);
 
                 insertAtEnd(&head, newNode);
@@ -178,9 +178,6 @@ Node* room_preference_parser(int* ischange, int user, int* preference, int durat
                     insertAtEnd(&head, newNode);
                 }
             }
-        }
-        else{
-            continue;
         }
     }
 

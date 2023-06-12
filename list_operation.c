@@ -63,7 +63,7 @@ void displayList(Node* head) {
     Node* current = head;
     printf("Task List:\n--------------------------\n");
     while (current != NULL) {
-        printf("device : %d , level : %d , temp : %d , reservation : %d , priority : %d\n", current->task.device, current->task.level, current->task.temp, current->task.reservation, current->task.priority);
+        printf("device : %d , level : %d , temp : %d , reservation : %d , priority : %d , duration : %d\n", current->task.device, current->task.level, current->task.temp, current->task.reservation, current->task.priority, current->task.duration);
         current = current->next;
     }
     printf("--------------------------\n");

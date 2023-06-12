@@ -127,108 +127,108 @@ int main() {
 
 
 //*********************************start of mode setting*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"setmode | user Jonathan | night");
-    write(sockfd,message,msglen+1);
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"setmode | user Jonathan | night");
+    // write(sockfd,message,msglen+1);
 
-    //********************set temp of bedroom********************//
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer);
+    // //********************set temp of bedroom********************//
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
-    scanf("%s",message); // the temperature of air conditioner
-    write(sockfd,message,msglen+1);
+    // scanf("%s",message); // the temperature of air conditioner
+    // write(sockfd,message,msglen+1);
 
-    //********************set light of bedroom********************//
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer);
+    // //********************set light of bedroom********************//
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
-    scanf("%s",message); // the brightness of air conditioner
-    write(sockfd,message,msglen+1);
+    // scanf("%s",message); // the brightness of air conditioner
+    // write(sockfd,message,msglen+1);
 
-    //********************set fan of bedroom********************//
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer);
+    // //********************set fan of bedroom********************//
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
-    scanf("%s",message); // the level of fan
-    write(sockfd,message,msglen+1);
+    // scanf("%s",message); // the level of fan
+    // write(sockfd,message,msglen+1);
 
-    //********************set curtain of bedroom********************//
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer);
+    // //********************set curtain of bedroom********************//
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
-    scanf("%s",message); // open or close of curtain
-    write(sockfd,message,msglen+1);
+    // scanf("%s",message); // open or close of curtain
+    // write(sockfd,message,msglen+1);
 
-    //********************set temp of living room********************//
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer);
+    // //********************set temp of living room********************//
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
-    scanf("%s",message); // the temperature of air conditioner
-    write(sockfd,message,msglen+1);
+    // scanf("%s",message); // the temperature of air conditioner
+    // write(sockfd,message,msglen+1);
 
-    //********************set light of living room********************//
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer);
+    // //********************set light of living room********************//
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
-    scanf("%s",message); // the brightness of light
-    write(sockfd,message,msglen+1);
+    // scanf("%s",message); // the brightness of light
+    // write(sockfd,message,msglen+1);
 
-    //********************set fan of living room********************//
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer);
+    // //********************set fan of living room********************//
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
-    scanf("%s",message); // the level of fan
-    write(sockfd,message,msglen+1);
+    // scanf("%s",message); // the level of fan
+    // write(sockfd,message,msglen+1);
 
-    //********************set curtain of living room********************//
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer);
+    // //********************set curtain of living room********************//
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
-    scanf("%s",message); // open or close of curtain
-    write(sockfd,message,msglen+1);
+    // scanf("%s",message); // open or close of curtain
+    // write(sockfd,message,msglen+1);
 
-    //********************set light of kitchen********************//
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer);
+    // //********************set light of kitchen********************//
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
-    scanf("%s",message); // the brightness of light
-    write(sockfd,message,msglen+1);
+    // scanf("%s",message); // the brightness of light
+    // write(sockfd,message,msglen+1);
 
-    //********************set temp of bathroom********************//
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer);
+    // //********************set temp of bathroom********************//
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
-    scanf("%s",message); // the temperature of air conditioner
-    write(sockfd,message,msglen+1);
+    // scanf("%s",message); // the temperature of air conditioner
+    // write(sockfd,message,msglen+1);
 
-    //********************set light of bedroom********************//
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    read(sockfd, buffer, MAX_BUFFER_SIZE);
-    printf("%s",buffer);
+    // //********************set light of bedroom********************//
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
-    scanf("%s",message); // the brightness of air conditioner
-    write(sockfd,message,msglen+1);
+    // scanf("%s",message); // the brightness of air conditioner
+    // write(sockfd,message,msglen+1);
 
 //*********************************end of mode setting*********************************//
 
 //*********************************start of mode command*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"mode night | user Jonathan");
-    write(sockfd,message,msglen+1);
-    printf("Sent setmode to server: %s\n", message);
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"mode night | user Jonathan");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent setmode to server: %s\n", message);
 
-    sleep(1);
+    // sleep(1);
 //*********************************end of mode command*********************************//
 
 //*********************************start of emergency command*********************************//
@@ -369,13 +369,13 @@ int main() {
 
 
 //*********************************start of control device command*********************************//
-    // memset(message,0,MAX_BUFFER_SIZE);
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"control device | user Jonathan | bedroom light comfort | livingroom light comfort");
-    // write(sockfd,message,msglen+1);
-    // printf("Sent control to server: %s\n", message);
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"control device | user Jonathan | duration 20 | bedroom light 2 | livingroom light 3");
+    write(sockfd,message,msglen+1);
+    printf("Sent control to server: %s\n", message);
 
-    // sleep(1);
+    sleep(1);
 //*********************************end of control device command*********************************//  
 
 //*********************************start of deletion*********************************//

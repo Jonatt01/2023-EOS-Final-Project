@@ -12,7 +12,10 @@ int* create_status_table(key_t key);
 * create user mode table
 */
 int* create_mode_table(key_t key);
-
+/**
+* create device usage time table
+*/
+int* create_start_time_table(key_t key);
 /**
 * create device usage time table
 */

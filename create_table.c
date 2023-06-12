@@ -6,7 +6,8 @@
 
 # define STATUS_SIZE 12*sizeof(int)
 # define MODE_SIZE 30*12*sizeof(int)
-# define USE_TIME_SIZE 2*12*sizeof(int)
+# define START_TIME_SIZE 12*sizeof(int)
+# define USE_TIME_SIZE 12*sizeof(int)
 # define PREFERENCE_SIZE 10*12*sizeof(int)
 # define TEMP_SIZE 3*sizeof(int)
 # define STATISTIC_SIZE 
@@ -47,6 +48,26 @@ int* create_mode_table(key_t key){
     memset(mode_shm,0,MODE_SIZE);
     return mode_shm;
 }
+
+int start_time_shm_id;
+int *start_time_shm;
+
+int* create_start_time_table(key_t key){
+    if ((start_time_shm_id = shmget(key, START_TIME_SIZE, IPC_CREAT | 0666)) < 0)
+    {
+        perror("shmget");
+        exit(-1);
+    }
+    if ((start_time_shm = shmat(start_time_shm_id, NULL, 0)) == (int *) -1)
+    {
+        perror("shmat");
+        exit(-1);
+    }
+    memset(start_time_shm,0,START_TIME_SIZE);
+    return start_time_shm;
+}
+
+
 
 int using_time_shm_id;
 int *using_time_shm;

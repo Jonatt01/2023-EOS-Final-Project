@@ -49,6 +49,10 @@ key_t mode_key = 5678;
 extern int mode_shm_id; // defined in create_table.c
 int* user_mode;
 
+key_t start_time_key = 2345;
+extern int start_time_shm_id; // defined in create_table.c
+int* start_time;
+
 key_t use_time_key = 2468;
 extern int using_time_shm_id; // defined in create_table.c
 int* use_time;
@@ -125,12 +129,14 @@ int main()
     device_status = create_status_table(dev_status_key);
     // create user specific mode table
     user_mode = create_mode_table(mode_key);
+    // create start time table
+    start_time = create_start_time_table(start_time_key);
     // create use time table
     use_time = create_using_time_table(use_time_key);
     // create preference table
     preference = create_preference_table(preference_key);
     // create temperature table
-    temperature = create_temperature_table(temperature_key);
+    // temperature = create_temperature_table(temperature_key);
 
     // Create POSIX semaphore for preference table
     preference_sem = sem_open("/SEM_PREFERENCE", O_CREAT, 0666, 1);
@@ -322,7 +328,7 @@ int main()
                         newnode = emergency_parser();
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
-                        dispatcher(task_list_head,device_status);
+                        // dispatcher(task_list_head,device_status);
                     }
                     // normal control command
                     else if(strncmp(rcvBuffer,"control",7)==0){
@@ -547,7 +553,7 @@ int main()
                         // sem_getvalue(preference_sem,&val_pref);
                         // printf("Begin room setting - preference sem value=%d, pid=%d\n",val_pref, getpid());
 
-                        newnode = room_preference_parser(roomisset, user_index, preference,duration);
+                        newnode = room_preference_parser(roomisset, user_index, preference, duration);
 
                         sem_post(preference_sem);
                         // sem_getvalue(preference_sem,&val_pref);
@@ -797,6 +803,19 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
+    // delete shared memory (start time)
+    if (shmdt(start_time) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(start_time_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+
+
     // delete shared memory (use time)
     if (shmdt(use_time) == -1) {
         perror("shmdt");
@@ -808,7 +827,7 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
-    // delete shared memory (use time)
+    // delete shared memory (preference)
     if (shmdt(preference) == -1) {
         perror("shmdt");
         exit(1);
@@ -819,7 +838,7 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
-    // delete shared memory (use time)
+    // delete shared memory (temperature)
     if (shmdt(temperature) == -1) {
         perror("shmdt");
         exit(1);
