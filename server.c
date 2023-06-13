@@ -22,6 +22,7 @@
 # include "parser.h"
 # include "scheduler.h"
 # include "dispatcher.h"
+# include "additional.h"
 
 #define MAX_BUFFER_SIZE 1024
 #define PORT 8080
@@ -614,6 +615,9 @@ int main()
 
                         // print_int_table(preference, 10, 12);
                         // printUserTable(users);
+                    }
+                    else if(strncmp(rcvBuffer,"using",5)==0){
+                        ;
                     }
                     
                     
