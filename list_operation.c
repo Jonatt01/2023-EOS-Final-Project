@@ -63,7 +63,8 @@ void displayList(Node* head) {
     Node* current = head;
     printf("Task List:\n--------------------------\n");
     while (current != NULL) {
-        printf("device : %d , level : %d , temp : %d , reservation : %d , priority : %d\n", current->task.device, current->task.level, current->task.temp, current->task.reservation, current->task.priority);
+        printf("device : %d , level : %d , temp : %d , reservation : %d , priority : %d , duration : %d\n", current->task.device, current->task.level, current->task.temp, current->task.reservation, current->task.priority, current->task.duration);
+        //printf("next : %p\n", current->next);
         current = current->next;
     }
     printf("--------------------------\n");
@@ -71,7 +72,20 @@ void displayList(Node* head) {
 
 void removeHeadNode(Node** head) {
         // 每操作完一次 head 後移
+        if (*head == NULL) {
+            printf("連結串列為空，無法移除頭節點\n");
+        return;
+        }
+
         Node* temp = *head;
+        printf("temp : %p\n",temp);
+        printf("next : %p\n",(*head)->next);
+        
         *head = (*head)->next;
+        printf("temp : %p\n",temp);
+
+
+
+
         free(temp); // 釋放NODE
 }

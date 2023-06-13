@@ -22,6 +22,7 @@
 # include "parser.h"
 # include "scheduler.h"
 # include "dispatcher.h"
+# include "additional.h"
 
 #define MAX_BUFFER_SIZE 1024
 #define PORT 8080
@@ -49,6 +50,10 @@ key_t mode_key = 5678;
 extern int mode_shm_id; // defined in create_table.c
 int* user_mode;
 
+key_t start_time_key = 2345;
+extern int start_time_shm_id; // defined in create_table.c
+int* start_time;
+
 key_t use_time_key = 2468;
 extern int using_time_shm_id; // defined in create_table.c
 int* use_time;
@@ -60,6 +65,18 @@ int* preference;
 key_t temperature_key = 4567;
 extern int temperature_shm_id; // defined in create_table.c
 int* temperature;
+
+key_t watt_key = 9876;
+extern int watt_shm_id;
+int* watt;
+
+key_t expect_using_time_key = 1579;
+extern int expect_using_time_shm_id;
+int* expect_using_time;
+
+key_t expect_watt_shm_key = 6543;
+extern int expect_watt_shm_id;
+int* expect_watt;
 
 // parameters for semaphores
 int val_pref; // for checking semaphore value
@@ -79,6 +96,9 @@ extern User users[MAXUSERNUM];
 
 void mode_settingmsg(int connfd, int* table);
 void preference_settingmsgs(int connfd, int* table);
+void expect_time_settingmsgs(int connfd, int* table);
+void expect_watt_settingmsgs(int connfd, int* table);
+
 void interrupt_handler(int signum);
 
 int socket_server()
@@ -125,12 +145,20 @@ int main()
     device_status = create_status_table(dev_status_key);
     // create user specific mode table
     user_mode = create_mode_table(mode_key);
+    // create start time table
+    start_time = create_start_time_table(start_time_key);
     // create use time table
     use_time = create_using_time_table(use_time_key);
     // create preference table
     preference = create_preference_table(preference_key);
     // create temperature table
     temperature = create_temperature_table(temperature_key);
+    // create watt table
+    watt = create_watt_table(watt_key);
+    // create expect using time table
+    expect_using_time = create_expect_using_time_table(expect_using_time_key);    
+    // create expect watt table
+    expect_watt = create_expect_watt_table(expect_watt_shm_key); 
 
     // Create POSIX semaphore for preference table
     preference_sem = sem_open("/SEM_PREFERENCE", O_CREAT, 0666, 1);
@@ -313,7 +341,7 @@ int main()
 
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
-                        dispatcher(task_list_head,device_status);
+                        dispatcher(&task_list_head,device_status);
 
                     }
                     // emergency
@@ -322,7 +350,7 @@ int main()
                         newnode = emergency_parser();
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
-                        dispatcher(task_list_head,device_status);
+                        dispatcher(&task_list_head,device_status);
                     }
                     // normal control command
                     else if(strncmp(rcvBuffer,"control",7)==0){
@@ -400,7 +428,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(task_list_head,device_status);
+                        dispatcher(&task_list_head,device_status);
                     }
                     // reservation
                     else if(strncmp(rcvBuffer,"reservation",11)==0){
@@ -463,7 +491,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(task_list_head,device_status);
+                        dispatcher(&task_list_head,device_status);
                     }
                     // set preference table
                     else if(strncmp(rcvBuffer,"preference",10)==0){
@@ -547,7 +575,7 @@ int main()
                         // sem_getvalue(preference_sem,&val_pref);
                         // printf("Begin room setting - preference sem value=%d, pid=%d\n",val_pref, getpid());
 
-                        newnode = room_preference_parser(roomisset, user_index, preference,duration);
+                        newnode = room_preference_parser(roomisset, user_index, preference, duration);
 
                         sem_post(preference_sem);
                         // sem_getvalue(preference_sem,&val_pref);
@@ -556,6 +584,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
+                        dispatcher(&task_list_head,device_status);
                     }
                     // delete user
                     else if(strncmp(rcvBuffer,"delete",6)==0){
@@ -591,7 +620,62 @@ int main()
                         // print_int_table(preference, 10, 12);
                         // printUserTable(users);
                     }
+                    // set the expect time table
+                    else if(strncmp(rcvBuffer,"expect time",11)==0){
+                        char username[64];
+                        char tmp[64];
+                        int user_index = 0;
+                        char *token;
 
+                        token=strtok(rcvBuffer,"|"); // expect time
+                        token=strtok(NULL,"|"); // user Jonathan
+
+                        sscanf(token," %s %s",tmp,username);
+                        user_index = whichuser(username,users);
+                        if(user_index == 11){
+                            printf("User not found!\n");
+                            break;
+                        }
+
+                        printf("%s start to set expect device using time.\n",username);
+
+                        int settable[12] = {0}; // temp storage of what user set
+                        expect_time_settingmsgs(clientfd, settable);
+
+                        setusingtime(expect_using_time, user_index, settable);
+
+                        printf("%s end of seting expect using time.\n",username);
+                        // print_int_table(expect_using_time, 1, 12);    
+
+                    }
+                    // set the expect WATT table
+                    else if(strncmp(rcvBuffer,"expect watt",11)==0){
+                        char username[64];
+                        char tmp[64];
+                        int user_index = 0;
+                        char *token;
+
+                        token=strtok(rcvBuffer,"|"); // expect time
+                        token=strtok(NULL,"|"); // user Jonathan
+
+                        sscanf(token," %s %s",tmp,username);
+                        user_index = whichuser(username,users);
+                        printf("%s user index : %d",username,user_index);
+                        if(user_index == 11){
+                            printf("User not found!\n");
+                            break;
+                        }
+
+                        printf("%s start to set expect watt.\n",username);
+
+                        int settable[12] = {0}; // temp storage of what user set
+                        expect_watt_settingmsgs(clientfd, settable);
+
+                        setwatt(expect_watt, user_index, settable);
+
+                        printf("%s end of seting expect watt.\n",username);
+                        // print_int_table(expect_watt, 2, 12);
+                    }                    
                     
                 }
             }
@@ -769,7 +853,158 @@ void preference_settingmsgs(int connfd, int* table){
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[10] = atoi(rcv);
     printf("Lights brightness : %d\n",*(table + 10));   
+}
 
+void expect_time_settingmsgs(int connfd, int* table){
+    char snd[MAX_BUFFER_SIZE] = {0},rcv[MAX_BUFFER_SIZE] = {0};
+    int msglen = 0;
+    
+    memset(rcv, 0, MAX_BUFFER_SIZE);
+    memset(snd, 0, MAX_BUFFER_SIZE);
+    msglen = sprintf(snd,"Start of the Bedroom setting.\nExpect using time of airconditioner : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[0] = atoi(rcv);
+    printf("Expect using time of air conditioner : %d\n",*(table));
+
+    msglen = sprintf(snd,"Expect using time of lights : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[1] = atoi(rcv);
+    printf("Expect using time of lights : %d\n",*(table + 1));
+
+    msglen = sprintf(snd,"Expect using time of fan : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[2] = atoi(rcv);
+    printf("Expect using time of fan : %d\n",*(table + 2));
+
+    // msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
+    // write(clientfd,snd,msglen+1);
+    // read(clientfd,rcv,MAX_BUFFER_SIZE);
+    // table[3] = atoi(rcv);
+    // printf("Changed curtain level : %d\n",*(table + 3));
+
+    // living room
+    msglen = sprintf(snd,"Start of the Living room setting.\nExpect using time of airconditioner : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[4] = atoi(rcv);
+    printf("Expect using time of air conditioner : %d\n",*(table + 4));
+
+    msglen = sprintf(snd,"Expect using time of lights : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[5] = atoi(rcv);
+    printf("Expect using time of lights : %d\n",*(table + 5));
+
+    msglen = sprintf(snd,"Expect using time of fan : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[6] = atoi(rcv);
+    printf("Expect using time of fan : %d\n",*(table + 6));
+
+    // msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
+    // write(clientfd,snd,msglen+1);
+    // read(clientfd,rcv,MAX_BUFFER_SIZE);
+    // table[7] = atoi(rcv);
+    // printf("Changed curtain level : %d\n",*(table + 7)); 
+
+    // kitchen
+    msglen = sprintf(snd,"Start of the Kitchen setting.\nExpect using time of lights : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[8] = atoi(rcv);
+    printf("Expect using time of lights : %d\n",*(table + 8));
+
+    // bathroom
+    msglen = sprintf(snd,"Start of the Bathroom setting.\nExpect using time of airconditioner : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[9] = atoi(rcv);
+    printf("Expect using time of air conditioner : %d\n",*(table + 9));
+
+    msglen = sprintf(snd,"Expect using time of lights : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[10] = atoi(rcv);
+    printf("Expect using time of lights : %d\n",*(table + 10));       
+}
+
+void expect_watt_settingmsgs(int connfd, int* table){
+    char snd[MAX_BUFFER_SIZE] = {0},rcv[MAX_BUFFER_SIZE] = {0};
+    int msglen = 0;
+    
+    memset(rcv, 0, MAX_BUFFER_SIZE);
+    memset(snd, 0, MAX_BUFFER_SIZE);
+    msglen = sprintf(snd,"Start of the Bedroom setting.\nExpect using watt of airconditioner : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[0] = atoi(rcv);
+    printf("Expect using watt of air conditioner : %d\n",*(table));
+
+    msglen = sprintf(snd,"Expect using watt of lights : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[1] = atoi(rcv);
+    printf("Expect using watt of lights : %d\n",*(table + 1));
+
+    msglen = sprintf(snd,"Expect using watt of fan : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[2] = atoi(rcv);
+    printf("Expect using watt of fan : %d\n",*(table + 2));
+
+    // msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
+    // write(clientfd,snd,msglen+1);
+    // read(clientfd,rcv,MAX_BUFFER_SIZE);
+    // table[3] = atoi(rcv);
+    // printf("Changed curtain level : %d\n",*(table + 3));
+
+    // living room
+    msglen = sprintf(snd,"Start of the Living room setting.\nExpect using watt of airconditioner : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[4] = atoi(rcv);
+    printf("Expect using watt of air conditioner : %d\n",*(table + 4));
+
+    msglen = sprintf(snd,"Expect using watt of lights : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[5] = atoi(rcv);
+    printf("Expect using watt of lights : %d\n",*(table + 5));
+
+    msglen = sprintf(snd,"Expect using watt of fan : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[6] = atoi(rcv);
+    printf("Expect using watt of fan : %d\n",*(table + 6));
+
+    // msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
+    // write(clientfd,snd,msglen+1);
+    // read(clientfd,rcv,MAX_BUFFER_SIZE);
+    // table[7] = atoi(rcv);
+    // printf("Changed curtain level : %d\n",*(table + 7)); 
+
+    // kitchen
+    msglen = sprintf(snd,"Start of the Kitchen setting.\nExpect using watt of lights : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[8] = atoi(rcv);
+    printf("Expect using watt of lights : %d\n",*(table + 8));
+
+    // bathroom
+    msglen = sprintf(snd,"Start of the Bathroom setting.\nExpect using watt of airconditioner : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[9] = atoi(rcv);
+    printf("Expect using watt of air conditioner : %d\n",*(table + 9));
+
+    msglen = sprintf(snd,"Expect using watt of lights : ");
+    write(clientfd,snd,msglen+1);
+    read(clientfd,rcv,MAX_BUFFER_SIZE);
+    table[10] = atoi(rcv);
+    printf("Expect using watt of lights : %d\n",*(table + 10));       
 }
 
 void interrupt_handler(int signum){
@@ -797,6 +1032,19 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
+    // delete shared memory (start time)
+    if (shmdt(start_time) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(start_time_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+
+
     // delete shared memory (use time)
     if (shmdt(use_time) == -1) {
         perror("shmdt");
@@ -808,7 +1056,7 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
-    // delete shared memory (use time)
+    // delete shared memory (preference)
     if (shmdt(preference) == -1) {
         perror("shmdt");
         exit(1);
@@ -819,7 +1067,7 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
-    // delete shared memory (use time)
+    // delete shared memory (temperature)
     if (shmdt(temperature) == -1) {
         perror("shmdt");
         exit(1);
@@ -830,17 +1078,56 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
+    // delete shared memory (watt)
+    if (shmdt(watt) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(watt_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+        // delete shared memory (expect using time)
+    if (shmdt(expect_using_time) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(expect_using_time_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+        // delete shared memory (expect watt)
+    if (shmdt(expect_watt) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(expect_watt_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
 
     // delete named POSIX semphore
+
+    sem_close(preference_sem);
     sem_unlink("/SEM_PREFERENCE");
 
     // delete named POSIX semphore
+
+    sem_close(mode_sem);
     sem_unlink("/SEM_MODE");
 
     // delete named POSIX semaphore
+    
+    sem_close(using_time_sem);
     sem_unlink("/SEM_TIME");
 
     // delete named POSIX semaphore
+    sem_close(temperature_sem);
     sem_unlink("/SEM_TEMP");
 
     close(clientfd);

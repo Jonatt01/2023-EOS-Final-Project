@@ -232,19 +232,19 @@ int main() {
 
     
 //*********************************start of emergency command*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"emergency earthquake");
-    write(sockfd,message,msglen+1);
-    printf("Sent emregency to server: %s\n", message);
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"emergency earthquake");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent emregency to server: %s\n", message);
 
-    sleep(1);
+    // sleep(1);
 //*********************************end of emergency command*********************************//   
 
 //*********************************start of control device command*********************************//
     // memset(message,0,MAX_BUFFER_SIZE);
     // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"control device | user Jonathan | bedroom light 3 | livingroom light 2");
+    // msglen = sprintf(message,"control device | user Jonathan | duration 20 | bedroom light 3 | livingroom light 2");
     // write(sockfd,message,msglen+1);
     // printf("Sent control to server: %s\n", message);
 
@@ -358,24 +358,24 @@ int main() {
 //*********************************end of personal setting*********************************//    
 
 //*********************************start of room command*********************************//
-    // memset(message,0,MAX_BUFFER_SIZE);
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"room | user Jonathan | bedroom comfort | kitchen comfort");
-    // write(sockfd,message,msglen+1);
-    // printf("Sent control to server: %s\n", message);
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"room | user Jonathan | duration 20 | bedroom comfort | kitchen comfort");
+    write(sockfd,message,msglen+1);
+    printf("Sent control to server: %s\n", message);
 
-    // sleep(1);
+    sleep(1);
 //*********************************end of room command*********************************//  
 
 
 //*********************************start of control device command*********************************//
-    // memset(message,0,MAX_BUFFER_SIZE);
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"control device | user Jonathan | bedroom light comfort | livingroom light comfort");
-    // write(sockfd,message,msglen+1);
-    // printf("Sent control to server: %s\n", message);
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"control device | user aaa | bedroom light 0 | kitchen light 0");
+    write(sockfd,message,msglen+1);
+    printf("Sent control to server: %s\n", message);
 
-    // sleep(1);
+    sleep(1);
 //*********************************end of control device command*********************************//  
     
     // }

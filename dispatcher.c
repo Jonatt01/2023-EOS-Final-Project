@@ -29,7 +29,7 @@
 
 int reservation_device_id = 0;
 int reservation_operation = -1;
-int reservation_data[4];
+int reservation_data[5];
 
 pid_t reservaion_child;
 key_t msgQ_key;
@@ -39,13 +39,14 @@ int msg_queue_id;
 struct message
 {
     long msg_type;
-    int data[4];
+    int data[5];
 };
 
 #define DEVICE_ID 0
 #define LEVEL 1
 #define TEMP 2
 #define DURATION 3
+#define RESERVATION_TIME 4
 
 void signal_handler(int signum)
 {
@@ -81,6 +82,7 @@ void signal_handler(int signum)
         msg.data[LEVEL] = reservation_data[LEVEL];
         msg.data[TEMP] = reservation_data[TEMP];
         msg.data[DURATION] = reservation_data[DURATION];
+        msg.data[RESERVATION_TIME] = reservation_data[RESERVATION_TIME];
 
         if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1)
         {
@@ -91,26 +93,26 @@ void signal_handler(int signum)
     }
 }
 
-int get_command_type(Node *head)
+int get_command_type(Node **head)
 {
 
-    if (head->task.device != 0 && head->task.reservation == 0)
+    if ((*head)->task.device != 0 && (*head)->task.reservation == 0)
     {
         return RELAY;
     }
-    if (head->task.reservation == 1 && head->task.device != 0)
+    if ((*head)->task.reservation == 1 && (*head)->task.device != 0)
     {
         return RESERVATION;
     }
-    if (head->task.calculate == 1)
+    if ((*head)->task.calculate == 1)
     {
         return CALCULATE;
     }
 }
 
-int get_reservation_operation(Node *head)
+int get_reservation_operation(Node **head)
 {
-    if (head->task.level > 0 || head->task.temp > 0)
+    if ((*head)->task.level > 0 || (*head)->task.temp > 0)
     {
         return OPEN;
     }
@@ -120,9 +122,9 @@ int get_reservation_operation(Node *head)
     }
 }
 
-void dispatcher(Node *head, int* status_shm)
+void dispatcher(Node** head, int* status_shm)
 {
-    while (head != NULL)
+    while (*head != NULL)
     {
         printf("Strating dispatch ..\n");
         // 判斷進入哪個流程，分為 relay、reservation、calculate
@@ -130,7 +132,7 @@ void dispatcher(Node *head, int* status_shm)
         command_type = get_command_type(head);
         reservation_operation = get_reservation_operation(head);
         printf("command type = %d\n",command_type);
-        printf("device_id = %d\n",head->task.device);
+        printf("device_id = %d\n",(*head)->task.device);
         switch (command_type)
         {
         case RELAY:
@@ -145,15 +147,16 @@ void dispatcher(Node *head, int* status_shm)
             struct message msg;
             // 儲存要送給Relay的資料，放進msgQ中
             msg.msg_type = MSG_TYPE;
-            msg.data[DEVICE_ID] = head->task.device;
-            msg.data[LEVEL] = head->task.level;
-            msg.data[TEMP] = head->task.temp;
-            msg.data[DURATION] = head->task.duration;
+            msg.data[DEVICE_ID] = (*head)->task.device;
+            msg.data[LEVEL] = (*head)->task.level;
+            msg.data[TEMP] = (*head)->task.temp;
+            msg.data[DURATION] = (*head)->task.duration;
+            msg.data[RESERVATION_TIME] = (*head)->task.reservation_time;
             printf("msg.data[DEVICE_ID] = %d\n",msg.data[DEVICE_ID]);
             printf("msg.data[LEVEL] = %d\n",msg.data[LEVEL]);
             printf("msg.data[TEMP] = %d\n", msg.data[TEMP]);
             printf("msg.data[DURATION] = %d\n",msg.data[DURATION]);
-           
+            printf("msg.data[RESERVATION_TIME] = %d\n",msg.data[RESERVATION_TIME]);
             if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1)
             {
                 perror("msgsnd error");
@@ -165,12 +168,14 @@ void dispatcher(Node *head, int* status_shm)
             reservaion_child = fork();
             if (reservaion_child == 0)
             {
-                reservation_device_id = head->task.device;
-                reservation_data[DEVICE_ID] = head->task.device;
-                reservation_data[LEVEL] = head->task.level;
-                reservation_data[TEMP] = head->task.temp;
-                reservation_data[DURATION] = head->task.reservation_time;
-                device_reservation(head->task.device, head->task.reservation_time, status_shm, reservation_operation);
+                reservation_device_id = (*head)->task.device;
+                reservation_data[DEVICE_ID] = (*head)->task.device;
+                reservation_data[LEVEL] = (*head)->task.level;
+                reservation_data[TEMP] = (*head)->task.temp;
+                reservation_data[DURATION] = (*head)->task.duration;
+                reservation_data[RESERVATION_TIME] = (*head)->task.reservation_time;
+
+                device_reservation((*head)->task.device, (*head)->task.reservation_time, status_shm, reservation_operation);
                 exit(EXIT_SUCCESS);
             }
             else
@@ -180,15 +185,15 @@ void dispatcher(Node *head, int* status_shm)
             break;
         case CALCULATE:
 
+            
 
-
-        
             break;
 
         default:
             break;
         }
 
-        removeHeadNode(&head);
+        removeHeadNode(head);
+        printf("after remove  head = %p\n",head);
     }
 }

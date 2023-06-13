@@ -1,11 +1,9 @@
 # ifndef LIST_OPERATION_H
 # define LIST_OPERATION_H
 
-# include "list_operation.h"
-
 typedef struct Task {
     int priority;
-    int user; // 1-10
+    int user; // 1-10   
     int reservation; // 0 or 1
     int reservation_time; // minute
     int place; // useless

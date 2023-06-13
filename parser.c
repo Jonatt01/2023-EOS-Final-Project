@@ -12,7 +12,7 @@ int device_index[12] = {1,2,3,4,1,2,3,4,2,1,2,5};
 Node* setmode_parser(int user, int mode, int* mode_table){
     Node* head = NULL;
     
-    for(int i=0;i<12;i++){
+    for(int i=0;i<11;i++){
         Node* newNode = createNode();
 
         newNode -> task.user = user;
@@ -153,7 +153,7 @@ Node* room_preference_parser(int* ischange, int user, int* preference, int durat
                 if(duration != 0){
                     newNode -> task.duration = duration;
                 }
-                
+
                 newNode -> task.level = *(preference + user*12 + 8);
 
                 insertAtEnd(&head, newNode);
@@ -178,9 +178,6 @@ Node* room_preference_parser(int* ischange, int user, int* preference, int durat
                     insertAtEnd(&head, newNode);
                 }
             }
-        }
-        else{
-            continue;
         }
     }
 

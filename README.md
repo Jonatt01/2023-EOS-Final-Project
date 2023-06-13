@@ -27,6 +27,10 @@
     - `delete`
 - set the mode
     - `setmode | user Jonathan | afternoon`
+- **set the expect using time of devices**
+    - `expect time | user Jonathan`
+- **set the expect WATT of devices**
+    - `expect watt | user Jonathan`
 - set preference
     - `preference | user Jonathan`
 - change the user specific mode
@@ -36,17 +40,19 @@
 - open device (`duration 0` means do not set with duration)
     - `control device | user Jonathan | duration 20 | bedroom light 3 | livingroom light 2`
     - `control device | user Jonathan | duration 0 | bedroom light comfort | kitchen light comfort`
-- set place to comfort
+- set place to comfort (`duration 0` means do not set with duration)
     - `room | user Jonathan | duration 20 | bedroom comfort | bathroom comfort`
 - reservation
     - `reservation 30 | user Jonathan | bedroom light 3 | livingroom light 2`
     - `reservation 30 | user Jonathan | bathroom light comfort | livingroom light 2`
+- **checkout the using time**
+    - `using time | bedroom light`
+- **checkout the temperature**
+    - `temperature | bedroom`
+- **check out device status**
+    - `device status | bedroom light`
 - **calculate**
     - `calculate bill`
-- **search**
-    - `search | light | using time`
-- **device status**
-    - `device status | bedroom light`
 
 ## parser
 - output list of structures
