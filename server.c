@@ -65,6 +65,18 @@ key_t temperature_key = 4567;
 extern int temperature_shm_id; // defined in create_table.c
 int* temperature;
 
+key_t watt_key = 9876;
+extern int watt_shm_id;
+int* watt;
+
+key_t expect_using_time_key = 1579;
+extern int expect_using_time_shm_id;
+int* expect_using_time;
+
+key_t expect_watt_shm_key = 6543;
+extern int expect_watt_shm_id;
+int* expect_watt;
+
 // parameters for semaphores
 int val_pref; // for checking semaphore value
 sem_t *preference_sem;
@@ -136,7 +148,13 @@ int main()
     // create preference table
     preference = create_preference_table(preference_key);
     // create temperature table
-    // temperature = create_temperature_table(temperature_key);
+    temperature = create_temperature_table(temperature_key);
+    // create watt table
+    temperature = create_watt_table(watt_key);
+    // create expect using time table
+    temperature = create_expect_using_time_table(expect_using_time_key);    
+    // create expect watt table
+    temperature = create_expect_watt_table(expect_watt_shm_key); 
 
     // Create POSIX semaphore for preference table
     preference_sem = sem_open("/SEM_PREFERENCE", O_CREAT, 0666, 1);
@@ -849,6 +867,38 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
+    // delete shared memory (watt)
+    if (shmdt(watt) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(watt_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+        // delete shared memory (expect using time)
+    if (shmdt(expect_using_time) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(expect_using_time_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
+
+        // delete shared memory (expect watt)
+    if (shmdt(expect_watt) == -1) {
+        perror("shmdt");
+        exit(1);
+    }
+
+    if (shmctl(expect_watt_shm_id, IPC_RMID, NULL) == -1) {
+        perror("shmctl");
+        exit(1);
+    }
 
     // delete named POSIX semphore
     sem_unlink("/SEM_PREFERENCE");

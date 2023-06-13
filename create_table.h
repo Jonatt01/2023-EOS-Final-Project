@@ -28,4 +28,10 @@ int* create_preference_table(key_t key);
 
 int* create_temperature_table(key_t key);
 
+int* create_watt_table(key_t key);
+
+int* create_expect_using_time_table(key_t key);
+
+int* create_expect_watt_table(key_t key);
+
 # endif
