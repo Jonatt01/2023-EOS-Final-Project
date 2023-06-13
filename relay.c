@@ -400,7 +400,7 @@ void *command_thread(void *arg)
             // 讀取共享內存，製作新的指令，將處理過後的指令內容到socket buffer EX: 23 0 0 2 1 0 3 1 0 ...
             
             sem_wait(useTime_semaphore);
-            update_time_table(start_time_shm,use_time_shm,msgQ); // update start time and use time.
+            update_time_table(start_time_shm,using_time_shm,msgQ); // update start time and use time.
             sem_post(useTime_semaphore);
 
             memset(commandBuffer,0,strlen(commandBuffer));

@@ -338,7 +338,7 @@ int main()
 
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
-                        dispatcher(task_list_head,device_status);
+                        dispatcher(&task_list_head,device_status);
 
                     }
                     // emergency
@@ -347,7 +347,7 @@ int main()
                         newnode = emergency_parser();
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
-                        // dispatcher(task_list_head,device_status);
+                        dispatcher(&task_list_head,device_status);
                     }
                     // normal control command
                     else if(strncmp(rcvBuffer,"control",7)==0){
@@ -425,7 +425,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(task_list_head,device_status);
+                        dispatcher(&task_list_head,device_status);
                     }
                     // reservation
                     else if(strncmp(rcvBuffer,"reservation",11)==0){
@@ -488,7 +488,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(task_list_head,device_status);
+                        dispatcher(&task_list_head,device_status);
                     }
                     // set preference table
                     else if(strncmp(rcvBuffer,"preference",10)==0){
@@ -581,6 +581,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
+                        dispatcher(&task_list_head,device_status);
                     }
                     // delete user
                     else if(strncmp(rcvBuffer,"delete",6)==0){
