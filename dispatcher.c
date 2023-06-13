@@ -39,7 +39,7 @@ int msg_queue_id;
 struct message
 {
     long msg_type;
-    int data[5];
+    int data[6];
 };
 
 #define DEVICE_ID 0
@@ -47,6 +47,7 @@ struct message
 #define TEMP 2
 #define DURATION 3
 #define RESERVATION_TIME 4
+#define IS_MODE 5
 
 void signal_handler(int signum)
 {
@@ -122,7 +123,7 @@ int get_reservation_operation(Node **head)
     }
 }
 
-void dispatcher(Node** head, int* status_shm)
+void dispatcher(Node** head, int* status_shm,int is_mode)
 {
     while (*head != NULL)
     {
@@ -152,11 +153,13 @@ void dispatcher(Node** head, int* status_shm)
             msg.data[TEMP] = (*head)->task.temp;
             msg.data[DURATION] = (*head)->task.duration;
             msg.data[RESERVATION_TIME] = (*head)->task.reservation_time;
+            msg.data[IS_MODE] = is_mode;
             printf("msg.data[DEVICE_ID] = %d\n",msg.data[DEVICE_ID]);
             printf("msg.data[LEVEL] = %d\n",msg.data[LEVEL]);
             printf("msg.data[TEMP] = %d\n", msg.data[TEMP]);
             printf("msg.data[DURATION] = %d\n",msg.data[DURATION]);
             printf("msg.data[RESERVATION_TIME] = %d\n",msg.data[RESERVATION_TIME]);
+            printf("msg.data[IS_MODE] = %d\n",is_mode);
             if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1)
             {
                 perror("msgsnd error");

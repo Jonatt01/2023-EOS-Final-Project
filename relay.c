@@ -24,6 +24,7 @@
 #define TEMP 2
 #define DURATION 3
 #define RESERVATION_TIME 4
+#define IS_MODE 5
 
 #define STATUS_SHM_LENGTH 12
 #define STATUS_SIZE 12 * sizeof(int)
@@ -38,7 +39,7 @@ int msgQid;
 struct message // msgQ message format
 {
     long msg_type;
-    int data[5];
+    int data[6];
 };
 struct message msgQ;
 #define MSG_Q_KEY 1111
@@ -270,6 +271,7 @@ void *command_thread(void *arg)
     char commandBuffer[MAX_BUFFER_SIZE];
     int duration_table[12]={0};
     time_t duration_start_time[12]={0};
+    int mode_counter = 0;
     { // 獲得 msgQ 參數
         // 產生唯一的 key
         msgQkey = MSG_Q_KEY;
@@ -453,11 +455,29 @@ void *command_thread(void *arg)
             printf("In Relay.c , Relay -> Device commandBuffer = %s.\n",commandBuffer);
             // 透過socket轉送給device
             sleep(1);
-            if (send(clientSocket, commandBuffer, SEND_SIZE, 0) < 0)
+            if(msgQ.data[IS_MODE] == 0)
             {
-                perror("錯誤：發送訊息失敗");
-                exit(1);
+                if (send(clientSocket, commandBuffer, SEND_SIZE, 0) < 0)
+                {
+                    perror("錯誤：發送訊息失敗");
+                    exit(1);
+                }
             }
+            else if(msgQ.data[IS_MODE] == 1)
+            {
+                mode_counter++;
+                if(mode_counter == 11)
+                {
+                    printf("Mode command collect finished! send mode command to device!\n");
+                    if (send(clientSocket, commandBuffer, SEND_SIZE, 0) < 0)
+                    {
+                        perror("錯誤：發送訊息失敗");
+                        exit(1);
+                    }
+                    mode_counter = 0;  
+                }
+            }
+
         }
 
         // 查看共享內存溫度訊息，若溫度過高將冷氣打開到適合的溫度，再次發送一個指令
