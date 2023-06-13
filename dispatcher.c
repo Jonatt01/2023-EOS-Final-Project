@@ -179,6 +179,9 @@ void dispatcher(Node *head, int* status_shm)
             }
             break;
         case CALCULATE:
+
+            
+
             break;
 
         default:

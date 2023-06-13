@@ -12,6 +12,7 @@
 #include <unistd.h> // for close
 #include <fcntl.h>
 #include <semaphore.h>
+#include <sys/time.h>
 
 #define MAX_BUFFER_SIZE 1024
 #define DEVICE_PORT 9090
@@ -25,6 +26,9 @@
 #define STATUS_SHM_LENGTH 12
 #define STATUS_SIZE 12 * sizeof(int)
 #define MODE_SIZE 30 * 12 * sizeof(int)
+# define START_TIME_SIZE 12*sizeof(int)
+# define USE_TIME_SIZE 12*sizeof(int)
+
 /*     創建 Msg Queue     */
 
 key_t msgQkey;
@@ -41,12 +45,21 @@ key_t status_shm_key = 1234;
 int *status_shm;
 int status_shm_id;
 
+key_t start_time_key = 2345;
+int start_time_shm_id;
+int *start_time_shm;
+
+key_t use_time_key = 2468;
+int using_time_shm_id;
+int *using_time_shm;
+
 key_t mode_shm_key = 5678;
 int *mode_shm;
 int mode_shm_id;
 
 /*     創建 Semaphore     */
-sem_t *semaphore; // 二元信號量
+sem_t *status_semaphore; // 二元信號量
+sem_t *useTime_semaphore;
 
 int serverSocket, clientSocket;
 int sockfd, connfd;
@@ -60,30 +73,82 @@ void interrupt_handler(int signum)
         perror("msgctl");
         exit(1);
     }
-    printf("MsgQ deleted!\n");
+    printf("msgQ deleted!\n");
 
     // 刪除 Shared memory
     if (shmdt(status_shm) == -1)
     {
-        perror("shmdt");
+        perror("shmdt status_shm");
         exit(1);
     }
-
     if (shmctl(status_shm_id, IPC_RMID, NULL) == -1)
     {
-        perror("shmctl");
+        perror("shmctl status_shm");
         exit(1);
     }
 
-    exit(EXIT_SUCCESS);
+    if (shmdt(start_time_shm) == -1)
+    {
+        perror("shmdt start_time_shm");
+        exit(1);
+    }
+    if (shmctl(start_time_shm_id, IPC_RMID, NULL) == -1)
+    {
+        perror("shmctl start_time_shm");
+        exit(1);
+    }
+
+    if (shmdt(using_time_shm) == -1)
+    {
+        perror("shmdt using_time_shm");
+        exit(1);
+    }
+    if (shmctl(using_time_shm_id, IPC_RMID, NULL) == -1)
+    {
+        perror("shmctl using_time_shm");
+        exit(1);
+    }
+
 
     close(clientSocket);
     close(serverSocket);
     close(sockfd);
 
-    sem_close(semaphore);
-    sem_unlink("/my_sem");
+    sem_close(status_semaphore);
+    sem_unlink("/SEM_STATUS");
+    
+    sem_close(useTime_semaphore);
+    sem_unlink("/SEM_TIME");
+    exit(EXIT_SUCCESS);
 }
+
+void update_time_table(int *start_time_shm, int *use_time_shm, struct message msgQ)
+{
+    struct timeval current_time;
+    if(msgQ.data[LEVEL] > 0 || msgQ.data[TEMP] > 0) // open device
+    {
+        if(start_time_shm[msgQ.data[DEVICE_ID] - 1] == 0) // first open device
+        {
+            gettimeofday(&current_time,NULL); // get current time
+            start_time_shm[msgQ.data[DEVICE_ID] - 1] = (int)current_time.tv_sec; // update device open start time
+
+        }
+        else
+        {
+            // nothing to update, dispatcher will tell the user accumulative time.
+        }
+    }
+    else // for close device
+    {
+        if(start_time_shm[msgQ.data[DEVICE_ID] - 1] != 0) // To avoid that the device did not open yet but calculate the using time.
+        {
+            gettimeofday(&current_time,NULL); // get current time
+            int elapsed_time = ((int)current_time.tv_sec - start_time_shm[msgQ.data[DEVICE_ID] - 1]); // current time - start time = accumulative time
+            use_time_shm[msgQ.data[DEVICE_ID] - 1] = elapsed_time;
+        }
+    }
+}
+
 
 void *status_thread(void *arg)
 {
@@ -195,7 +260,8 @@ void *command_thread(void *arg)
     }
 
     { // 獲得Semaphore參數
-        semaphore = sem_open("/my_sem", O_CREAT, 0666, 1);
+        status_semaphore = sem_open("/SEM_STATUS", O_CREAT, 0666, 1);
+        useTime_semaphore = sem_open("/SEM_TIME", O_CREAT, 0666, 1);
     }
 
     { // 獲得 shm 參數
@@ -206,11 +272,34 @@ void *command_thread(void *arg)
             exit(1);
         }
 
-        status_shm = (int *)shmat(status_shm_id, NULL, 0);
-        if (status_shm == (int *)-1)
+        start_time_shm_id = shmget(start_time_key, START_TIME_SIZE, IPC_CREAT | 0666);
+        if (start_time_shm_id == -1)
         {
-            perror("shmat error");
+            perror("shmget error");
             exit(1);
+        }
+
+        using_time_shm_id = shmget(using_time_shm_id, USE_TIME_SIZE, IPC_CREAT | 0666);
+        if (using_time_shm_id == -1)
+        {
+            perror("shmget error");
+            exit(1);
+        }
+
+        if ((status_shm = shmat(status_shm_id, NULL, 0)) == (int *) -1)
+        {
+            perror("shmat");
+            exit(-1);
+        }
+        if ((start_time_shm = shmat(start_time_shm_id, NULL, 0)) == (int *) -1)
+        {
+            perror("shmat");
+            exit(-1);
+        }
+        if ((using_time_shm = shmat(using_time_shm_id, NULL, 0)) == (int *) -1)
+        {
+            perror("shmat");
+            exit(-1);
         }
     }
     { // 建立和devices的socket
@@ -274,7 +363,7 @@ void *command_thread(void *arg)
         }
 
         /*          critical section          */
-        sem_wait(semaphore);
+        sem_wait(status_semaphore);
 
         // 查看目前Device狀態，如果設備已開啟則不更新共享內存並設置裝置
         int sendToDevice = 0;
@@ -309,6 +398,11 @@ void *command_thread(void *arg)
 
         if(sendToDevice){
             // 讀取共享內存，製作新的指令，將處理過後的指令內容到socket buffer EX: 23 0 0 2 1 0 3 1 0 ...
+            
+            sem_wait(useTime_semaphore);
+            update_time_table(start_time_shm,use_time_shm,msgQ); // update start time and use time.
+            sem_post(useTime_semaphore);
+
             memset(commandBuffer,0,strlen(commandBuffer));
             char insert_str[3];
 
@@ -342,7 +436,7 @@ void *command_thread(void *arg)
         // 查看共享內存溫度訊息，若溫度過高將冷氣打開到適合的溫度，再次發送一個指令
         // send()
 
-        sem_post(semaphore);
+        sem_post(status_semaphore);
         /*          critical section          */
     }
     exit(EXIT_SUCCESS);
