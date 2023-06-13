@@ -48,7 +48,7 @@ int main() {
         memset(buffer,0,MAX_BUFFER_SIZE);
 
         // Receive data from the server
-        ssize_t num_bytes_read = read(sockfd, buffer, MAX_BUFFER_SIZE);
+        ssize_t num_bytes_read = read(sockfd, buffer, 27);
         if (num_bytes_read == -1) {
             perror("Error: Failed to receive data from server");
             close(sockfd);

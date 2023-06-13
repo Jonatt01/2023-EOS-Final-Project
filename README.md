@@ -30,7 +30,7 @@
 - **set the expect using time of devices**
     - `expect time | user Jonathan`
 - **set the expect WATT of devices**
-    - `expect WATT | user Jonathan`
+    - `expect watt | user Jonathan`
 - set preference
     - `preference | user Jonathan`
 - change the user specific mode

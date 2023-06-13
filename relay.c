@@ -15,6 +15,7 @@
 #include <sys/time.h>
 
 #define MAX_BUFFER_SIZE 1024
+#define SEND_SIZE 27
 #define DEVICE_PORT 9090
 #define STATUS_PORT 9091
 
@@ -127,16 +128,8 @@ void update_time_table(int *start_time_shm, int *use_time_shm, struct message ms
     struct timeval current_time;
     if(msgQ.data[LEVEL] > 0 || msgQ.data[TEMP] > 0) // open device
     {
-        if(start_time_shm[msgQ.data[DEVICE_ID] - 1] == 0) // first open device
-        {
             gettimeofday(&current_time,NULL); // get current time
             start_time_shm[msgQ.data[DEVICE_ID] - 1] = (int)current_time.tv_sec; // update device open start time
-
-        }
-        else
-        {
-            // nothing to update, dispatcher will tell the user accumulative time.
-        }
     }
     else // for close device
     {
@@ -144,7 +137,7 @@ void update_time_table(int *start_time_shm, int *use_time_shm, struct message ms
         {
             gettimeofday(&current_time,NULL); // get current time
             int elapsed_time = ((int)current_time.tv_sec - start_time_shm[msgQ.data[DEVICE_ID] - 1]); // current time - start time = accumulative time
-            use_time_shm[msgQ.data[DEVICE_ID] - 1] = elapsed_time;
+            use_time_shm[msgQ.data[DEVICE_ID] - 1] += elapsed_time;
         }
     }
 }
@@ -426,7 +419,8 @@ void *command_thread(void *arg)
             }
             printf("In Relay.c , Relay -> Device commandBuffer = %s.\n",commandBuffer);
             // 透過socket轉送給device
-            if (send(clientSocket, commandBuffer, strlen(commandBuffer)+1, 0) < 0)
+            sleep(1);
+            if (send(clientSocket, commandBuffer, SEND_SIZE, 0) < 0)
             {
                 perror("錯誤：發送訊息失敗");
                 exit(1);

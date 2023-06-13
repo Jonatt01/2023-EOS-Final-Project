@@ -13,4 +13,8 @@ void setmode(int* user_mode, int user, int mode, int* settable);
 */
 void setpreference(int* preference, int user, int* settable);
 
+void setusingtime(int* expect_using_time, int user, int* settable);
+
+void setwatt(int* expect_watt, int user, int* settable);
+
 # endif

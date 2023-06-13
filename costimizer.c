@@ -20,3 +20,15 @@ void setpreference(int* preference, int user,int* settable){
     }
     
 }
+
+void setusingtime(int* expect_using_time, int user, int* settable){
+    for(int i=0; i<12; i++){
+        *(expect_using_time + user*12 + i) = settable[i];
+    }
+}
+
+void setwatt(int* expect_watt, int user, int* settable){
+    for(int i=0; i<12; i++){
+        *(expect_watt + user*12 + i) = settable[i];
+    }   
+}

@@ -244,7 +244,7 @@ int main() {
 //*********************************start of control device command*********************************//
     // memset(message,0,MAX_BUFFER_SIZE);
     // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"control device | user Jonathan | bedroom light 3 | livingroom light 2");
+    // msglen = sprintf(message,"control device | user Jonathan | duration 20 | bedroom light 3 | livingroom light 2");
     // write(sockfd,message,msglen+1);
     // printf("Sent control to server: %s\n", message);
 

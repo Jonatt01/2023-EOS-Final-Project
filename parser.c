@@ -12,7 +12,7 @@ int device_index[12] = {1,2,3,4,1,2,3,4,2,1,2,5};
 Node* setmode_parser(int user, int mode, int* mode_table){
     Node* head = NULL;
     
-    for(int i=0;i<12;i++){
+    for(int i=0;i<11;i++){
         Node* newNode = createNode();
 
         newNode -> task.user = user;
