@@ -67,8 +67,6 @@ int* create_start_time_table(key_t key){
     return start_time_shm;
 }
 
-
-
 int using_time_shm_id;
 int *using_time_shm;
 
@@ -124,3 +122,4 @@ int* create_temperature_table(key_t key){
     return temperature_shm;
 
 }
+

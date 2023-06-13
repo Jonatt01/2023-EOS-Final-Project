@@ -27,6 +27,10 @@
     - `delete`
 - set the mode
     - `setmode | user Jonathan | afternoon`
+- **set the expect using time of devices**
+    - `expect time | user Jonathan`
+- **set the expect WATT of devices**
+    - `expect WATT | user Jonathan`
 - set preference
     - `preference | user Jonathan`
 - change the user specific mode
