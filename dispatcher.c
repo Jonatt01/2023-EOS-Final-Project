@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <time.h>
 # include <sys/shm.h>
+#include <semaphore.h>
+
 #include "reservation_signal.h"
 #include "list_operation.h"
 

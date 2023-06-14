@@ -1134,6 +1134,8 @@ void interrupt_handler(int signum){
     sem_close(temperature_sem);
     sem_unlink("/SEM_TEMP");
 
+    sem_unlink("/SEM_WAIT_N_SIGNAL");
+
     close(clientfd);
     close(serverfd);
 

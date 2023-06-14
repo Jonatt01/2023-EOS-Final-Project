@@ -63,6 +63,7 @@ int mode_shm_id;
 /*     創建 Semaphore     */
 sem_t *status_semaphore; // 二元信號量
 sem_t *useTime_semaphore;
+sem_t *wait_n_signal_semaphore;
 
 int serverSocket, clientSocket;
 int sockfd, connfd;
@@ -375,6 +376,7 @@ void *command_thread(void *arg)
     signal(SIGINT, interrupt_handler);
     while (1)
     {
+        wait_n_signal_semaphore = sem_open("/SEM_WAIT_N_SIGNAL", O_CREAT, 0666, 0);
         // 接收指令
         if (msgrcv(msgQid, &msgQ, sizeof(struct message) - sizeof(long), 1, 0) == -1)
         {
@@ -423,6 +425,7 @@ void *command_thread(void *arg)
                 }
             }
         }
+        //sem_post(wait_n_signal_semaphore); // 通知已完成shm的寫入，reservation可繼續進行
 
         if(sendToDevice){
             // 讀取共享內存，製作新的指令，將處理過後的指令內容到socket buffer EX: 23 0 0 2 1 0 3 1 0 ...
