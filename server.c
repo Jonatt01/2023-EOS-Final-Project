@@ -251,13 +251,14 @@ int main()
             continue;
         }
 
+        int user_index_global = 0; // who log in the system
         if(strncmp(rcvBuffer,"login",5)==0){
 
             int authenticate = 0; // 0 : failed, 1 : successful
             authenticate = welcome(clientfd);
-            
+            user_index_global = authenticate;
             printf("authenticate result : %d\n",authenticate);
-            if(authenticate == 0){
+            if(authenticate == -1){
                 printf("Wrong user password\n");
                 printf("Close socket to client\n");
                 close(clientfd);
@@ -265,6 +266,8 @@ int main()
             }
         }
         
+        
+
         childpid = fork();
         if (childpid >= 0)
         {
@@ -370,7 +373,7 @@ int main()
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
                         is_mode = 1;
-                        dispatcher(&task_list_head,device_status,is_mode);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd);
 
                     }
                     // emergency
@@ -379,7 +382,7 @@ int main()
                         newnode = emergency_parser();
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd);
                     }
                     // normal control command
                     else if(strncmp(rcvBuffer,"control",7)==0){
@@ -457,7 +460,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd);
                     }
                     // reservation
                     else if(strncmp(rcvBuffer,"reservation",11)==0){
@@ -520,7 +523,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd);
                     }
                     // set preference table
                     else if(strncmp(rcvBuffer,"preference",10)==0){
@@ -613,7 +616,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd);
                     }
                     // calculate bill
                     else if(strncmp(rcvBuffer,"calculate bill",14)==0){
@@ -851,7 +854,25 @@ int main()
                         sem_post(status_sem);
                     }
 
+                    //recommendation
+                    sem_wait(temperature_sem);
+                    sem_wait(preference_sem);
+                    check_temperature(clientfd, temperature, preference, user_index_global);
+                    sem_post(preference_sem);
+                    sem_post(temperature_sem);
                     
+                    // recommendation
+                    sem_wait(status_sem);
+                    sem_wait(using_time_sem);
+                    sem_wait(start_time_sem);
+                    sem_wait(expect_time_sem);
+                    check_using_time(clientfd, device_status, use_time, start_time, expect_using_time, user_index_global);
+                    sem_post(status_sem);
+                    sem_post(using_time_sem);
+                    sem_post(start_time_sem);
+                    sem_post(expect_time_sem);
+
+
                 }
             }
             else if (childpid > 0)

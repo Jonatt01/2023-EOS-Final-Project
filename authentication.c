@@ -3,6 +3,7 @@
 # include <string.h> // memset
 # include <unistd.h> // read write
 
+
 # define BUFFERSIZE 1024
 # define MAXUSERNUM 10
 
@@ -36,8 +37,11 @@ int welcome(int connfd){
     char* name = {0};
     char* password = {0};
 
+    int user_index = 0;
+
     for(int i=0;i<numUsers;i++){
         if(strcmp(rcv,users[i].id)==0){
+            user_index = i;
             name = users[i].id;
             password = users[i].password;
             break;
@@ -49,7 +53,7 @@ int welcome(int connfd){
     if(password == 0){
         msglen = sprintf(snd,"No user found!\n");
         write(connfd,snd,msglen+1);
-        return 0;
+        return -1;
     }
     else{
         msglen = sprintf(snd,"Please enter your password : ");
@@ -71,7 +75,7 @@ int welcome(int connfd){
                 perror("Error: write()\n");
                 exit(-1);
             }
-            return 1;
+            return user_index;
         }
         else{
             msglen = sprintf(snd,"Wrong password...\n");
@@ -79,7 +83,7 @@ int welcome(int connfd){
                 perror("Error: write()\n");
                 exit(-1);
             }
-            return 0;
+            return -1;
         }
     }
 }

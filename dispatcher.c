@@ -12,6 +12,7 @@
 
 #include "reservation_signal.h"
 #include "list_operation.h"
+# include "additional.h"
 
 #define MSG_TYPE 1
 #define MSG_Q_KEY 1111
@@ -125,7 +126,7 @@ int get_reservation_operation(Node **head)
     }
 }
 
-void dispatcher(Node** head, int* status_shm,int is_mode)
+void dispatcher(Node** head, int* status_shm,int is_mode, int connfd)
 {
     while (*head != NULL)
     {
@@ -190,7 +191,7 @@ void dispatcher(Node** head, int* status_shm,int is_mode)
             break;
         case CALCULATE:
 
-            
+            // calculate_bill(connfd, using_time);
 
             break;
 

@@ -25,12 +25,10 @@ void inquire_temperature(int connfd, int* temperature, int* ischeck);
 */
 void check_temperature(int connfd, int* temperature, int* preference, int user);
 
-void check_status(int connfd, int* ischeck, int* status);
-
 /**
 * check if the total using time of devices is higher than user expected (recommand)
 */
-void check_using_time(int connfd, int* using_time);
+void check_using_time(int connfd, int* status, int* using_time, int* start_time, int* expect_use_time, int user);
 
 /**
 * check if the total using watt of devices is higher than user expected (recommand)
