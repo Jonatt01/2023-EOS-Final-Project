@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "ipc.h": "c",
+        "msg.h": "c",
+        "stdio.h": "c",
+        "reservation_signal.h": "c",
+        "semaphore.h": "c",
+        "list_operation.h": "c",
+        "sstream": "c",
+        "system_error": "c"
+    }
+}
