@@ -128,7 +128,7 @@ int main() {
 //*********************************start of mode setting*********************************//
     memset(message,0,MAX_BUFFER_SIZE);
     msglen = sprintf(message,"setmode | user Jonathan | night");
-    write(sockfd,message,msglen+1);
+    write(sockfd,message,MAX_BUFFER_SIZE);
 
     //********************set temp of bedroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -136,7 +136,7 @@ int main() {
     printf("%s",buffer);
 
     scanf("%s",message); // the temperature of air conditioner
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
 
     //********************set light of bedroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -144,7 +144,7 @@ int main() {
     printf("%s",buffer);
 
     scanf("%s",message); // the brightness of air conditioner
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
 
     //********************set fan of bedroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -152,7 +152,7 @@ int main() {
     printf("%s",buffer);
 
     scanf("%s",message); // the level of fan
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
 
     //********************set curtain of bedroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -160,7 +160,7 @@ int main() {
     printf("%s",buffer);
 
     scanf("%s",message); // open or close of curtain
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
 
     //********************set temp of living room********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -168,7 +168,7 @@ int main() {
     printf("%s",buffer);
 
     scanf("%s",message); // the temperature of air conditioner
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
 
     //********************set light of living room********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -176,7 +176,7 @@ int main() {
     printf("%s",buffer);
 
     scanf("%s",message); // the brightness of light
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
 
     //********************set fan of living room********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -184,7 +184,7 @@ int main() {
     printf("%s",buffer);
 
     scanf("%s",message); // the level of fan
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
 
     //********************set curtain of living room********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -192,7 +192,7 @@ int main() {
     printf("%s",buffer);
 
     scanf("%s",message); // open or close of curtain
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
 
     //********************set light of kitchen********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -200,7 +200,7 @@ int main() {
     printf("%s",buffer);
 
     scanf("%s",message); // the brightness of light
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
 
     //********************set temp of bathroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -208,7 +208,7 @@ int main() {
     printf("%s",buffer);
 
     scanf("%s",message); // the temperature of air conditioner
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
 
     //********************set light of bedroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -216,7 +216,7 @@ int main() {
     printf("%s",buffer);
 
     scanf("%s",message); // the brightness of air conditioner
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
     sleep(1);
 //*********************************end of mode setting*********************************//
 
@@ -224,7 +224,7 @@ int main() {
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
     msglen = sprintf(message,"mode night | user Jonathan");
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
     printf("Sent setmode to server: %s\n", message);
 
     sleep(1);
@@ -235,7 +235,7 @@ int main() {
     // memset(message,0,MAX_BUFFER_SIZE);
     // memset(buffer,0,MAX_BUFFER_SIZE);
     // msglen = sprintf(message,"emergency earthquake");
-    // write(sockfd,message,msglen+1);
+    // write(connfd,snd,MAX_BUFFER_SIZE);
     // printf("Sent emregency to server: %s\n", message);
 
     // sleep(1);
@@ -245,7 +245,7 @@ int main() {
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
     msglen = sprintf(message,"control device | user Jonathan | duration 20 | bedroom light 3 | livingroom light 2");
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
     printf("Sent control to server: %s\n", message);
 
     sleep(1);
@@ -255,7 +255,7 @@ int main() {
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
     msglen = sprintf(message,"check using time | user Jonathan | bedroom light | livingroom light");
-    write(sockfd,message,msglen+1);
+    write(connfd,snd,MAX_BUFFER_SIZE);
     printf("Sent check using time to server: %s\n", message);
 
 
