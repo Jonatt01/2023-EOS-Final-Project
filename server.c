@@ -254,7 +254,7 @@ int main()
         if(strncmp(rcvBuffer,"register",8)==0){
 
             int msglen = sprintf(sendBuffer,"Please enter your id : ");
-            if ((write(clientfd,sendBuffer,msglen+1))==-1){
+            if ((write(clientfd,sendBuffer,MAX_BUFFER_SIZE))==-1){
                 perror("Error: write()\n");
                 exit(-1);
             }
@@ -646,7 +646,7 @@ int main()
                     else if(strncmp(rcvBuffer,"delete",6)==0){
 
                         int msglen = sprintf(sendBuffer,"Please enter the id you want to delete : ");
-                        if ((write(clientfd,sendBuffer,msglen+1))==-1){
+                        if ((write(clientfd,sendBuffer,MAX_BUFFER_SIZE))==-1){
                             perror("Error: write()\n");
                             exit(-1);
                         }
@@ -1002,70 +1002,70 @@ void preference_settingmsgs(int connfd, int* table){
     memset(rcv, 0, MAX_BUFFER_SIZE);
     memset(snd, 0, MAX_BUFFER_SIZE);
     msglen = sprintf(snd,"Start of the Bedroom setting.\nTemperature of airconditioner : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[0] = atoi(rcv);
     printf("Air conditioner temperature : %d\n",*(table));
 
     msglen = sprintf(snd,"Brightness of lights (0-5) : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[1] = atoi(rcv);
     printf("Lights brightness : %d\n",*(table + 1));
 
     msglen = sprintf(snd,"Level of fan (0-3) : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[2] = atoi(rcv);
     printf("Fan level : %d\n",*(table + 2));
 
     msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[3] = atoi(rcv);
     printf("Changed curtain level : %d\n",*(table + 3));
 
     // living room
     msglen = sprintf(snd,"Start of the Living room setting.\nTemperature of airconditioner : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[4] = atoi(rcv);
     printf("Air conditioner temperature : %d\n",*(table + 4));
 
     msglen = sprintf(snd,"Brightness of lights (0-5) : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[5] = atoi(rcv);
     printf("Lights brightness : %d\n",*(table + 5));
 
     msglen = sprintf(snd,"Level of fan (0-3) : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[6] = atoi(rcv);
     printf("Fan level : %d\n",*(table + 6));
 
     msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[7] = atoi(rcv);
     printf("Changed curtain level : %d\n",*(table + 7)); 
 
     // kitchen
     msglen = sprintf(snd,"Start of the Kitchen setting.\nBrightness of lights (0-5) : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[8] = atoi(rcv);
     printf("Lights brightness : %d\n",*(table + 8));
 
     // bathroom
     msglen = sprintf(snd,"Start of the Bathroom setting.\nTemperature of airconditioner : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[9] = atoi(rcv);
     printf("Air conditioner temperature : %d\n",*(table + 9));
 
     msglen = sprintf(snd,"Brightness of lights (0-5) : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[10] = atoi(rcv);
     printf("Lights brightness : %d\n",*(table + 10));   
@@ -1078,70 +1078,70 @@ void expect_time_settingmsgs(int connfd, int* table){
     memset(rcv, 0, MAX_BUFFER_SIZE);
     memset(snd, 0, MAX_BUFFER_SIZE);
     msglen = sprintf(snd,"Start of the Bedroom setting.\nExpect using time of airconditioner : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[0] = atoi(rcv);
     printf("Expect using time of air conditioner : %d\n",*(table));
 
     msglen = sprintf(snd,"Expect using time of lights : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[1] = atoi(rcv);
     printf("Expect using time of lights : %d\n",*(table + 1));
 
     msglen = sprintf(snd,"Expect using time of fan : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[2] = atoi(rcv);
     printf("Expect using time of fan : %d\n",*(table + 2));
 
     // msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
-    // write(connfd,snd,MAX_BUFFER_SIZE)
+    // write(connfd,snd,MAX_BUFFER_SIZE);
     // read(clientfd,rcv,MAX_BUFFER_SIZE);
     // table[3] = atoi(rcv);
     // printf("Changed curtain level : %d\n",*(table + 3));
 
     // living room
     msglen = sprintf(snd,"Start of the Living room setting.\nExpect using time of airconditioner : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[4] = atoi(rcv);
     printf("Expect using time of air conditioner : %d\n",*(table + 4));
 
     msglen = sprintf(snd,"Expect using time of lights : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[5] = atoi(rcv);
     printf("Expect using time of lights : %d\n",*(table + 5));
 
     msglen = sprintf(snd,"Expect using time of fan : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[6] = atoi(rcv);
     printf("Expect using time of fan : %d\n",*(table + 6));
 
     // msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
-    // write(connfd,snd,MAX_BUFFER_SIZE)
+    // write(connfd,snd,MAX_BUFFER_SIZE);
     // read(clientfd,rcv,MAX_BUFFER_SIZE);
     // table[7] = atoi(rcv);
     // printf("Changed curtain level : %d\n",*(table + 7)); 
 
     // kitchen
     msglen = sprintf(snd,"Start of the Kitchen setting.\nExpect using time of lights : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[8] = atoi(rcv);
     printf("Expect using time of lights : %d\n",*(table + 8));
 
     // bathroom
     msglen = sprintf(snd,"Start of the Bathroom setting.\nExpect using time of airconditioner : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[9] = atoi(rcv);
     printf("Expect using time of air conditioner : %d\n",*(table + 9));
 
     msglen = sprintf(snd,"Expect using time of lights : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[10] = atoi(rcv);
     printf("Expect using time of lights : %d\n",*(table + 10));       
@@ -1154,70 +1154,70 @@ void expect_watt_settingmsgs(int connfd, int* table){
     memset(rcv, 0, MAX_BUFFER_SIZE);
     memset(snd, 0, MAX_BUFFER_SIZE);
     msglen = sprintf(snd,"Start of the Bedroom setting.\nExpect using watt of airconditioner : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[0] = atoi(rcv);
     printf("Expect using watt of air conditioner : %d\n",*(table));
 
     msglen = sprintf(snd,"Expect using watt of lights : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[1] = atoi(rcv);
     printf("Expect using watt of lights : %d\n",*(table + 1));
 
     msglen = sprintf(snd,"Expect using watt of fan : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[2] = atoi(rcv);
     printf("Expect using watt of fan : %d\n",*(table + 2));
 
     // msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
-    // write(connfd,snd,MAX_BUFFER_SIZE)
+    // write(connfd,snd,MAX_BUFFER_SIZE);
     // read(clientfd,rcv,MAX_BUFFER_SIZE);
     // table[3] = atoi(rcv);
     // printf("Changed curtain level : %d\n",*(table + 3));
 
     // living room
     msglen = sprintf(snd,"Start of the Living room setting.\nExpect using watt of airconditioner : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[4] = atoi(rcv);
     printf("Expect using watt of air conditioner : %d\n",*(table + 4));
 
     msglen = sprintf(snd,"Expect using watt of lights : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[5] = atoi(rcv);
     printf("Expect using watt of lights : %d\n",*(table + 5));
 
     msglen = sprintf(snd,"Expect using watt of fan : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[6] = atoi(rcv);
     printf("Expect using watt of fan : %d\n",*(table + 6));
 
     // msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
-    // write(connfd,snd,MAX_BUFFER_SIZE)
+    // write(connfd,snd,MAX_BUFFER_SIZE);
     // read(clientfd,rcv,MAX_BUFFER_SIZE);
     // table[7] = atoi(rcv);
     // printf("Changed curtain level : %d\n",*(table + 7)); 
 
     // kitchen
     msglen = sprintf(snd,"Start of the Kitchen setting.\nExpect using watt of lights : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[8] = atoi(rcv);
     printf("Expect using watt of lights : %d\n",*(table + 8));
 
     // bathroom
     msglen = sprintf(snd,"Start of the Bathroom setting.\nExpect using watt of airconditioner : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[9] = atoi(rcv);
     printf("Expect using watt of air conditioner : %d\n",*(table + 9));
 
     msglen = sprintf(snd,"Expect using watt of lights : ");
-    write(connfd,snd,MAX_BUFFER_SIZE)
+    write(connfd,snd,MAX_BUFFER_SIZE);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
     table[10] = atoi(rcv);
     printf("Expect using watt of lights : %d\n",*(table + 10));       
