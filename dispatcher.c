@@ -124,7 +124,7 @@ int get_reservation_operation(Node **head)
     }
 }
 
-void dispatcher(Node** head, int* status_shm,int is_mode, int connfd, int* using_time, int* start_time, int* watt)
+void dispatcher(Node** head, int* status_shm,int is_mode, int connfd, int* using_time, int* start_time)
 {
     sem_t *using_time_sem;
     sem_t *start_time_sem;
@@ -217,7 +217,7 @@ void dispatcher(Node** head, int* status_shm,int is_mode, int connfd, int* using
             sem_wait(watt_sem);
             sem_wait(status_sem);
 
-            calculate_bill(connfd, using_time, start_time, watt, status_shm);
+            calculate_bill(connfd, using_time, start_time, status_shm);
 
             sem_post(using_time_sem);
             sem_post(start_time_sem);

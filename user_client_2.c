@@ -242,32 +242,32 @@ int main() {
 //*********************************end of emergency command*********************************//   
 
 //*********************************start of control device command*********************************//
-    // memset(message,0,MAX_BUFFER_SIZE);
-    // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"control device | user Jonathan | duration 20 | bedroom light 3 | livingroom light 2");
-    // write(sockfd,message,msglen+1);
-    // printf("Sent control to server: %s\n", message);
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"control device | user Jonathan | duration 20 | bedroom light 3 | kitchen light 2");
+    write(sockfd,message,msglen+1);
+    printf("Sent control to server: %s\n", message);
 
-    // sleep(1);
+    sleep(1);
 //*********************************end of control device command*********************************//   
 
 //*********************************start of reservation command*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"reservation 5 | user Jonathan | bedroom airconditioner 30 | livingroom light 2");
-    write(sockfd,message,msglen+1);
-    printf("Sent reservation to server: %s\n", message);
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"reservation 5 | user Jonathan | bedroom airconditioner 30 | livingroom light 2");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent reservation to server: %s\n", message);
 
-    sleep(5);
+    // sleep(5);
 //*********************************end of reservation command*********************************// 
 //*********************************start of reservation command*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"reservation 5 | user Jonathan | bedroom airconditioner 0 | livingroom light 0");
-    write(sockfd,message,msglen+1);
-    printf("Sent reservation to server: %s\n", message);
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"reservation 5 | user Jonathan | bedroom airconditioner 0 | livingroom light 0");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent reservation to server: %s\n", message);
 
-    sleep(1);
+    // sleep(1);
 //*********************************end of reservation command*********************************// 
 
 //*********************************start of preference setting*********************************//
@@ -378,17 +378,108 @@ int main() {
 
 
 //*********************************start of control device command*********************************//
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"control device | user Jonathan | bedroom light 2 | kitchen light 3");
+    write(sockfd,message,msglen+1);
+    printf("Sent control to server: %s\n", message);
+
+    sleep(8);
+//*********************************end of control device command*********************************//  
+
+//*********************************start of check out device status command*********************************//
     // memset(message,0,MAX_BUFFER_SIZE);
     // memset(buffer,0,MAX_BUFFER_SIZE);
-    // msglen = sprintf(message,"control device | user aaa | bedroom light 0 | kitchen light 0");
+    // msglen = sprintf(message,"check device status | user Jonathan | bedroom light | kitchen light");
     // write(sockfd,message,msglen+1);
-    // printf("Sent control to server: %s\n", message);
+    // printf("Sent check status to server: %s\n", message);
+
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
+
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
 
     // sleep(1);
-//*********************************end of control device command*********************************//  
-    
-    // }
-    
+//*********************************end of check out device status command*********************************//  
+
+//*********************************start of check out using time command*********************************//
+    // memset(message,0,MAX_BUFFER_SIZE);
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // msglen = sprintf(message,"check using time | user Jonathan | bedroom light | kitchen light | bathroom light");
+    // write(sockfd,message,msglen+1);
+    // printf("Sent check using time to server: %s\n", message);
+
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
+
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
+
+    // memset(buffer,0,MAX_BUFFER_SIZE);
+    // read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("%s",buffer);
+
+    // sleep(1);
+//*********************************end of check out using time command*********************************//  
+
+//*********************************start of set expect watt command*********************************//
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"expect watt | user Jonathan");
+    write(sockfd,message,msglen+1);
+    printf("Sent set expect watt to server: %s\n", message);
+
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    scanf("%s",message);
+    write(sockfd, message, strlen(message)+1);
+
+    sleep(1);
+//*********************************end of set expect watt command*********************************//  
+
+
+//*********************************start of check out temperature command*********************************//
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"check temperature | user Jonathan | bedroom | livingroom | bathroom");
+    write(sockfd,message,msglen+1);
+    printf("Sent check temperature to server: %s\n", message);
+
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    sleep(1);
+//*********************************end of check out temperature command*********************************// 
+
+//*********************************start of calculate command*********************************//
+    memset(message,0,MAX_BUFFER_SIZE);
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    msglen = sprintf(message,"calculate bill");
+    write(sockfd,message,msglen+1);
+    printf("Sent calculate to server: %s\n", message);
+
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    printf("%s",buffer);
+
+    sleep(1);
+//*********************************end of calculate command*********************************// 
 
     close(sockfd);
 

@@ -190,5 +190,7 @@ Node* calculate_parser(){
     Node* newNode = createNode();
     newNode -> task.calculate = 1;
 
+    insertAtEnd(&head, newNode);
+    
     return head;
 }

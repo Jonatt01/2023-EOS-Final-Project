@@ -77,7 +77,7 @@ int whichplace(char* place){
     if(strcmp(place,"kitchen")==0){
         return 2;
     }
-    if(strcmp(place,"bathrooom")==0){
+    if(strcmp(place,"bathroom")==0){
         return 3;
     }
 }

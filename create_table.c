@@ -10,9 +10,8 @@
 # define USE_TIME_SIZE 12*sizeof(int)
 # define PREFERENCE_SIZE 10*12*sizeof(int)
 # define TEMP_SIZE 3*sizeof(int)
-# define WATT_SIZE 12*sizeof(int)
 # define EXPECT_USING_TIME_SIZE 12*sizeof(int)
-# define EXPECT_WATT_SIZE 12*sizeof(int)
+# define EXPECT_WATT_SIZE 10*sizeof(int)
 
 int status_shm_id;
 int *status_shm; // float because of the temperature might be float
@@ -125,24 +124,6 @@ int* create_temperature_table(key_t key){
 
 }
 
-int watt_shm_id;
-int *watt_shm;
-
-int* create_watt_table(key_t key){
-    if ((watt_shm_id = shmget(key, WATT_SIZE, IPC_CREAT | 0666)) < 0)
-    {
-        perror("shmget");
-        exit(-1);
-    }
-    if ((watt_shm = shmat(watt_shm_id, NULL, 0)) == (int *) -1)
-    {
-        perror("shmat");
-        exit(-1);
-    }
-    memset(watt_shm,0,WATT_SIZE);
-    return watt_shm;
-
-}
 
 int expect_using_time_shm_id;
 int *expect_using_time_shm;

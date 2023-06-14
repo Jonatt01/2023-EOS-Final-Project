@@ -27,8 +27,6 @@ void setusingtime(int* expect_using_time, int user, int* settable){
     }
 }
 
-void setwatt(int* expect_watt, int user, int* settable){
-    for(int i=0; i<12; i++){
-        *(expect_watt + user*12 + i) = settable[i];
-    }   
+void setwatt(int* expect_watt, int user, int expect_watt_value){
+        *(expect_watt + user) = expect_watt_value;
 }

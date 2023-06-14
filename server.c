@@ -67,10 +67,6 @@ key_t temperature_key = 4567;
 extern int temperature_shm_id; // defined in create_table.c
 int* temperature;
 
-key_t watt_key = 9876;
-extern int watt_shm_id;
-int* watt;
-
 key_t expect_using_time_key = 1579;
 extern int expect_using_time_shm_id;
 int* expect_using_time;
@@ -113,7 +109,7 @@ int is_mode = 0;
 void mode_settingmsg(int connfd, int* table);
 void preference_settingmsgs(int connfd, int* table);
 void expect_time_settingmsgs(int connfd, int* table);
-void expect_watt_settingmsgs(int connfd, int* table);
+int expect_watt_settingmsgs(int connfd);
 
 void interrupt_handler(int signum);
 
@@ -169,8 +165,6 @@ int main()
     preference = create_preference_table(preference_key);
     // create temperature table
     temperature = create_temperature_table(temperature_key);
-    // create watt table
-    watt = create_watt_table(watt_key);
     // create expect using time table
     expect_using_time = create_expect_using_time_table(expect_using_time_key);    
     // create expect watt table
@@ -226,6 +220,8 @@ int main()
         return -1;  
     }
 
+    sem_getvalue(status_sem,&val_mode);
+    printf("After deleteUser - status sem value=%d, pid=%d\n",val_mode, getpid());
 
     signal(SIGINT,interrupt_handler);
     while (1)
@@ -296,13 +292,11 @@ int main()
                     memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
                     memset(sendBuffer, 0, MAX_BUFFER_SIZE);
                     // read data from client
-                    if (strlen(rcvBuffer) > 0){
-                        printf("New loop...\n");
-                    }
                     read(clientfd, rcvBuffer, MAX_BUFFER_SIZE);
                     if (strlen(rcvBuffer) > 0){
                         printf("Received message from client: %s\n", rcvBuffer);
-                    }                  
+                    }
+                    if(strlen(rcvBuffer) == 0){continue;}        
 
                     // set their own mode
                     if(strncmp(rcvBuffer,"setmode",7)==0){
@@ -388,7 +382,7 @@ int main()
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
                         is_mode = 1;
-                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time, watt);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time);
 
                     }
                     // emergency
@@ -397,7 +391,7 @@ int main()
                         newnode = emergency_parser();
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time, watt);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time);
                     }
                     // normal control command
                     else if(strncmp(rcvBuffer,"control",7)==0){
@@ -475,7 +469,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time, watt);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time);
                     }
                     // reservation
                     else if(strncmp(rcvBuffer,"reservation",11)==0){
@@ -538,7 +532,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time, watt);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time);
                     }
                     // set preference table
                     else if(strncmp(rcvBuffer,"preference",10)==0){
@@ -631,7 +625,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time, watt);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time);
                     }
                     // calculate bill
                     else if(strncmp(rcvBuffer,"calculate bill",14)==0){
@@ -640,6 +634,8 @@ int main()
                         newnode = calculate_parser();
 
                         scheduler(&task_list_head,newnode);
+                        displayList(task_list_head);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time);
                     }
                     // delete user
                     else if(strncmp(rcvBuffer,"delete",6)==0){
@@ -711,6 +707,7 @@ int main()
                         char tmp[64];
                         int user_index = 0;
                         char *token;
+                        int expect_watt_value = 0;
 
                         token=strtok(rcvBuffer,"|"); // expect time
                         token=strtok(NULL,"|"); // user Jonathan
@@ -725,15 +722,14 @@ int main()
 
                         printf("%s start to set expect watt.\n",username);
 
-                        int settable[12] = {0}; // temp storage of what user set
-                        expect_watt_settingmsgs(clientfd, settable);
+                        expect_watt_value = expect_watt_settingmsgs(clientfd);
 
                         sem_wait(expect_watt_sem);
-                        setwatt(expect_watt, user_index, settable);
+                        setwatt(expect_watt, user_index, expect_watt_value);
                         sem_post(expect_watt_sem);
 
                         printf("%s end of seting expect watt.\n",username);
-                        // print_int_table(expect_watt, 2, 12);
+                        // print_int_table(expect_watt, 10, 1);
                     }
                     // check out temperature of three rooms
                     else if(strncmp(rcvBuffer,"check temperature",17)==0){
@@ -800,21 +796,26 @@ int main()
                         }
                         
                         printf("%s want to check the device status.\n",username);
-
+                        printf("-------------\n");
                         token=strtok(NULL,"|"); // bedroom light
+                        printf("token : %s\n",token);
+                        printf("-------------\n");
                         do{
                             memset(place,0,64);
                             memset(device,0,64);
 
                             sscanf(token," %s %s",place, device);
                             device_index = whichdevice(place,device);
+                            printf("device index: %d\n",device_index);
 
                             ischeck[device_index-1] = 1;
                 
                             token=strtok(NULL,"|");
+                            printf("token : %s\n",token);
                 
                         }while(token != NULL);
 
+                        print_int_table(ischeck, 1, 12);
                         sem_wait(status_sem);
                         inquire_status(clientfd, ischeck, device_status);
                         sem_post(status_sem);
@@ -844,9 +845,11 @@ int main()
                             break;
                         }
                         
-                        printf("%s want to check the device using time.\n",username);
-
+                        // printf("%s want to check the device using time.\n",username);
+                        // printf("-------------\n");
                         token=strtok(NULL,"|"); // bedroom light
+                        // printf("-------------\n");
+                        // printf("token : %s\n",token);
                         do{
                             memset(place,0,64);
                             memset(device,0,64);
@@ -855,11 +858,15 @@ int main()
                             device_index = whichdevice(place,device);
 
                             ischeck[device_index-1] = 1;
+                            printf("is check : %d\n",ischeck[device_index-1]);
                 
                             token=strtok(NULL,"|");
+                            printf("token : %s\n",token);
                 
                         }while(token != NULL);
-                        
+
+                        print_int_table(ischeck, 1, 12);
+
                         sem_wait(status_sem);
                         sem_wait(using_time_sem);
                         sem_wait(start_time_sem);
@@ -869,28 +876,28 @@ int main()
                         sem_post(status_sem);
                     }
 
-                    //recommendation for temperature
-                    sem_wait(temperature_sem);
-                    sem_wait(preference_sem);
-                    check_temperature(clientfd, temperature, preference, user_index_global);
-                    sem_post(preference_sem);
-                    sem_post(temperature_sem);
+                    // //recommendation for temperature
+                    // sem_wait(temperature_sem);
+                    // sem_wait(preference_sem);
+                    // check_temperature(clientfd, temperature, preference, user_index_global);
+                    // sem_post(preference_sem);
+                    // sem_post(temperature_sem);
                     
-                    // recommendation for device using time
-                    sem_wait(status_sem);
-                    sem_wait(using_time_sem);
-                    sem_wait(start_time_sem);
-                    sem_wait(expect_time_sem);
-                    check_using_time(clientfd, device_status, use_time, start_time, expect_using_time, user_index_global);
-                    sem_post(status_sem);
-                    sem_post(using_time_sem);
-                    sem_post(start_time_sem);
-                    sem_post(expect_time_sem);
+                    // // recommendation for device using time
+                    // sem_wait(status_sem);
+                    // sem_wait(using_time_sem);
+                    // sem_wait(start_time_sem);
+                    // sem_wait(expect_time_sem);
+                    // check_using_time(clientfd, device_status, use_time, start_time, expect_using_time, user_index_global);
+                    // sem_post(status_sem);
+                    // sem_post(using_time_sem);
+                    // sem_post(start_time_sem);
+                    // sem_post(expect_time_sem);
 
                     // recommendation for watt
                     sem_wait(watt_sem);
                     sem_wait(expect_watt_sem);
-                    check_using_watt(clientfd, watt, expect_watt, user_index_global);
+                    check_using_watt(clientfd, device_status, expect_watt, user_index_global);
                     sem_post(watt_sem);
                     sem_post(expect_watt_sem);
                 }
@@ -1146,80 +1153,18 @@ void expect_time_settingmsgs(int connfd, int* table){
     printf("Expect using time of lights : %d\n",*(table + 10));       
 }
 
-void expect_watt_settingmsgs(int connfd, int* table){
+int expect_watt_settingmsgs(int connfd){
     char snd[MAX_BUFFER_SIZE] = {0},rcv[MAX_BUFFER_SIZE] = {0};
     int msglen = 0;
     
     memset(rcv, 0, MAX_BUFFER_SIZE);
     memset(snd, 0, MAX_BUFFER_SIZE);
-    msglen = sprintf(snd,"Start of the Bedroom setting.\nExpect using watt of airconditioner : ");
+    msglen = sprintf(snd,"Start of the Expect watt setting.\nExpect watt : ");
     write(clientfd,snd,msglen+1);
     read(clientfd,rcv,MAX_BUFFER_SIZE);
-    table[0] = atoi(rcv);
-    printf("Expect using watt of air conditioner : %d\n",*(table));
-
-    msglen = sprintf(snd,"Expect using watt of lights : ");
-    write(clientfd,snd,msglen+1);
-    read(clientfd,rcv,MAX_BUFFER_SIZE);
-    table[1] = atoi(rcv);
-    printf("Expect using watt of lights : %d\n",*(table + 1));
-
-    msglen = sprintf(snd,"Expect using watt of fan : ");
-    write(clientfd,snd,msglen+1);
-    read(clientfd,rcv,MAX_BUFFER_SIZE);
-    table[2] = atoi(rcv);
-    printf("Expect using watt of fan : %d\n",*(table + 2));
-
-    // msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
-    // write(clientfd,snd,msglen+1);
-    // read(clientfd,rcv,MAX_BUFFER_SIZE);
-    // table[3] = atoi(rcv);
-    // printf("Changed curtain level : %d\n",*(table + 3));
-
-    // living room
-    msglen = sprintf(snd,"Start of the Living room setting.\nExpect using watt of airconditioner : ");
-    write(clientfd,snd,msglen+1);
-    read(clientfd,rcv,MAX_BUFFER_SIZE);
-    table[4] = atoi(rcv);
-    printf("Expect using watt of air conditioner : %d\n",*(table + 4));
-
-    msglen = sprintf(snd,"Expect using watt of lights : ");
-    write(clientfd,snd,msglen+1);
-    read(clientfd,rcv,MAX_BUFFER_SIZE);
-    table[5] = atoi(rcv);
-    printf("Expect using watt of lights : %d\n",*(table + 5));
-
-    msglen = sprintf(snd,"Expect using watt of fan : ");
-    write(clientfd,snd,msglen+1);
-    read(clientfd,rcv,MAX_BUFFER_SIZE);
-    table[6] = atoi(rcv);
-    printf("Expect using watt of fan : %d\n",*(table + 6));
-
-    // msglen = sprintf(snd,"Curtain (0: close, 1: open): ");
-    // write(clientfd,snd,msglen+1);
-    // read(clientfd,rcv,MAX_BUFFER_SIZE);
-    // table[7] = atoi(rcv);
-    // printf("Changed curtain level : %d\n",*(table + 7)); 
-
-    // kitchen
-    msglen = sprintf(snd,"Start of the Kitchen setting.\nExpect using watt of lights : ");
-    write(clientfd,snd,msglen+1);
-    read(clientfd,rcv,MAX_BUFFER_SIZE);
-    table[8] = atoi(rcv);
-    printf("Expect using watt of lights : %d\n",*(table + 8));
-
-    // bathroom
-    msglen = sprintf(snd,"Start of the Bathroom setting.\nExpect using watt of airconditioner : ");
-    write(clientfd,snd,msglen+1);
-    read(clientfd,rcv,MAX_BUFFER_SIZE);
-    table[9] = atoi(rcv);
-    printf("Expect using watt of air conditioner : %d\n",*(table + 9));
-
-    msglen = sprintf(snd,"Expect using watt of lights : ");
-    write(clientfd,snd,msglen+1);
-    read(clientfd,rcv,MAX_BUFFER_SIZE);
-    table[10] = atoi(rcv);
-    printf("Expect using watt of lights : %d\n",*(table + 10));       
+    printf("rcv : %s\n",rcv);
+    return atoi(rcv);
+       
 }
 
 void interrupt_handler(int signum){
@@ -1293,18 +1238,7 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
-    // delete shared memory (watt)
-    if (shmdt(watt) == -1) {
-        perror("shmdt");
-        exit(1);
-    }
-
-    if (shmctl(watt_shm_id, IPC_RMID, NULL) == -1) {
-        perror("shmctl");
-        exit(1);
-    }
-
-        // delete shared memory (expect using time)
+    // delete shared memory (expect using time)
     if (shmdt(expect_using_time) == -1) {
         perror("shmdt");
         exit(1);
