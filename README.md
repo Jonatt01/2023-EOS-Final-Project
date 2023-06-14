@@ -27,9 +27,9 @@
     - `delete`
 - set the mode
     - `setmode | user Jonathan | afternoon`
-- **set the expect using time of devices**
+- set the expect using time of devices
     - `expect time | user Jonathan`
-- **set the expect WATT of devices**
+- set the expect WATT of devices
     - `expect watt | user Jonathan`
 - set preference
     - `preference | user Jonathan`
@@ -45,13 +45,13 @@
 - reservation
     - `reservation 30 | user Jonathan | bedroom light 3 | livingroom light 2`
     - `reservation 30 | user Jonathan | bathroom light comfort | livingroom light 2`
-- **checkout the using time**
-    - `using time | bedroom light`
-- **checkout the temperature**
-    - `temperature | bedroom`
-- **check out device status**
-    - `device status | bedroom light`
-- **calculate**
+- checkout the using time
+    - `check using time | bedroom light`
+- checkout the temperature
+    - `check temperature | user Jonathan | bedroom | livingroom | bathroom`
+- check out device status
+    - `check device status | user Jonathan | bedroom light | livingroom fan`
+- calculate
     - `calculate bill`
 
 ## parser
@@ -60,10 +60,10 @@
 ## scheduler 
 - insert the list of structures into the original task list
 
-## recommand condition
+## **recommand condition**
 - temperature is higher than his comfort
     - server will check the temperature in shared memory to decide whether recommand the user to open the aircondition (2 temperature)
-- device using more than user wish
+- device using time more than user wish
     - tell the user about this situation
     - recommand the user to turn off the device
 - simultaneously opening device more than user wish

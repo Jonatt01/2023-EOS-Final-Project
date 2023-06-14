@@ -91,6 +91,14 @@ sem_t *using_time_sem;
 int value_temperature;
 sem_t *temperature_sem;
 
+sem_t *status_sem;
+
+sem_t *start_time_sem;
+
+sem_t *expect_time_sem;
+
+sem_t *expect_watt_sem;
+
 // authentication
 extern User users[MAXUSERNUM];
 
@@ -187,6 +195,23 @@ int main()
         perror("Temp_sem init failed:");  
         return -1;  
     }
+    status_sem = sem_open("/SEM_STATUS", O_CREAT, 0666, 1);
+    if(status_sem == SEM_FAILED){
+        perror("Status_sem init failed:");  
+        return -1;  
+    }
+    expect_time_sem = sem_open("/SEM_EXPECT_TIME", O_CREAT, 0666, 1);
+    if(expect_time_sem == SEM_FAILED){
+        perror("Expect_time_sem init failed:");  
+        return -1;  
+    }
+    expect_watt_sem = sem_open("/SEM_EXPECT_WATT", O_CREAT, 0666, 1);
+    if(expect_watt_sem == SEM_FAILED){
+        perror("Expect_watt_sem init failed:");
+        return -1;  
+    }
+
+
 
     while (1)
     {
@@ -590,6 +615,14 @@ int main()
                         displayList(task_list_head);
                         dispatcher(&task_list_head,device_status,is_mode);
                     }
+                    // calculate bill
+                    else if(strncmp(rcvBuffer,"calculate bill",14)==0){
+                        
+                        Node* newnode;
+                        newnode = calculate_parser();
+
+                        scheduler(&task_list_head,newnode);
+                    }
                     // delete user
                     else if(strncmp(rcvBuffer,"delete",6)==0){
 
@@ -646,7 +679,9 @@ int main()
                         int settable[12] = {0}; // temp storage of what user set
                         expect_time_settingmsgs(clientfd, settable);
 
+                        sem_wait(expect_time_sem);
                         setusingtime(expect_using_time, user_index, settable);
+                        sem_post(expect_time_sem);
 
                         printf("%s end of seting expect using time.\n",username);
                         // print_int_table(expect_using_time, 1, 12);    
@@ -675,11 +710,147 @@ int main()
                         int settable[12] = {0}; // temp storage of what user set
                         expect_watt_settingmsgs(clientfd, settable);
 
+                        sem_wait(expect_watt_sem);
                         setwatt(expect_watt, user_index, settable);
+                        sem_post(expect_watt_sem);
 
                         printf("%s end of seting expect watt.\n",username);
                         // print_int_table(expect_watt, 2, 12);
-                    }                    
+                    }
+                    // check out temperature of three rooms
+                    else if(strncmp(rcvBuffer,"check temperature",17)==0){
+                                            
+                        char username[64];
+                        char tmp[64];
+                        int user_index = 0;
+                        int place_index = 0;
+                        char *token;
+                        int ischeck[4] = {0}; // 1: want to check the temperature of this room
+
+                        token=strtok(rcvBuffer,"|"); // check temperature
+                        token=strtok(NULL,"|"); // user Jonathan
+                        sscanf(token," %s %s",tmp,username);
+                        user_index = whichuser(username,users);
+                        printf("%s user index : %d",username,user_index);
+                        if(user_index == 11){
+                            printf("User not found!\n");
+                            break;
+                        }
+
+                        printf("%s want to check the temperature.\n",username);
+
+                        token=strtok(NULL,"|"); // bedroom
+                        do{
+                            remove_spaces(token);
+                            place_index = whichplace(token);
+                            printf("in check temperature - place index : %d.\n",place_index);
+                            ischeck[place_index] = 1;
+                
+                            token=strtok(NULL,"|");
+                
+                        }while(token != NULL);
+
+                        sem_wait(temperature_sem);
+                        inquire_temperature(clientfd, temperature, ischeck);
+                        sem_post(temperature_sem);
+
+                        printf("End of %s checking temperature.\n", username);
+                    }
+                    // check for device status
+                    else if(strncmp(rcvBuffer,"check device status",19)==0){
+                        char username[64];
+                        char tmp[64];
+                        char place[64];
+                        char device[64];
+                        char status[64];
+                        int duration = 0;
+                        int user_index = 0;
+                        int device_index = 0;
+                        
+                        char *token;
+                        int ischeck[12] = {0}; // 1 means user wants to check the status of this device 
+
+                        token=strtok(rcvBuffer,"|"); // check device status
+
+                        token=strtok(NULL,"|"); // user Jonathan
+                        sscanf(token," %s %s",tmp,username);
+                        user_index = whichuser(username,users);
+                        printf("user index: %d\n",user_index);
+                        if(user_index == 11){
+                            printf("User not found!\n");
+                            break;
+                        }
+                        
+                        printf("%s want to check the device status.\n",username);
+
+                        token=strtok(NULL,"|"); // bedroom light
+                        do{
+                            memset(place,0,64);
+                            memset(device,0,64);
+
+                            sscanf(token," %s %s",place, device);
+                            device_index = whichdevice(place,device);
+
+                            ischeck[device_index-1] = 1;
+                
+                            token=strtok(NULL,"|");
+                
+                        }while(token != NULL);
+
+                        sem_wait(status_sem);
+                        inquire_status(clientfd, ischeck, device_status);
+                        sem_post(status_sem);
+                    }
+                    // check using time
+                    else if(strncmp(rcvBuffer,"check using time",16)==0){
+                        char username[64];
+                        char tmp[64];
+                        char place[64];
+                        char device[64];
+                        char status[64];
+                        int duration = 0;
+                        int user_index = 0;
+                        int device_index = 0;
+                        
+                        char *token;
+                        int ischeck[12] = {0}; // 1 means user wants to check the status of this device 
+
+                        token=strtok(rcvBuffer,"|"); // check using time
+
+                        token=strtok(NULL,"|"); // user Jonathan
+                        sscanf(token," %s %s",tmp,username);
+                        user_index = whichuser(username,users);
+                        printf("user index: %d\n",user_index);
+                        if(user_index == 11){
+                            printf("User not found!\n");
+                            break;
+                        }
+                        
+                        printf("%s want to check the device using time.\n",username);
+
+                        token=strtok(NULL,"|"); // bedroom light
+                        do{
+                            memset(place,0,64);
+                            memset(device,0,64);
+
+                            sscanf(token," %s %s",place, device);
+                            device_index = whichdevice(place,device);
+
+                            ischeck[device_index-1] = 1;
+                
+                            token=strtok(NULL,"|");
+                
+                        }while(token != NULL);
+                        
+                        sem_wait(status_sem);
+                        sem_wait(using_time_sem);
+                        sem_wait(start_time_sem);
+                        inquire_using_time(clientfd, ischeck, use_time, start_time, device_status);
+                        sem_post(start_time_sem);
+                        sem_post(using_time_sem);
+                        sem_post(status_sem);
+                    }
+
                     
                 }
             }
@@ -696,8 +867,7 @@ int main()
         close(clientfd);
     }
     
-    // delete named POSIX semphore
-    sem_unlink("/SEM_PREFERENCE");
+    
     
     close(serverfd);
     return 0;
@@ -1135,6 +1305,19 @@ void interrupt_handler(int signum){
     sem_unlink("/SEM_TEMP");
 
     sem_unlink("/SEM_WAIT_N_SIGNAL");
+
+    sem_unlink("/SEM_STATUS");
+
+    sem_close(start_time_sem);
+    sem_unlink("/SEM_START_TIME");
+
+    
+    sem_close(expect_time_sem);
+    sem_unlink("/SEM_EXPECT_TIME");
+
+    sem_close(expect_watt_sem);
+    sem_unlink("/SEM_EXPECT_WATT");
+    
 
     close(clientfd);
     close(serverfd);

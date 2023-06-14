@@ -183,3 +183,12 @@ Node* room_preference_parser(int* ischange, int user, int* preference, int durat
 
     return head;
 }
+
+Node* calculate_parser(){
+
+    Node* head = NULL;
+    Node* newNode = createNode();
+    newNode -> task.calculate = 1;
+
+    return head;
+}

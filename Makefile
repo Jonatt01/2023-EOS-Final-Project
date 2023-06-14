@@ -1,5 +1,5 @@
 all: server.c authentication.c create_table.c translate.c costimizer.c parser.c scheduler.c list_operation.c relay.c reservation_signal.c dispatcher.c user_client_2.c user_client_3.c
-	gcc -o server server.c authentication.c create_table.c translate.c costimizer.c parser.c scheduler.c list_operation.c dispatcher.c reservation_signal.c -lpthread
+	gcc -o server server.c authentication.c create_table.c translate.c costimizer.c parser.c scheduler.c list_operation.c dispatcher.c reservation_signal.c additional.c -lpthread
 	gcc user_client.c -o user_client
 	gcc user_client_2.c -o user_client_2
 	gcc user_client_3.c -o user_client_3
