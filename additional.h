@@ -33,7 +33,7 @@ void check_using_time(int connfd, int* status, int* using_time, int* start_time,
 /**
 * check if the total using watt of devices is higher than user expected (recommand)
 */
-void check_using_watt(int connfd, int* watt, int* expect_watt);
+void check_using_watt(int connfd, int* watt, int* expect_watt, int user);
 
 
 

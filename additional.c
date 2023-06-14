@@ -188,3 +188,25 @@ void check_using_time(int connfd, int* status, int* using_time, int* start_time,
         }
     }    
 }
+
+void check_using_watt(int connfd, int* watt, int* expect_watt, int user){
+
+    int msglen = 0;
+    char snd[BUFFERSIZE] = {0},rcv[BUFFERSIZE] = {0};
+
+    char *arr[] = {"Bedroom airconditioner", "Bedroom light", "Bedroom fan", "Bedroom cutain", "Living room airconditioner", "Living room light", "Living room fan", "Living room cutain", "Kitchen light", "Bathroom airconditioner", "Bathroom light", "Doors"};
+    
+    for(int i=0; i<12; i++){
+        
+        int total_time = 0;
+
+        // do not need to check curtain using time
+        if(i==3 | i==7) continue;
+
+        if( *(watt + i) > *(expect_watt + i) ){
+            memset(snd,0,BUFFERSIZE);
+            msglen = sprintf(snd,"Using watt of %s is too high.\n",arr[i]);
+            write(connfd,snd,msglen+1);
+        }
+    }   
+}

@@ -97,6 +97,8 @@ sem_t *start_time_sem;
 
 sem_t *expect_time_sem;
 
+sem_t *watt_sem;
+
 sem_t *expect_watt_sem;
 
 // authentication
@@ -203,6 +205,11 @@ int main()
     expect_time_sem = sem_open("/SEM_EXPECT_TIME", O_CREAT, 0666, 1);
     if(expect_time_sem == SEM_FAILED){
         perror("Expect_time_sem init failed:");  
+        return -1;  
+    }
+    watt_sem = sem_open("/SEM_WATT", O_CREAT, 0666, 1);
+    if(watt_sem == SEM_FAILED){
+        perror("Watt_sem init failed:");
         return -1;  
     }
     expect_watt_sem = sem_open("/SEM_EXPECT_WATT", O_CREAT, 0666, 1);
@@ -854,14 +861,14 @@ int main()
                         sem_post(status_sem);
                     }
 
-                    //recommendation
+                    //recommendation for temperature
                     sem_wait(temperature_sem);
                     sem_wait(preference_sem);
                     check_temperature(clientfd, temperature, preference, user_index_global);
                     sem_post(preference_sem);
                     sem_post(temperature_sem);
                     
-                    // recommendation
+                    // recommendation for device using time
                     sem_wait(status_sem);
                     sem_wait(using_time_sem);
                     sem_wait(start_time_sem);
@@ -872,7 +879,12 @@ int main()
                     sem_post(start_time_sem);
                     sem_post(expect_time_sem);
 
-
+                    // recommendation for watt
+                    sem_wait(watt_sem);
+                    sem_wait(expect_watt_sem);
+                    check_using_watt(clientfd, watt, expect_watt, user_index_global);
+                    sem_post(watt_sem);
+                    sem_post(expect_watt_sem);
                 }
             }
             else if (childpid > 0)
@@ -1338,6 +1350,9 @@ void interrupt_handler(int signum){
 
     sem_close(expect_watt_sem);
     sem_unlink("/SEM_EXPECT_WATT");
+
+    sem_close(watt_sem);
+    sem_unlink("/SEM_WATT");
     
 
     close(clientfd);
