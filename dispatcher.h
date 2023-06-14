@@ -5,5 +5,5 @@
 void signal_handler(int signum);
 int get_command_type(Node **head);
 int get_reservation_operation(Node **head);
-void dispatcher(Node **head,int* status_shm,int is_mode, int connfd);
+void dispatcher(Node **head,int* status_shm,int is_mode, int connfd, int* using_time, int* start_time, int* watt);
 #endif

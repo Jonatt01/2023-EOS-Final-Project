@@ -18,8 +18,6 @@ void inquire_using_time(int connfd, int* ischeck, int* using_time, int* start_ti
 void inquire_temperature(int connfd, int* temperature, int* ischeck);
 
 
-
-
 /**
 * check if the temperature is higher than user comfort
 */
@@ -42,6 +40,6 @@ void check_using_watt(int connfd, int* watt, int* expect_watt, int user);
 /**
 * calculate the bill and return to user (will be called by dispatcher)
 */
-void calculate_bill(int connfd, int* using_time);
+void calculate_bill(int connfd, int* using_time, int* start_time, int* watt, int* status);
 
 # endif

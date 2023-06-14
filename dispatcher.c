@@ -26,10 +26,6 @@
 
 #define STATUS_SIZE 12 * sizeof(int)
 
-# define AIRCONDITION_WATT 5
-# define LIGHT_WATT 1
-# define FAN_WATT 2
-
 int reservation_device_id = 0;
 int reservation_operation = -1;
 int reservation_data[5];
@@ -126,7 +122,7 @@ int get_reservation_operation(Node **head)
     }
 }
 
-void dispatcher(Node** head, int* status_shm,int is_mode, int connfd)
+void dispatcher(Node** head, int* status_shm,int is_mode, int connfd, int* using_time, int* start_time, int* watt)
 {
     while (*head != NULL)
     {
@@ -191,7 +187,7 @@ void dispatcher(Node** head, int* status_shm,int is_mode, int connfd)
             break;
         case CALCULATE:
 
-            // calculate_bill(connfd, using_time);
+            calculate_bill(connfd, using_time, start_time, watt, status_shm);
 
             break;
 

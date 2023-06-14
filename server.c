@@ -380,7 +380,7 @@ int main()
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
                         is_mode = 1;
-                        dispatcher(&task_list_head,device_status,is_mode,clientfd);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time, watt);
 
                     }
                     // emergency
@@ -389,7 +389,7 @@ int main()
                         newnode = emergency_parser();
                         scheduler(&task_list_head,newnode);
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode,clientfd);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time, watt);
                     }
                     // normal control command
                     else if(strncmp(rcvBuffer,"control",7)==0){
@@ -467,7 +467,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode,clientfd);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time, watt);
                     }
                     // reservation
                     else if(strncmp(rcvBuffer,"reservation",11)==0){
@@ -530,7 +530,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode,clientfd);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time, watt);
                     }
                     // set preference table
                     else if(strncmp(rcvBuffer,"preference",10)==0){
@@ -623,7 +623,7 @@ int main()
                         scheduler(&task_list_head,newnode);
 
                         displayList(task_list_head);
-                        dispatcher(&task_list_head,device_status,is_mode,clientfd);
+                        dispatcher(&task_list_head,device_status,is_mode,clientfd, use_time, start_time, watt);
                     }
                     // calculate bill
                     else if(strncmp(rcvBuffer,"calculate bill",14)==0){

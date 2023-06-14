@@ -6,6 +6,11 @@
 
 # define BUFFERSIZE 1024
 
+# define AIRCONDITION_WATT 5
+# define LIGHT_WATT 1
+# define FAN_WATT 2
+
+# define MONEY_PER_WATT 1
 
 
 void inquire_temperature(int connfd, int* temperature, int* ischeck){
@@ -209,4 +214,30 @@ void check_using_watt(int connfd, int* watt, int* expect_watt, int user){
             write(connfd,snd,msglen+1);
         }
     }   
+}
+
+void calculate_bill(int connfd, int* using_time, int* start_time, int* watt, int* status){
+    int bill = 0;
+
+    for(int i=0; i<12; i++){
+        
+        int total_time = 0;
+
+        if(i==3 | i==7) continue;
+
+        if( *(status+i) >= 1 ){
+
+            struct timeval now_system_time;
+
+            gettimeofday(&now_system_time,NULL); // get current time
+            total_time = *(using_time+i) + (int)now_system_time.tv_sec - *(start_time+i);
+        }
+        else if( *(status+i) == 0 ){
+            total_time = *(using_time+i);
+        }
+
+        bill += total_time * MONEY_PER_WATT * (*(watt+i));
+        printf("bill: %d\n", bill);
+    }
+    printf("Total bill: %d\n", bill);
 }
