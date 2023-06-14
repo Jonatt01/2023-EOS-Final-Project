@@ -7,6 +7,7 @@
 #include <sys/shm.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <sys/msg.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -104,6 +105,8 @@ sem_t *expect_watt_sem;
 // authentication
 extern User users[MAXUSERNUM];
 
+//message queue
+extern int msg_queue_id; 
 // flag for mode
 int is_mode = 0;
 
@@ -215,6 +218,11 @@ int main()
     expect_watt_sem = sem_open("/SEM_EXPECT_WATT", O_CREAT, 0666, 1);
     if(expect_watt_sem == SEM_FAILED){
         perror("Expect_watt_sem init failed:");
+        return -1;  
+    }
+    start_time_sem = sem_open("/SEM_START_TIME", O_CREAT, 0666, 1);
+    if(start_time_sem == SEM_FAILED){
+        perror("start_time_sem init failed:");  
         return -1;  
     }
 
@@ -1315,6 +1323,12 @@ void interrupt_handler(int signum){
 
     if (shmctl(expect_watt_shm_id, IPC_RMID, NULL) == -1) {
         perror("shmctl");
+        exit(1);
+    }
+
+    // delete message queue
+    if(msgctl(msg_queue_id, IPC_RMID, NULL)){
+        perror("msgctl");
         exit(1);
     }
 

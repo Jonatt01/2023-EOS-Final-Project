@@ -14,6 +14,7 @@
 #include <semaphore.h>
 #include <sys/time.h>
 
+#define TEMP_BUFFER_SIZE 256
 #define MAX_BUFFER_SIZE 1024
 #define SEND_SIZE 27
 #define DEVICE_PORT 9090
@@ -31,6 +32,7 @@
 #define MODE_SIZE 30 * 12 * sizeof(int)
 # define START_TIME_SIZE 12*sizeof(int)
 # define USE_TIME_SIZE 12*sizeof(int)
+# define TEMP_SIZE 3*sizeof(int)
 
 /*     創建 Msg Queue     */
 
@@ -60,10 +62,15 @@ key_t mode_shm_key = 5678;
 int *mode_shm;
 int mode_shm_id;
 
+key_t temperature_key = 4567;
+int temperature_shm_id; 
+int* temperature_shm;
+
 /*     創建 Semaphore     */
 sem_t *status_semaphore; // 二元信號量
 sem_t *useTime_semaphore;
 sem_t *wait_n_signal_semaphore;
+sem_t *temperature_semaphore;
 
 int serverSocket, clientSocket;
 int sockfd, connfd;
@@ -112,6 +119,11 @@ void interrupt_handler(int signum)
         perror("shmctl using_time_shm");
         exit(1);
     }
+    if (shmctl(temperature_shm_id, IPC_RMID, NULL) == -1)
+    {
+        perror("shmctl temperature_shm");
+        exit(1);
+    }
 
 
     close(clientSocket);
@@ -123,6 +135,13 @@ void interrupt_handler(int signum)
     
     sem_close(useTime_semaphore);
     sem_unlink("/SEM_TIME");
+    
+    sem_close(wait_n_signal_semaphore);
+    sem_unlink("/SEM_WAIT_N_SIGNAL");
+
+    sem_close(temperature_semaphore);
+    sem_unlink("/SEM_TEMP");
+
     exit(EXIT_SUCCESS);
 }
 
@@ -178,8 +197,26 @@ int check_duration(struct message msgQ,int* duration_table, time_t* duration_sta
 void *status_thread(void *arg)
 {
     struct sockaddr_in serverAddr, clientAddr;
-    char buffer[MAX_BUFFER_SIZE];
+    char buffer[TEMP_BUFFER_SIZE];
     int addrLen = sizeof(clientAddr);
+
+    /*                Shared Memory                */
+
+    
+    if ((temperature_shm_id = shmget(temperature_key, TEMP_SIZE, IPC_CREAT | 0666)) < 0)
+    {
+        perror("shmget");
+        exit(-1);
+    }
+    if ((temperature_shm = shmat(temperature_shm_id, NULL, 0)) == (int *) -1)
+    {
+        perror("shmat");
+        exit(-1);
+    }
+    /*                Shared Memory                */
+
+    /*                Semaphore                */
+    temperature_semaphore = sem_open("/SEM_TEMP", O_CREAT, 0666, 1);
 
     // 建立 Socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -218,32 +255,15 @@ void *status_thread(void *arg)
         exit(1);
     }
 
-    /*                Shared Memory                */
-    {
-        status_shm_id = shmget(status_shm_key, STATUS_SIZE, IPC_CREAT | 0666);
-        if (status_shm_id == -1)
-        {
-            perror("shmget error");
-            exit(1);
-        }
-
-        status_shm = (int *)shmat(status_shm_id, NULL, 0);
-        if (status_shm == (int *)-1)
-        {
-            perror("shmat error");
-            exit(1);
-        }
-    }
-    /*                Shared Memory                */
 
     signal(SIGINT, interrupt_handler);
     // 接收訊息並處理
     while (1)
     {
-        memset(buffer, 0, MAX_BUFFER_SIZE);
+        memset(buffer, 0, TEMP_BUFFER_SIZE);
 
         // 接收訊息
-        if (recv(connfd, buffer, MAX_BUFFER_SIZE, 0) < 0)
+        if (recv(connfd, buffer, TEMP_BUFFER_SIZE, 0) < 0)
         {
             perror("錯誤：接收訊息失敗");
             exit(1);
@@ -251,15 +271,19 @@ void *status_thread(void *arg)
 
         if (strlen(buffer) > 0)
         {
-            printf("接收到的訊息：%s", buffer);
+            printf("接收到的溫度訊息：%s", buffer);
         }
 
         // 將狀態寫到shared memory
-
-        if (strcmp(buffer, "exit\n") == 0)
-        {
-            break;
-        }
+        
+        // 解析接收到的值
+        int value = atoi(buffer);
+        sem_wait(temperature_semaphore);
+        // 写入共享内存
+        temperature_shm[0] = value;
+        temperature_shm[1] = value;
+        temperature_shm[2] = value;
+        sem_post(temperature_semaphore);
     }
 
     // 關閉 Socket

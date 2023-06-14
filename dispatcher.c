@@ -7,8 +7,10 @@
 #include <signal.h>
 #include <unistd.h>
 #include <time.h>
-# include <sys/shm.h>
+#include <sys/shm.h>
 #include <semaphore.h>
+#include <fcntl.h>
+
 
 #include "reservation_signal.h"
 #include "list_operation.h"
@@ -124,6 +126,28 @@ int get_reservation_operation(Node **head)
 
 void dispatcher(Node** head, int* status_shm,int is_mode, int connfd, int* using_time, int* start_time, int* watt)
 {
+    sem_t *using_time_sem;
+    sem_t *start_time_sem;
+    sem_t *watt_sem;
+    sem_t *status_sem;
+
+    using_time_sem = sem_open("/SEM_TIME", O_CREAT, 0666, 1);
+    if(using_time_sem == SEM_FAILED){
+        perror("Time_sem init failed:");  
+    }
+    start_time_sem = sem_open("/SEM_START_TIME", O_CREAT, 0666, 1);
+    if(start_time_sem == SEM_FAILED){
+        perror("start_time_sem init failed:");  
+    }
+    watt_sem = sem_open("/SEM_WATT", O_CREAT, 0666, 1);
+    if(watt_sem == SEM_FAILED){
+        perror("Watt_sem init failed:");
+    }
+    status_sem = sem_open("/SEM_STATUS", O_CREAT, 0666, 1);
+    if(status_sem == SEM_FAILED){
+        perror("Status_sem init failed:");  
+    }
+
     while (*head != NULL)
     {
         printf("Strating dispatch ..\n");
@@ -187,8 +211,18 @@ void dispatcher(Node** head, int* status_shm,int is_mode, int connfd, int* using
             break;
         case CALCULATE:
 
+
+            sem_wait(using_time_sem);
+            sem_wait(start_time_sem);
+            sem_wait(watt_sem);
+            sem_wait(status_sem);
+
             calculate_bill(connfd, using_time, start_time, watt, status_shm);
 
+            sem_post(using_time_sem);
+            sem_post(start_time_sem);
+            sem_post(watt_sem);
+            sem_post(status_sem);
             break;
 
         default:
