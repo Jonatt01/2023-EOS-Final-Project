@@ -227,7 +227,7 @@ int main()
     }
 
 
-
+    signal(SIGINT, interrupt_handler);
     while (1)
     {
 
@@ -293,17 +293,18 @@ int main()
                 int msglen = 0;
                 while (1)
                 {
+                    // printf("new loop\n");
                     memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
                     memset(sendBuffer, 0, MAX_BUFFER_SIZE);
                     // read data from client
-                    if (strlen(rcvBuffer) > 0){
-                        printf("New loop...\n");
-                    }
+
                     read(clientfd, rcvBuffer, MAX_BUFFER_SIZE);
                     if (strlen(rcvBuffer) > 0){
                         printf("Received message from client: %s\n", rcvBuffer);
                     }                  
-
+                    if (strlen(rcvBuffer) == 0){
+                        continue;
+                    }
                     // set their own mode
                     if(strncmp(rcvBuffer,"setmode",7)==0){
                         // printf("%d wants to set the user mode.\n",clientfd);
@@ -443,7 +444,7 @@ int main()
 
                             ischange[device_index-1] = 1;
 
-                            sem_wait(preference_sem);
+                            // sem_wait(preference_sem);
                             // sem_getvalue(preference_sem,&val_pref);
                             // printf("Begin - preference sem value=%d, pid=%d\n",val_pref, getpid());
 
@@ -451,10 +452,10 @@ int main()
                                 device_report[device_index-1] = *(preference + 12*user_index + device_index - 1);
 
                                 sem_post(preference_sem);
-                                // sem_getvalue(preference_sem,&val_pref);
-                                // printf("After - preference sem value=%d, pid=%d\n",val_pref, getpid());
+                                sem_getvalue(preference_sem,&val_pref);
+                                printf("After - preference sem value=%d, pid=%d\n",val_pref, getpid());
                             }else{
-                                sem_post(preference_sem);
+                                // sem_post(preference_sem);
                                 // sem_getvalue(preference_sem,&val_pref);
                                 // printf("After - preference sem value=%d, pid=%d\n",val_pref, getpid());
 
@@ -859,23 +860,23 @@ int main()
                             token=strtok(NULL,"|");
                 
                         }while(token != NULL);
-                        
-                        sem_wait(status_sem);
-                        sem_wait(using_time_sem);
-                        sem_wait(start_time_sem);
+                        print_int_table(ischeck, 1, 12);
+                        // sem_wait(status_sem);
+                        // sem_wait(using_time_sem);
+                        // sem_wait(start_time_sem);
                         inquire_using_time(clientfd, ischeck, use_time, start_time, device_status);
-                        sem_post(start_time_sem);
-                        sem_post(using_time_sem);
-                        sem_post(status_sem);
+                        // sem_post(start_time_sem);
+                        // sem_post(using_time_sem);
+                        // sem_post(status_sem);
                     }
-
+                    printf("0-----------\n");
                     //recommendation for temperature
                     sem_wait(temperature_sem);
-                    sem_wait(preference_sem);
+                    //sem_wait(preference_sem);
                     check_temperature(clientfd, temperature, preference, user_index_global);
-                    sem_post(preference_sem);
+                    //sem_post(preference_sem);
                     sem_post(temperature_sem);
-                    
+                    printf("1-----------\n");
                     // recommendation for device using time
                     sem_wait(status_sem);
                     sem_wait(using_time_sem);
@@ -886,7 +887,7 @@ int main()
                     sem_post(using_time_sem);
                     sem_post(start_time_sem);
                     sem_post(expect_time_sem);
-
+                    printf("2-------------\n");
                     // recommendation for watt
                     sem_wait(watt_sem);
                     sem_wait(expect_watt_sem);
@@ -1327,10 +1328,10 @@ void interrupt_handler(int signum){
     }
 
     // delete message queue
-    if(msgctl(msg_queue_id, IPC_RMID, NULL)){
-        perror("msgctl");
-        exit(1);
-    }
+    // if(msgctl(msg_queue_id, IPC_RMID, NULL)){
+    //     perror("msgctl");
+    //     exit(1);
+    // }
 
     // delete named POSIX semphore
 

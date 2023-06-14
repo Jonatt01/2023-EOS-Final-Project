@@ -46,7 +46,7 @@
     - `reservation 30 | user Jonathan | bedroom light 3 | livingroom light 2`
     - `reservation 30 | user Jonathan | bathroom light comfort | livingroom light 2`
 - checkout the using time
-    - `check using time | bedroom light`
+    - `check using time | user Jonathan | bedroom light`
 - checkout the temperature
     - `check temperature | user Jonathan | bedroom | livingroom | bathroom`
 - check out device status
