@@ -271,7 +271,7 @@ void *status_thread(void *arg)
 
         if (strlen(buffer) > 0)
         {
-            printf("接收到的溫度訊息：%s", buffer);
+            // printf("接收到的溫度訊息：%s", buffer);
         }
 
         // 將狀態寫到shared memory

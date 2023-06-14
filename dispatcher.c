@@ -155,12 +155,12 @@ void dispatcher(Node** head, int* status_shm,int is_mode, int connfd, int* using
         int command_type = -1;
         command_type = get_command_type(head);
         reservation_operation = get_reservation_operation(head);
-        printf("command type = %d\n",command_type);
-        printf("device_id = %d\n",(*head)->task.device);
+        // printf("command type = %d\n",command_type);
+        // printf("device_id = %d\n",(*head)->task.device);
         switch (command_type)
         {
         case RELAY:
-            printf("command for RELAY\n");
+            // printf("command for RELAY\n");
             msgQ_key = MSG_Q_KEY;
             msg_queue_id = msgget(msgQ_key, IPC_CREAT | 0666); // get msgQ
             if (msg_queue_id == -1)
@@ -177,12 +177,12 @@ void dispatcher(Node** head, int* status_shm,int is_mode, int connfd, int* using
             msg.data[DURATION] = (*head)->task.duration;
             msg.data[RESERVATION_TIME] = (*head)->task.reservation_time;
             msg.data[IS_MODE] = is_mode;
-            printf("msg.data[DEVICE_ID] = %d\n",msg.data[DEVICE_ID]);
-            printf("msg.data[LEVEL] = %d\n",msg.data[LEVEL]);
-            printf("msg.data[TEMP] = %d\n", msg.data[TEMP]);
-            printf("msg.data[DURATION] = %d\n",msg.data[DURATION]);
-            printf("msg.data[RESERVATION_TIME] = %d\n",msg.data[RESERVATION_TIME]);
-            printf("msg.data[IS_MODE] = %d\n",is_mode);
+            // printf("msg.data[DEVICE_ID] = %d\n",msg.data[DEVICE_ID]);
+            // printf("msg.data[LEVEL] = %d\n",msg.data[LEVEL]);
+            // printf("msg.data[TEMP] = %d\n", msg.data[TEMP]);
+            // printf("msg.data[DURATION] = %d\n",msg.data[DURATION]);
+            // printf("msg.data[RESERVATION_TIME] = %d\n",msg.data[RESERVATION_TIME]);
+            // printf("msg.data[IS_MODE] = %d\n",is_mode);
             if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1)
             {
                 perror("msgsnd error");
@@ -230,6 +230,5 @@ void dispatcher(Node** head, int* status_shm,int is_mode, int connfd, int* using
         }
 
         removeHeadNode(head);
-        printf("after remove  head = %p\n",head);
     }
 }

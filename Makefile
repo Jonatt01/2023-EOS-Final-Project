@@ -6,6 +6,11 @@ all: server.c authentication.c create_table.c translate.c costimizer.c parser.c 
 	gcc relay.c -o relay -lpthread
 	gcc device_client.c -o device_client
 	gcc deviceStatus_client.c -o deviceStatus_client
+	gcc user_client_register.c -o user_client_register
+	gcc user_client_mode.c -o user_client_mode
+	gcc user_client_emergency.c -o user_client_emergency
+	gcc user_client_control.c -o user_client_control
+
 clean:
 	rm user_client
 	rm user_client_2
@@ -14,4 +19,8 @@ clean:
 	rm relay
 	rm device_client
 	rm deviceStatus_client
+	rm user_client_register
+	rm user_client_mode
+	rm user_client_emergency
+	rm user_client_control
 

@@ -78,14 +78,7 @@ void removeHeadNode(Node** head) {
         }
 
         Node* temp = *head;
-        printf("temp : %p\n",temp);
-        printf("next : %p\n",(*head)->next);
-        
         *head = (*head)->next;
-        printf("temp : %p\n",temp);
-
-
-
 
         free(temp); // 釋放NODE
 }

@@ -220,9 +220,6 @@ int main()
         return -1;  
     }
 
-    sem_getvalue(status_sem,&val_mode);
-    printf("After deleteUser - status sem value=%d, pid=%d\n",val_mode, getpid());
-
     signal(SIGINT,interrupt_handler);
     while (1)
     {
