@@ -333,7 +333,7 @@ void *command_thread(void *arg)
             exit(1);
         }
 
-        using_time_shm_id = shmget(using_time_shm_id, USE_TIME_SIZE, IPC_CREAT | 0666);
+        using_time_shm_id = shmget(use_time_key, USE_TIME_SIZE, IPC_CREAT | 0666);
         if (using_time_shm_id == -1)
         {
             perror("shmget error");
@@ -454,13 +454,55 @@ void *command_thread(void *arg)
             }
         }
         //sem_post(wait_n_signal_semaphore); // 通知已完成shm的寫入，reservation可繼續進行
+        
+        if(sendToDevice == 0)
+        {
+            if(msgQ.data[IS_MODE] == 1)
+            {
+                mode_counter++;
 
+                if(mode_counter == 11)
+                {
+                    memset(commandBuffer,0,strlen(commandBuffer));
+                    char insert_str[3];
+                    for(int i=0;i<STATUS_SHM_LENGTH;i++)
+                    {
+                        if(i == 0 || i == 4 || i == 9){ // aircon device 的特殊情況 為0(關閉)時補0 EX:0->00
+                            if(status_shm[i] == 0){
+                                strcpy(insert_str, "00");
+                            }
+                            else{
+                                sprintf(insert_str, "%d", status_shm[i]);
+                            }
+                        }
+                        else{
+                            sprintf(insert_str, "%d", status_shm[i]);
+                        }
+                        //sprintf(insert_str, "%d", status_shm[i]);
+                        strcat(commandBuffer,insert_str);
+                        strcat(commandBuffer," ");
+                        memset(insert_str,0,strlen(insert_str));
+                    }
+                    printf("In Relay.c , Relay -> Device commandBuffer = %s.\n",commandBuffer);
+                    printf("Mode command collect finished! send mode command to device!\n");
+                    if (send(clientSocket, commandBuffer, SEND_SIZE, 0) < 0)
+                    {
+                        perror("錯誤：發送訊息失敗");
+                        exit(1);
+                    }
+                    mode_counter = 0;  
+                }
+            }
+            
+        }
         if(sendToDevice){
             // 讀取共享內存，製作新的指令，將處理過後的指令內容到socket buffer EX: 23 0 0 2 1 0 3 1 0 ...
             
+            printf("Before update using time shm , device = %d , using time = %d\n",msgQ.data[DEVICE_ID] - 1, using_time_shm[msgQ.data[DEVICE_ID]-1]);
             sem_wait(useTime_semaphore);
             update_time_table(start_time_shm,using_time_shm,msgQ); // update start time and use time.
             sem_post(useTime_semaphore);
+            printf("After update using time shm , device = %d , using time = %d\n",msgQ.data[DEVICE_ID] - 1, using_time_shm[msgQ.data[DEVICE_ID]-1]);
 
             memset(commandBuffer,0,strlen(commandBuffer));
             char insert_str[3];

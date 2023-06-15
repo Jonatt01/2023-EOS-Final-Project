@@ -296,7 +296,7 @@ int main()
 
                 while (1)
                 {
-
+                    int mode_flag = 0;
                     // generate a random file name for message queue key generation
                     if(is_first_loop == 0){
                         
@@ -376,7 +376,7 @@ int main()
                     }
                     // set to specifc mode
                     else if(strncmp(rcvBuffer,"mode",4)==0){
-
+                        mode_flag = 1;
                         char mode[64];
                         char username[64];
                         char tmp[64];
@@ -906,29 +906,33 @@ int main()
                         sem_post(status_sem);
                     }
 
-                    // sem_wait(temperature_sem);
-                    // sem_wait(preference_sem);
+                    sem_wait(temperature_sem);
+                    sem_wait(preference_sem);
                     check_temperature(clientfd, temperature, preference, user_index_global,msg_queue_id);
-                    // sem_post(preference_sem);
-                    // sem_post(temperature_sem);
-                    
-                    // // recommendation for device using time
-                    // sem_wait(status_sem);
-                    // sem_wait(using_time_sem);
-                    // sem_wait(start_time_sem);
-                    // sem_wait(expect_time_sem);
-                    // check_using_time(clientfd, device_status, use_time, start_time, expect_using_time, user_index_global, msg_queue_id);
-                    // sem_post(status_sem);
-                    // sem_post(using_time_sem);
-                    // sem_post(start_time_sem);
-                    // sem_post(expect_time_sem);
+                    sem_post(preference_sem);
+                    sem_post(temperature_sem);
 
-                    // // recommendation for watt
-                    // sem_wait(watt_sem);
-                    // sem_wait(expect_watt_sem);
-                    //check_using_watt(clientfd, device_status, expect_watt, user_index_global, msg_queue_id);
-                    // sem_post(watt_sem);
-                    // sem_post(expect_watt_sem);
+                    // recommendation for device using time
+                    if(mode_flag == 1) sleep(10);
+                    sem_wait(status_sem);
+                    sem_wait(using_time_sem);
+                    sem_wait(start_time_sem);
+                    sem_wait(expect_time_sem);
+                    check_using_time(clientfd, device_status, use_time, start_time, expect_using_time, user_index_global, msg_queue_id);
+                    sem_post(status_sem);
+                    sem_post(using_time_sem);
+                    sem_post(start_time_sem);
+                    sem_post(expect_time_sem);
+
+                    // recommendation for watt
+                    sem_wait(watt_sem);
+                    sem_wait(expect_watt_sem);
+                    check_using_watt(clientfd, device_status, expect_watt, user_index_global, msg_queue_id);
+                    sem_post(watt_sem);
+                    sem_post(expect_watt_sem);
+
+                    printf("Device status\n");
+                    print_int_table(device_status, 1, 12);
                 }
             }
             else if (childpid > 0)

@@ -77,14 +77,14 @@ void inquire_status(int connfd, int* ischeck, int* status){
                 sleep(0.00001);
                 msglen = sprintf(snd,"%s is open.\n", arr[i]);
                 write(connfd,snd,msglen+1);
-                printf("%s.\n",snd);
+                // printf("%s.\n",snd);
                 sleep(1);
             }
             else if( *(status+i) == 0 ){
                 sleep(0.00001);
                 msglen = sprintf(snd,"%s is close.\n", arr[i]);
                 write(connfd,snd,msglen+1);
-                printf("%s.\n",snd);
+                // printf("%s.\n",snd);
                 sleep(1);
             }
         }
@@ -100,7 +100,7 @@ void inquire_using_time(int connfd, int* ischeck, int* using_time, int* start_ti
     for(int i=0; i<12; i++){
         
         // do not need to check curtain using time
-        if(i==3 | i==7) continue;
+        if(i==3 || i==7) continue;
 
         if(ischeck[i]==1){
             if( *(status+i) >= 1 ){
@@ -140,35 +140,35 @@ void check_temperature(int connfd, int* temperature, int* preference, int user, 
     for(int i=0; i<4; i++){
         if(i==0){
 
-            printf("Temperature in bedroom : %d, Temperature in preference: %d\n", *(temperature) , *(preference + 12*user) );
+            // printf("Temperature in bedroom : %d, Temperature in preference: %d\n", *(temperature) , *(preference + 12*user) );
 
             if( *(temperature) > *(preference + 12*user)  & *(preference + 12*user) != 0){
                 
-                printf("Temperature in bedroom is too high.\n");
+                // printf("Temperature in bedroom is too high.\n");
 
                 msg.msg_type = MSG_TYPE;
                 memset(msg.message,0,50);
                 strcat(msg.message,"Temperature in bedroom is too high.\n");
-                printf("message %s\n",msg.message);
+                // printf("message %s\n",msg.message);
 
                 sleep(0.00001);
-                printf("msg queue id : %d\n", msg_queue_id);
+                // printf("msg queue id : %d\n", msg_queue_id);
                 // write to message queue
                 if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long) , 0) == -1){
                     perror("msgsnd error");
                     exit(1);
                 }
-                printf("msg queue in i==0 command send!\n");
+                // printf("msg queue in i==0 command send!\n");
             }
         }
 
         if(i==1){
             
-            printf("Temperature in living room : %d, Temperature in preference: %d\n", *(temperature + 1) , *(preference + 12*user + 4) );
+            // printf("Temperature in living room : %d, Temperature in preference: %d\n", *(temperature + 1) , *(preference + 12*user + 4) );
 
             if( *(temperature + 1) > *(preference + 12*user + 4) & *(preference + 12*user + 4) != 0 ){
                 
-                printf("Temperature in living room is too high.\n");
+                // printf("Temperature in living room is too high.\n");
 
                 msg.msg_type = MSG_TYPE;
                 memset(msg.message,0,50);
@@ -180,16 +180,16 @@ void check_temperature(int connfd, int* temperature, int* preference, int user, 
                     perror("msgsnd error");
                     exit(1);
                 }
-                printf("msg queue in i==1 command send!\n");
+                // printf("msg queue in i==1 command send!\n");
             }
         }
 
         if(i==3){
 
-            printf("Temperature in bathroom : %d, Temperature in preference: %d\n", *(temperature + 2) , *(preference + 12*user + 9) );
+            // printf("Temperature in bathroom : %d, Temperature in preference: %d\n", *(temperature + 2) , *(preference + 12*user + 9) );
 
             if( *(temperature + 2) > *(preference + 12*user + 9) & *(preference + 12*user + 9) != 0 ){
-                printf("Temperature in bathroom is too high.\n");
+                // printf("Temperature in bathroom is too high.\n");
 
                 msg.msg_type = MSG_TYPE;
                 memset(msg.message,0,50);
@@ -201,7 +201,7 @@ void check_temperature(int connfd, int* temperature, int* preference, int user, 
                     perror("msgsnd error");
                     exit(1);
                 }
-                printf("msg queue in i==3 command send!\n");
+                // printf("msg queue in i==3 command send!\n");
             }
         }            
     }
@@ -220,7 +220,7 @@ void check_using_time(int connfd, int* status, int* using_time, int* start_time,
         int total_time = 0;
 
         // do not need to check curtain using time
-        if(i==3 | i==7 | i==11) continue;
+        if(i==3 || i==7 || i==11) continue;
 
 
         if( *(status+i) >= 1 ){
@@ -232,17 +232,17 @@ void check_using_time(int connfd, int* status, int* using_time, int* start_time,
 
             total_time = *(using_time+i) + (int)now_system_time.tv_sec - *(start_time+i);
 
-            printf("%s using time : %d.\texpect using time : %d\n", arr[i] ,total_time, *(expect_use_time + 12*user + i) );
+            // printf("%s using time : %d.\texpect using time : %d\n", arr[i] ,total_time, *(expect_use_time + 12*user + i) );
 
         }
         else if( *(status+i) == 0 ){
 
             total_time = *(using_time+i);
 
-            printf("%s using time : %d.\texpect using time : %d\n", arr[i] ,total_time, *(expect_use_time + 12*user + i) );
+            // printf("%s using time : %d.\texpect using time : %d\n", arr[i] ,total_time, *(expect_use_time + 12*user + i) );
         }
 
-        if( total_time == *(expect_use_time + 12*user + i) ){
+        if( total_time > *(expect_use_time + 12*user + i) ){
 
             sleep(0.00001);
 
@@ -251,17 +251,17 @@ void check_using_time(int connfd, int* status, int* using_time, int* start_time,
             memset(snd,0,BUFFERSIZE);
             sprintf(snd,"Using time of %s is too long.\n",arr[i]);
             strcat(msg.message,snd);
-            printf("message %s\n",msg.message);
+            // printf("message %s\n",msg.message);
 
             sleep(0.00001);
-            printf("msg queue id : %d\n", msg_queue_id);
+            // printf("msg queue id : %d\n", msg_queue_id);
 
             // write to message queue
             if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long) , 0) == -1){
                 perror("msgsnd error");
                 exit(1);
             }
-            printf("msg queue in using time command send. i = %d!\n",i);
+            // printf("msg queue in using time command send. i = %d!\n",i);
         }
     }    
 }
@@ -272,24 +272,27 @@ void check_using_watt(int connfd, int* device_status, int* expect_watt, int user
     int msglen = 0;
 
     struct message msg;
-
+    int now_watt = 0;
     for(int i=0; i<12; i++){
         
         int now_watt = 0;
-        if( i==0 | i==4 | i==9 ) now_watt = AIRCONDITION_WATT;
-        else if( i==1 | i==5 | i==8 | i==10) now_watt = LIGHT_WATT;
-        else if( i==2 | i==6) now_watt = FAN_WATT;
+        if( i==0 || i==4 || i==9 ) now_watt = AIRCONDITION_WATT;
+        else if( i==1 || i==5 || i==8 || i==10) now_watt = LIGHT_WATT;
+        else if( i==2 || i==6) now_watt = FAN_WATT;
 
         // do not need to check curtain using time
-        if(i==3 | i==7) continue;
-
-        total_watt += *(device_status + i)*now_watt;
+        if(i==3 || i==7) continue;
+        int bit_status = 0;
+        if(*(device_status + i) > 0){
+            bit_status = 1;
+        }
+        total_watt += bit_status*now_watt;
 
     } 
-    printf("total watt: %d, expect watt: %d\n", total_watt, *(expect_watt + user));
+    // printf("total watt: %d, expect watt: %d\n", total_watt, *(expect_watt + user));
     if( total_watt > *(expect_watt + user) & *(expect_watt + user) != 0 ){
 
-        printf("Using watt of is too high.\n");
+        // printf("Using watt of is too high.\n");
 
         msg.msg_type = MSG_TYPE;
         memset(msg.message,0,50);
@@ -301,7 +304,7 @@ void check_using_watt(int connfd, int* device_status, int* expect_watt, int user
             perror("msgsnd error");
             exit(1);
         }
-        printf("msg queue in watt send!\n");
+        // printf("msg queue in watt send!\n");
         
     }
 }
@@ -317,11 +320,11 @@ void calculate_bill(int connfd, int* using_time, int* start_time, int* status){
         int total_time = 0;
 
         int now_watt = 0;
-        if( i==0 | i==4 | i==9 ) now_watt = AIRCONDITION_WATT;
-        else if( i==1 | i==5 | i==8 | i==10) now_watt = LIGHT_WATT;
-        else if( i==2 | i==6) now_watt = FAN_WATT;
+        if( i==0 || i==4 || i==9 ) now_watt = AIRCONDITION_WATT;
+        else if( i==1 || i==5 || i==8 || i==10) now_watt = LIGHT_WATT;
+        else if( i==2 || i==6) now_watt = FAN_WATT;
 
-        if(i==3 | i==7) continue;
+        if(i==3 || i==7) continue;
 
         if( *(status+i) >= 1 ){
 
@@ -335,9 +338,9 @@ void calculate_bill(int connfd, int* using_time, int* start_time, int* status){
         }
 
         bill += total_time * now_watt * MONEY_PER_WATT;
-        printf("bill: %d\n", bill);
+        // printf("bill: %d\n", bill);
     }
-    printf("Total bill: %d\n", bill);
+    // printf("Total bill: %d\n", bill);
 
     sleep(0.00001);
     memset(snd,0,BUFFERSIZE);

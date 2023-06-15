@@ -1,21 +1,62 @@
 # FINAL PROJECT
-## system
-- 最多接受10個人註冊
-- user id length < 20, password length < 20 
-## variable explaination
+## System Restriction
+- At most 10 user register to the system.
+    - user id length < 20 characters
+    - password length < 20 characters
 
-### server
-- **clientfd**
-    - The fd for the client
-- **serverfd**
-    - The fd for the server
-- **device_status**
-    - An array to save the status of all devices
-    - The size is 1*12 float
-    - Create by calling create_status_table defined in create_table.c
-- **authenticate**
-    - The flag to indicate whether the user is legal
-    - "1" : legal, "0" : illegal
+## How to use for RPi 3B+
+- Download this project on client, server, and device sides.
+    ```
+    $ git clone https://github.com/Jonatt01/2023-EOS-Final-Project.git
+    ```
+- Check IP on client side and device side
+**terminal on server side**
+    ```
+    $ ifconfig
+    ```
+And fill the IP address to all client side codes and device side codes.
+If user side is the same PC with server side, then set the IP address in client side code `127.0.0.1`
+
+- client side (must register to server first if not registered before)
+    ```
+    $ make
+    $ ./register
+    $ ./user_client_XXX
+    ```
+
+- server side
+
+    **terminal 1 (run system server)**
+    ```
+    $ make
+    $ ./server
+    ```
+    **terminal 2 (Run relay function)**
+    ```
+    $ ./relay
+    ```
+
+- device side
+
+    **terminal 1**
+    ```
+    $ make
+    $ sudo insmod seg_driver.ko
+    $ ./device_client
+    ```
+
+    **terminal 2**
+    ```
+    $ sudo ./dht11
+    ```
+    **terminal 3**
+    ```
+    $ sudo ./dht11_2
+    ```
+     **terminal 4**
+    ```
+    $ sudo ./client_dht11
+    ```
 ## tables
 
 ## commands
@@ -69,29 +110,31 @@
 - simultaneously opening device more than user wish (not yet)
     - tell the user about this situation
 
-## bill calculate
-- WATT * sec * money a degree
+## Some macros you can set
+- In `additional.c`
+    ```c=
+    # define AIRCONDITION_WATT 5 // The watt of airconditioners
+    # define LIGHT_WATT 1 // The watt of lights
+    # define FAN_WATT 2 // The watt of fans
+    # define MONEY_PER_WATT 5 // the cost per WATT that government charges
+    ```
 
 ## mapping
-- number to devices
+- number of devices
     - bedroom
         - 1: air conditioner
         - 2: light
         - 3: fan
         - 4: curtain
-
     - living room
         - 5: air conditioner
         - 6: light
         - 7: fan
         - 8: curtain
-
     - kitchen
         - 9: light
-
     - bathroom
         - 10: air conditioner
         - 11: light
-
     - special
         - 12: doors

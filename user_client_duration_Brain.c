@@ -92,8 +92,8 @@ void* command_thread(){
 
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
-    printf("Jonathan\n");
-    ssize_t num_bytes_written = write(sockfd, "Jonathan", strlen("Jonathan")); // send the user id to server
+    printf("Brain\n");
+    ssize_t num_bytes_written = write(sockfd, "Brain", strlen("Brain")); // send the user id to server
 
 
     // read the enter password to server
@@ -131,7 +131,7 @@ void* command_thread(){
 //*********************************start of control device command*********************************//
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"control device | user Jonathan | duration 8 | kitchen light 3 | livingroom light 2");
+    msglen = sprintf(message,"control device | user Brain | duration 8 | kitchen light 3 | livingroom light 2");
     write(sockfd,message,msglen+1);
     printf("Sent control to server: %s\n", message);
 
@@ -141,7 +141,7 @@ void* command_thread(){
 //*********************************start of control device command*********************************//
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"control device | user Jonathan | duration 0 | kitchen light 0 | livingroom light 0");
+    msglen = sprintf(message,"control device | user Brain | duration 0 | kitchen light 1 | livingroom light 2");
     write(sockfd,message,msglen+1);
     printf("Sent control to server: %s\n", message);
 
@@ -151,7 +151,7 @@ void* command_thread(){
 //*********************************start of control device command*********************************//
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"control device | user Jonathan | duration 0 | kitchen light 0 | livingroom light 0");
+    msglen = sprintf(message,"control device | user Brain | duration 0 | kitchen light 3 | livingroom light 0");
     write(sockfd,message,msglen+1);
     printf("Sent control to server: %s\n", message);
 

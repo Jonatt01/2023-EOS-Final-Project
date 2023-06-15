@@ -131,27 +131,7 @@ void* command_thread(){
 //*********************************start of control device command*********************************//
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"control device | user Jonathan | duration 8 | kitchen light 3 | livingroom light 2");
-    write(sockfd,message,msglen+1);
-    printf("Sent control to server: %s\n", message);
-
-    sleep(1);
-//*********************************end of control device command*********************************//
-
-//*********************************start of control device command*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"control device | user Jonathan | duration 0 | kitchen light 0 | livingroom light 0");
-    write(sockfd,message,msglen+1);
-    printf("Sent control to server: %s\n", message);
-
-    sleep(8);
-//*********************************end of control device command*********************************//
-
-//*********************************start of control device command*********************************//
-    memset(message,0,MAX_BUFFER_SIZE);
-    memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"control device | user Jonathan | duration 0 | kitchen light 0 | livingroom light 0");
+    msglen = sprintf(message,"control device | user Jonathan | bedroom airconditioner 0 | bedroom light 0 | bedroom fan 0 | bedroom cutain 0 | livingroom airconditioner 0 | livingroom light 0 | livingroom fan 0 | livingroom cutain 0 | kitchen light 0 | bathroom airconditioner 0 | bathroom light 0 | all doors 0");
     write(sockfd,message,msglen+1);
     printf("Sent control to server: %s\n", message);
 
