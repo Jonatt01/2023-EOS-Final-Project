@@ -1,24 +1,24 @@
 all: server.c authentication.c create_table.c translate.c costimizer.c parser.c scheduler.c list_operation.c relay.c reservation_signal.c dispatcher.c user_client_2.c user_client_3.c
 	gcc -o server server.c authentication.c create_table.c translate.c costimizer.c parser.c scheduler.c list_operation.c dispatcher.c reservation_signal.c additional.c -lpthread
-	gcc user_client.c -o user_client
-	gcc user_client_2.c -o user_client_2
-	gcc user_client_3.c -o user_client_3
-	gcc relay.c -o relay -lpthread
-	gcc device_client.c -o device_client
-	gcc deviceStatus_client.c -o deviceStatus_client
-	gcc user_client_register.c -o user_client_register
-	gcc user_client_mode.c -o user_client_mode
-	gcc user_client_emergency.c -o user_client_emergency
-	gcc user_client_closealll.c -o user_client_closealll
-	gcc user_client_preference.c -o user_client_preference
-	gcc user_client_set_watt_n_time.c -o user_client_set_watt_n_time
-	gcc user_client_reservation.c -o user_client_reservation
-	gcc user_client_duration.c -o user_client_duration
-	gcc user_client_check.c -o user_client_check
-	gcc user_client_delete.c -o user_client_delete
-	gcc user_register_Brain.c -o user_register_Brain
-	gcc user_client_duration_Brain.c -o user_client_duration_Brain
-	gcc user_client_mode_Brain.c -o user_client_mode_Brain
+	gcc user_client.c -o user_client -lpthread
+	gcc user_client_2.c -o user_client_2 -lpthread
+	gcc user_client_3.c -o user_client_3 -lpthread
+	gcc relay.c -o relay -lpthread -lpthread
+	gcc device_client.c -o device_client -lpthread
+	gcc deviceStatus_client.c -o deviceStatus_client -lpthread
+	gcc user_client_register.c -o user_client_register -lpthread
+	gcc user_client_mode.c -o user_client_mode -lpthread
+	gcc user_client_emergency.c -o user_client_emergency -lpthread
+	gcc user_client_closealll.c -o user_client_closealll -lpthread
+	gcc user_client_preference.c -o user_client_preference -lpthread
+	gcc user_client_set_watt_n_time.c -o user_client_set_watt_n_time -lpthread
+	gcc user_client_reservation.c -o user_client_reservation -lpthread
+	gcc user_client_duration.c -o user_client_duration -lpthread
+	gcc user_client_check.c -o user_client_check -lpthread
+	gcc user_client_delete.c -o user_client_delete -lpthread
+	gcc user_register_Brain.c -o user_register_Brain -lpthread
+	gcc user_client_duration_Brain.c -o user_client_duration_Brain -lpthread
+	gcc user_client_mode_Brain.c -o user_client_mode_Brain -lpthread
 
 
 clean:
