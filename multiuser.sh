@@ -8,7 +8,7 @@ tmux split-window -v
 tmux send-keys -t 0 "./user_client_register" Enter
 tmux send-keys -t 1 "./user_register_Brain" Enter
 
-tmux send-keys -t 0 "./user_client_duration" Enter
+tmux send-keys -t 0 "./user_client_duration_Jonathan" Enter
 # tmux send-keys -t 0 "./user_client_mode" Enter
 tmux send-keys -t 1 "./user_client_duration_Brain" Enter
 # tmux send-keys -t 1 "./user_client_mode_Brain" Enter

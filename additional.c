@@ -242,7 +242,7 @@ void check_using_time(int connfd, int* status, int* using_time, int* start_time,
             // printf("%s using time : %d.\texpect using time : %d\n", arr[i] ,total_time, *(expect_use_time + 12*user + i) );
         }
 
-        if( total_time > *(expect_use_time + 12*user + i) ){
+        if( total_time > *(expect_use_time + 12*user + i) && *(expect_use_time + 12*user + i) != 0){
 
             sleep(0.00001);
 

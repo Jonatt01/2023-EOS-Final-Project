@@ -17,6 +17,7 @@ all: server.c authentication.c create_table.c translate.c costimizer.c parser.c 
 	gcc user_client_check.c -o user_client_check -lpthread
 	gcc user_client_delete.c -o user_client_delete -lpthread
 	gcc user_register_Brain.c -o user_register_Brain -lpthread
+	gcc user_client_duration_Jonathan.c -o user_client_duration_Jonathan -lpthread
 	gcc user_client_duration_Brain.c -o user_client_duration_Brain -lpthread
 	gcc user_client_mode_Brain.c -o user_client_mode_Brain -lpthread
 
@@ -40,5 +41,6 @@ clean:
 	rm user_client_check
 	rm user_client_delete
 	rm user_register_Brain
+	rm user_client_duration_Jonathan
 	rm user_client_duration_Brain
 	rm user_client_mode_Brain
