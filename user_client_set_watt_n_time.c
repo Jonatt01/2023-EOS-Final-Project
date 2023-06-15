@@ -157,71 +157,71 @@ void* command_thread(){
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("4\n"); // set airconditioner time
-    write(sockfd,"4",strlen("4")+1);
+    printf("240\n"); // set airconditioner time
+    write(sockfd,"240",strlen("240")+1);
 
     //********************set light of bedroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("6\n");
-    write(sockfd,"6",strlen("6")+1);
+    printf("360\n");
+    write(sockfd,"360",strlen("360")+1);
 
     //********************set fan of bedroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("6\n");
-    write(sockfd,"6",strlen("6")+1);
+    printf("360\n");
+    write(sockfd,"360",strlen("360")+1);
 
     //********************set temp of living room********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("6\n");
-    write(sockfd,"6",strlen("6")+1);
+    printf("360\n");
+    write(sockfd,"360",strlen("360")+1);
 
     //********************set light of living room********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("6\n");
-    write(sockfd,"6",strlen("6")+1);
+    printf("360\n");
+    write(sockfd,"360",strlen("360")+1);
 
     //********************set fan of living room********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("6\n");
-    write(sockfd,"6",strlen("6")+1);
+    printf("360\n");
+    write(sockfd,"360",strlen("360")+1);
 
     //********************set light of kitchen********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("6\n");
-    write(sockfd,"6",strlen("6")+1);
+    printf("360\n");
+    write(sockfd,"360",strlen("360")+1);
 
     //********************set temp of bathroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("6\n");
-    write(sockfd,"6",strlen("6")+1);
+    printf("360\n");
+    write(sockfd,"360",strlen("360")+1);
     //********************set light of bedroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("6\n");
-    write(sockfd,"6",strlen("6")+1);
+    printf("360\n");
+    write(sockfd,"360",strlen("360")+1);
     
     sleep(1);
 

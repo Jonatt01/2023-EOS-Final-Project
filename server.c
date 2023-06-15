@@ -221,14 +221,6 @@ int main()
         return -1;  
     }
 
-    printf("0-------------\n");
-    sem_getvalue(preference_sem,&val_pref);
-    printf("Begin  - preference sem value=%d, pid=%d\n",val_pref, getpid());
-    sem_getvalue(temperature_sem,&val_pref);
-    printf("Begin c - temperature sem value=%d, pid=%d\n",val_pref, getpid());
-
-    
-
     while (1)
     {
 
