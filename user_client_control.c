@@ -3,11 +3,52 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <pthread.h>
+#include <sys/msg.h>
+#include <semaphore.h>
+#include <fcntl.h>
 
 #define PORT 8080
 #define MAX_BUFFER_SIZE 1024
 
-int main() {
+void* recommend_thread();
+void* command_thread();
+
+int id;
+key_t key;
+sem_t *wait_signal_sem;
+
+// msgQ message format
+struct message
+{
+    long msg_type;
+    char message[50];
+};
+
+struct message msg_queue;
+int main()
+{
+
+    wait_signal_sem = sem_open("/WT", O_CREAT, 0666, 0);
+    if(wait_signal_sem == SEM_FAILED){
+        perror("wait_signal_sem init failed:");  
+        return -1;  
+    }
+
+    pthread_t threads[2];
+    // 創建thread
+    pthread_create(&threads[0], NULL, command_thread, NULL);
+    pthread_create(&threads[1], NULL, recommend_thread, NULL);
+
+
+    // 等待線程完成
+    pthread_join(threads[0], NULL);
+    pthread_join(threads[1], NULL);
+
+    return 0;
+}
+
+void* command_thread(){
     int sockfd;
     struct sockaddr_in server_addr;
     char buffer[MAX_BUFFER_SIZE];
@@ -76,6 +117,17 @@ int main() {
     printf("%s", buffer);
 //*********************************end of authentication*********************************//
 
+//*********************************start of reading message queue id*********************************//
+
+    memset(buffer,0,MAX_BUFFER_SIZE);
+    read(sockfd, buffer, MAX_BUFFER_SIZE);
+    // printf("msg queue id : %s\n",buffer);
+    id = atoi(buffer);
+
+    sem_post(wait_signal_sem);
+
+//*********************************end of reading message queue id*********************************//
+
 //*********************************start of control device command*********************************//
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -85,5 +137,26 @@ int main() {
 
     sleep(1);
 //*********************************end of control device command*********************************//
+    sem_close(wait_signal_sem);
+    sem_unlink("/WT");
+}
+
+
+void* recommend_thread(){
+        
+    sem_wait(wait_signal_sem);
+
+    // printf("id in recommend thread : %d",id);
+
+    while(1){
+        if (msgrcv(id, &msg_queue, sizeof(struct message) - sizeof(long), 2, 0) == -1)
+        {
+            perror("msgrcv error");
+            exit(1);
+        }
+        printf("--------------------------RECOMMENDATION--------------------------\n");
+        printf("message : %s",msg_queue.message);
+        printf("------------------------------------------------------------------\n");
+    }
 
 }

@@ -103,6 +103,7 @@ extern User users[MAXUSERNUM];
 
 //message queue
 extern int msg_queue_id; 
+extern int msg_Q_id;
 // flag for mode
 int is_mode = 0;
 
@@ -171,7 +172,7 @@ int main()
     expect_watt = create_expect_watt_table(expect_watt_shm_key); 
 
     // Create POSIX semaphore for preference table
-    preference_sem = sem_open("/SEM_PREFERENCE", O_CREAT, 0666, 1);
+    preference_sem = sem_open("/SEM_PREFERENCE",O_CREAT , 0666, 1);
     if(preference_sem == SEM_FAILED){
         perror("Preference_sem init failed:");  
         return -1;  
@@ -220,7 +221,14 @@ int main()
         return -1;  
     }
 
-    signal(SIGINT,interrupt_handler);
+    printf("0-------------\n");
+    sem_getvalue(preference_sem,&val_pref);
+    printf("Begin  - preference sem value=%d, pid=%d\n",val_pref, getpid());
+    sem_getvalue(temperature_sem,&val_pref);
+    printf("Begin c - temperature sem value=%d, pid=%d\n",val_pref, getpid());
+
+    
+
     while (1)
     {
 
@@ -233,7 +241,7 @@ int main()
 
         printf("New connection accepted from %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
-
+        
 
         memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
         memset(sendBuffer, 0, MAX_BUFFER_SIZE);
@@ -275,7 +283,6 @@ int main()
         }
         
         
-
         childpid = fork();
         if (childpid >= 0)
         {
@@ -284,8 +291,35 @@ int main()
             {                
                 // 子程序，處理client的command，Read data from the client
                 int msglen = 0;
+                int is_first_loop = 0;
+                int msg_queue_id = 0;
+
                 while (1)
                 {
+
+                    // generate a random file name for message queue key generation
+                    if(is_first_loop == 0){
+                        
+                        // generate message queue key
+                        key_t message_queue_key = 0;
+
+
+                        printf("0.1-------------------\n");
+                        printf("pid : %d\n",getpid());
+                        message_queue_key = ftok(".", getpid());
+                        printf("0.7-------------------\n");
+                        // printf("message queue key : %d\n",message_queue_key);
+                        msg_queue_id = msgget(message_queue_key, 0666 | IPC_CREAT);
+
+                        printf("%d message queue id : %d\n", getpid(), msg_queue_id);
+                        msglen = sprintf(sendBuffer,"%d",msg_queue_id);
+                        write(clientfd,sendBuffer,msglen+1);
+
+                        is_first_loop++;
+                    }
+
+
+
                     memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
                     memset(sendBuffer, 0, MAX_BUFFER_SIZE);
                     // read data from client
@@ -294,6 +328,8 @@ int main()
                         printf("Received message from client: %s\n", rcvBuffer);
                     }
                     if(strlen(rcvBuffer) == 0){continue;}        
+
+
 
                     // set their own mode
                     if(strncmp(rcvBuffer,"setmode",7)==0){
@@ -327,7 +363,7 @@ int main()
                         sem_wait(mode_sem);
                         // sem_getvalue(mode_sem,&val_mode);
                         // printf("Begin setmode - mode sem value=%d, pid=%d\n",val_mode, getpid());
-
+                        
                         setmode(user_mode, user_index, mode, settable);
 
                         sem_post(mode_sem);
@@ -645,7 +681,7 @@ int main()
                         memset(rcvBuffer, 0, MAX_BUFFER_SIZE);
                         read(clientfd, rcvBuffer, MAX_BUFFER_SIZE);
 
-
+                        printUserTable(users);
                         // print_int_table(preference, 10, 12);
                         sem_wait(preference_sem);
                         // sem_getvalue(preference_sem,&val_pref);
@@ -666,7 +702,7 @@ int main()
                         // printf("After deleteUser - preference sem value=%d, pid=%d\n",val_pref, getpid());
 
                         // print_int_table(preference, 10, 12);
-                        // printUserTable(users);
+                        printUserTable(users);
                     }
                     // set the expect time table
                     else if(strncmp(rcvBuffer,"expect time",11)==0){
@@ -726,7 +762,7 @@ int main()
                         sem_post(expect_watt_sem);
 
                         printf("%s end of seting expect watt.\n",username);
-                        // print_int_table(expect_watt, 10, 1);
+                        // print_int_table(expect_watt, 1, 1);
                     }
                     // check out temperature of three rooms
                     else if(strncmp(rcvBuffer,"check temperature",17)==0){
@@ -760,7 +796,7 @@ int main()
                             token=strtok(NULL,"|");
                 
                         }while(token != NULL);
-
+                        print_int_table(ischeck, 1, 12);
                         sem_wait(temperature_sem);
                         inquire_temperature(clientfd, temperature, ischeck);
                         sem_post(temperature_sem);
@@ -842,11 +878,8 @@ int main()
                             break;
                         }
                         
-                        // printf("%s want to check the device using time.\n",username);
-                        // printf("-------------\n");
                         token=strtok(NULL,"|"); // bedroom light
-                        // printf("-------------\n");
-                        // printf("token : %s\n",token);
+
                         do{
                             memset(place,0,64);
                             memset(device,0,64);
@@ -873,10 +906,9 @@ int main()
                         sem_post(status_sem);
                     }
 
-                    // //recommendation for temperature
                     // sem_wait(temperature_sem);
                     // sem_wait(preference_sem);
-                    // check_temperature(clientfd, temperature, preference, user_index_global);
+                    check_temperature(clientfd, temperature, preference, user_index_global,msg_queue_id);
                     // sem_post(preference_sem);
                     // sem_post(temperature_sem);
                     
@@ -885,23 +917,24 @@ int main()
                     // sem_wait(using_time_sem);
                     // sem_wait(start_time_sem);
                     // sem_wait(expect_time_sem);
-                    // check_using_time(clientfd, device_status, use_time, start_time, expect_using_time, user_index_global);
+                    // check_using_time(clientfd, device_status, use_time, start_time, expect_using_time, user_index_global, msg_queue_id);
                     // sem_post(status_sem);
                     // sem_post(using_time_sem);
                     // sem_post(start_time_sem);
                     // sem_post(expect_time_sem);
 
-                    // recommendation for watt
-                    sem_wait(watt_sem);
-                    sem_wait(expect_watt_sem);
-                    check_using_watt(clientfd, device_status, expect_watt, user_index_global);
-                    sem_post(watt_sem);
-                    sem_post(expect_watt_sem);
+                    // // recommendation for watt
+                    // sem_wait(watt_sem);
+                    // sem_wait(expect_watt_sem);
+                    //check_using_watt(clientfd, device_status, expect_watt, user_index_global, msg_queue_id);
+                    // sem_post(watt_sem);
+                    // sem_post(expect_watt_sem);
                 }
             }
             else if (childpid > 0)
             {
                 // Parent process,listening the clients connections...
+                signal(SIGINT,interrupt_handler);
             }
         }
         else
@@ -911,8 +944,6 @@ int main()
         }
         close(clientfd);
     }
-    
-    
     
     close(serverfd);
     return 0;
@@ -1257,12 +1288,16 @@ void interrupt_handler(int signum){
         exit(1);
     }
 
-    // delete message queue
-    if(msgctl(msg_queue_id, IPC_RMID, NULL)){
-        perror("msgctl");
-        exit(1);
-    }
-
+    // // delete message queue
+    // if(msgctl(msg_queue_id, IPC_RMID, NULL)){
+    //     perror("msgctl");
+    //     exit(1);
+    // }
+    // // delete message queue
+    // if(msgctl(msg_Q_id, IPC_RMID, NULL)){
+    //     perror("msgctl");
+    //     exit(1);
+    // }
     // delete named POSIX semphore
 
     sem_close(preference_sem);

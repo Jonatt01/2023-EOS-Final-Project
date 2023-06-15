@@ -3,6 +3,7 @@
 # include <string.h>
 # include <unistd.h> // read write
 # include <sys/time.h> // gettimeofday
+# include <sys/msg.h> // msg queue
 
 # define BUFFERSIZE 1024
 
@@ -12,6 +13,18 @@
 
 # define MONEY_PER_WATT 5
 
+#define MSG_TYPE 2
+
+
+key_t msg_queue_key;
+int msg_queue_id;
+
+// msgQ message format
+struct message
+{
+    long msg_type;
+    char message[50];
+};
 
 void inquire_temperature(int connfd, int* temperature, int* ischeck){
 
@@ -115,21 +128,37 @@ void inquire_using_time(int connfd, int* ischeck, int* using_time, int* start_ti
 
 }
 
-void check_temperature(int connfd, int* temperature, int* preference, int user){
+void check_temperature(int connfd, int* temperature, int* preference, int user, int msg_queue_id){
 
     int msglen = 0;
     char snd[BUFFERSIZE] = {0},rcv[BUFFERSIZE] = {0};
+    // printf("out msg queue id : %d\n",msg_queue_id);
+
+    struct message msg;
+
 
     for(int i=0; i<4; i++){
         if(i==0){
 
             printf("Temperature in bedroom : %d, Temperature in preference: %d\n", *(temperature) , *(preference + 12*user) );
 
-            if( *(temperature) > *(preference + 12*user) ){
+            if( *(temperature) > *(preference + 12*user)  & *(preference + 12*user) != 0){
+                
+                printf("Temperature in bedroom is too high.\n");
+
+                msg.msg_type = MSG_TYPE;
+                memset(msg.message,0,50);
+                strcat(msg.message,"Temperature in bedroom is too high.\n");
+                printf("message %s\n",msg.message);
+
                 sleep(0.00001);
-                memset(snd,0,BUFFERSIZE);
-                msglen = sprintf(snd,"Temperature in bedroom is too high.\n");
-                write(connfd,snd,msglen+1);
+                printf("msg queue id : %d\n", msg_queue_id);
+                // write to message queue
+                if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long) , 0) == -1){
+                    perror("msgsnd error");
+                    exit(1);
+                }
+                printf("msg queue in i==0 command send!\n");
             }
         }
 
@@ -137,11 +166,21 @@ void check_temperature(int connfd, int* temperature, int* preference, int user){
             
             printf("Temperature in living room : %d, Temperature in preference: %d\n", *(temperature + 1) , *(preference + 12*user + 4) );
 
-            if( *(temperature + 1) > *(preference + 12*user + 4) ){
+            if( *(temperature + 1) > *(preference + 12*user + 4) & *(preference + 12*user + 4) != 0 ){
+                
+                printf("Temperature in living room is too high.\n");
+
+                msg.msg_type = MSG_TYPE;
+                memset(msg.message,0,50);
+                strcat(msg.message,"Temperature in living room is too high.\n");
+
                 sleep(0.00001);
-                memset(snd,0,BUFFERSIZE);
-                msglen = sprintf(snd,"Temperature in living room is too high.\n");
-                write(connfd,snd,msglen+1);
+                // write to message queue
+                if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1){
+                    perror("msgsnd error");
+                    exit(1);
+                }
+                printf("msg queue in i==1 command send!\n");
             }
         }
 
@@ -149,20 +188,30 @@ void check_temperature(int connfd, int* temperature, int* preference, int user){
 
             printf("Temperature in bathroom : %d, Temperature in preference: %d\n", *(temperature + 2) , *(preference + 12*user + 9) );
 
-            if( *(temperature + 2) > *(preference + 12*user + 9) ){
+            if( *(temperature + 2) > *(preference + 12*user + 9) & *(preference + 12*user + 9) != 0 ){
+                printf("Temperature in bathroom is too high.\n");
+
+                msg.msg_type = MSG_TYPE;
+                memset(msg.message,0,50);
+                strcat(msg.message,"Temperature in bathroom is too high.\n");;
+
                 sleep(0.00001);
-                memset(snd,0,BUFFERSIZE);
-                msglen = sprintf(snd,"Temperature in bathroom is too high.\n");
-                write(connfd,snd,msglen+1);
+                // write to message queue
+                if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1){
+                    perror("msgsnd error");
+                    exit(1);
+                }
+                printf("msg queue in i==3 command send!\n");
             }
         }            
     }
 }
 
-void check_using_time(int connfd, int* status, int* using_time, int* start_time, int* expect_use_time, int user){
+void check_using_time(int connfd, int* status, int* using_time, int* start_time, int* expect_use_time, int user, int msg_queue_id){
 
     int msglen = 0;
     char snd[BUFFERSIZE] = {0},rcv[BUFFERSIZE] = {0};
+    struct message msg;
 
     char *arr[] = {"Bedroom airconditioner", "Bedroom light", "Bedroom fan", "Bedroom cutain", "Living room airconditioner", "Living room light", "Living room fan", "Living room cutain", "Kitchen light", "Bathroom airconditioner", "Bathroom light", "Doors"};
     
@@ -193,20 +242,36 @@ void check_using_time(int connfd, int* status, int* using_time, int* start_time,
             printf("%s using time : %d.\texpect using time : %d\n", arr[i] ,total_time, *(expect_use_time + 12*user + i) );
         }
 
-        if( total_time > *(expect_use_time + 12*user + i) ){
+        if( total_time == *(expect_use_time + 12*user + i) ){
+
             sleep(0.00001);
+
+            msg.msg_type = MSG_TYPE;
+            memset(msg.message,0,50);
             memset(snd,0,BUFFERSIZE);
-            msglen = sprintf(snd,"Using time of %s is too long.\n",arr[i]);
-            write(connfd,snd,msglen+1);
+            sprintf(snd,"Using time of %s is too long.\n",arr[i]);
+            strcat(msg.message,snd);
+            printf("message %s\n",msg.message);
+
+            sleep(0.00001);
+            printf("msg queue id : %d\n", msg_queue_id);
+
+            // write to message queue
+            if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long) , 0) == -1){
+                perror("msgsnd error");
+                exit(1);
+            }
+            printf("msg queue in using time command send. i = %d!\n",i);
         }
     }    
 }
 
-void check_using_watt(int connfd, int* device_status, int* expect_watt, int user){
+void check_using_watt(int connfd, int* device_status, int* expect_watt, int user, int msg_queue_id){
 
     int total_watt = 0;
     int msglen = 0;
-    char snd[BUFFERSIZE] = {0},rcv[BUFFERSIZE] = {0};
+
+    struct message msg;
 
     for(int i=0; i<12; i++){
         
@@ -222,11 +287,22 @@ void check_using_watt(int connfd, int* device_status, int* expect_watt, int user
 
     } 
     printf("total watt: %d, expect watt: %d\n", total_watt, *(expect_watt + user));
-    if( total_watt > *(expect_watt + user) ){
+    if( total_watt > *(expect_watt + user) & *(expect_watt + user) != 0 ){
+
+        printf("Using watt of is too high.\n");
+
+        msg.msg_type = MSG_TYPE;
+        memset(msg.message,0,50);
+        strcat(msg.message,"Using watt of is too high.\n");
+
         sleep(0.00001);
-        memset(snd,0,BUFFERSIZE);
-        msglen = sprintf(snd,"Using watt of is too high.\n");
-        write(connfd,snd,msglen+1);
+        // write to message queue
+        if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1){
+            perror("msgsnd error");
+            exit(1);
+        }
+        printf("msg queue in watt send!\n");
+        
     }
 }
 

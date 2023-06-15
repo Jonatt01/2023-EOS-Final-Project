@@ -128,9 +128,9 @@ void* command_thread(){
 
 //*********************************end of reading message queue id*********************************//
 
-//*********************************start of mode setting*********************************//
+//*********************************start of preference setting*********************************//
     memset(message,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"setmode | user Jonathan | afternoon");
+    msglen = sprintf(message,"preference | user Jonathan");
     write(sockfd,message,msglen+1);
     printf("send setmode to server : %s\n",message);
 
@@ -139,24 +139,24 @@ void* command_thread(){
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("26\n"); // the temperature of air conditioner
-    write(sockfd, "26", strlen("26")+1);
+    printf("25\n"); // the temperature of air conditioner
+    write(sockfd, "25", strlen("25")+1);
 
     //********************set light of bedroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("1\n"); // the brightness of air conditioner
-    write(sockfd,"1",strlen("1")+1);
+    printf("3\n"); // the brightness of air conditioner
+    write(sockfd,"3",strlen("3")+1);
 
     //********************set fan of bedroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("0\n"); // the level of fan
-    write(sockfd,"0",strlen("0")+1);
+    printf("3\n"); // the level of fan
+    write(sockfd,"3",strlen("3")+1);
 
     //********************set curtain of bedroom********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -171,8 +171,8 @@ void* command_thread(){
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("22\n"); // the temperature of air conditioner
-    write(sockfd, "22", strlen("22")+1);
+    printf("0\n"); // the temperature of air conditioner
+    write(sockfd, "0", strlen("0")+1);
 
     //********************set light of living room********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -195,8 +195,8 @@ void* command_thread(){
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("1\n"); // open or close of curtain
-    write(sockfd,"1",strlen("1")+1);
+    printf("0\n"); // open or close of curtain
+    write(sockfd,"0",strlen("0")+1);
 
     //********************set light of kitchen********************//
     memset(buffer,0,MAX_BUFFER_SIZE);
@@ -219,20 +219,20 @@ void* command_thread(){
     read(sockfd, buffer, MAX_BUFFER_SIZE);
     printf("%s",buffer);
 
-    printf("0\n"); // the brightness of light
-    write(sockfd,"0",strlen("0")+1);
+    printf("2\n"); // the brightness of light
+    write(sockfd,"2",strlen("2")+1);
 
-//*********************************end of mode setting*********************************//
+//*********************************end of preference setting*********************************//
 
-//*********************************start of mode command*********************************//
+//*********************************start of room command*********************************//
     memset(message,0,MAX_BUFFER_SIZE);
     memset(buffer,0,MAX_BUFFER_SIZE);
-    msglen = sprintf(message,"mode afternoon | user Jonathan");
+    msglen = sprintf(message,"room | user Jonathan | duration 20 | bedroom comfort | kitchen comfort");
     write(sockfd,message,msglen+1);
-    printf("Sent setmode to server: %s\n", message);
+    printf("Sent control to server: %s\n", message);
 
     sleep(1);
-//*********************************end of mode command*********************************//
+//*********************************end of room command*********************************//
 
     sem_close(wait_signal_sem);
     sem_unlink("/WT");

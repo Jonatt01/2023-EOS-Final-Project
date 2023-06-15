@@ -201,7 +201,11 @@ void printUserTable(User* users){
     printf("-------\t\t--------\n");
 
     for (int i = 0; i < 10; i++){
-        printf("%s\t\t%s\n", users[i].id, users[i].password);
+        if(strlen(users[i].id) != 0){
+            printf("%-16s", users[i].id);
+            printf("%s\n",users[i].password);
+        }
+
     }
     printf("\n");
 }

@@ -263,7 +263,7 @@ void *status_thread(void *arg)
         memset(buffer, 0, TEMP_BUFFER_SIZE);
 
         // 接收訊息
-        if (recv(connfd, buffer, TEMP_BUFFER_SIZE, 0) < 0)
+        if (recv(connfd, buffer, 6, 0) < 0)
         {
             perror("錯誤：接收訊息失敗");
             exit(1);
@@ -277,12 +277,15 @@ void *status_thread(void *arg)
         // 將狀態寫到shared memory
         
         // 解析接收到的值
-        int value = atoi(buffer);
+        //int value = atoi(buffer);
+        int bedroom_temperature = 0;
+        int livingroom_temperature = 0;
+        sscanf(buffer,"%d %d",&bedroom_temperature,&livingroom_temperature);
         sem_wait(temperature_semaphore);
         // 写入共享内存
-        temperature_shm[0] = value;
-        temperature_shm[1] = value;
-        temperature_shm[2] = value;
+        temperature_shm[0] = bedroom_temperature;
+        temperature_shm[1] = livingroom_temperature;
+        temperature_shm[2] = bedroom_temperature;
         sem_post(temperature_semaphore);
     }
 
@@ -438,6 +441,7 @@ void *command_thread(void *arg)
                     status_shm[i] = 0;
                 }
                 status_shm[7] = 1; // 地震時窗簾打開
+                status_shm[3] = 1;
             }
             else
             {

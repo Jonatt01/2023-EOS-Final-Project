@@ -21,17 +21,17 @@ void inquire_temperature(int connfd, int* temperature, int* ischeck);
 /**
 * check if the temperature is higher than user comfort
 */
-void check_temperature(int connfd, int* temperature, int* preference, int user);
+void check_temperature(int connfd, int* temperature, int* preference, int user, int msg_queue_id);
 
 /**
 * check if the total using time of devices is higher than user expected (recommand)
 */
-void check_using_time(int connfd, int* status, int* using_time, int* start_time, int* expect_use_time, int user);
+void check_using_time(int connfd, int* status, int* using_time, int* start_time, int* expect_use_time, int user, int msg_queue_id);
 
 /**
 * check if the total using watt of devices is higher than user expected (recommand)
 */
-void check_using_watt(int connfd, int* device_status, int* expect_watt, int user);
+void check_using_watt(int connfd, int* device_status, int* expect_watt, int user, int msg_queue_id);
 
 
 

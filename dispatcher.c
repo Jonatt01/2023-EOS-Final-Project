@@ -33,8 +33,9 @@ int reservation_operation = -1;
 int reservation_data[5];
 
 pid_t reservaion_child;
+
 key_t msgQ_key;
-int msg_queue_id;
+int msg_Q_id;
 
 // msgQ message format
 struct message
@@ -73,8 +74,8 @@ void signal_handler(int signum)
         // signal send 給 relay
         // 將要signal給Relay的資料，放進msgQ中
         msgQ_key = MSG_Q_KEY;
-        msg_queue_id = msgget(msgQ_key, IPC_CREAT | 0666); // get msgQ
-        if (msg_queue_id == -1)
+        msg_Q_id = msgget(msgQ_key, IPC_CREAT | 0666); // get msgQ
+        if (msg_Q_id == -1)
         {
             perror("msgget error");
         }
@@ -86,7 +87,7 @@ void signal_handler(int signum)
         msg.data[DURATION] = reservation_data[DURATION];
         msg.data[RESERVATION_TIME] = reservation_data[RESERVATION_TIME];
 
-        if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1)
+        if (msgsnd(msg_Q_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1)
         {
             perror("msgsnd");
             exit(1);
@@ -162,8 +163,8 @@ void dispatcher(Node** head, int* status_shm,int is_mode, int connfd, int* using
         case RELAY:
             // printf("command for RELAY\n");
             msgQ_key = MSG_Q_KEY;
-            msg_queue_id = msgget(msgQ_key, IPC_CREAT | 0666); // get msgQ
-            if (msg_queue_id == -1)
+            msg_Q_id = msgget(msgQ_key, IPC_CREAT | 0666); // get msgQ
+            if (msg_Q_id == -1)
             {
                 perror("msgget error");
             }
@@ -183,7 +184,7 @@ void dispatcher(Node** head, int* status_shm,int is_mode, int connfd, int* using
             // printf("msg.data[DURATION] = %d\n",msg.data[DURATION]);
             // printf("msg.data[RESERVATION_TIME] = %d\n",msg.data[RESERVATION_TIME]);
             // printf("msg.data[IS_MODE] = %d\n",is_mode);
-            if (msgsnd(msg_queue_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1)
+            if (msgsnd(msg_Q_id, &msg, sizeof(struct message) - sizeof(long), 0) == -1)
             {
                 perror("msgsnd error");
                 exit(1);

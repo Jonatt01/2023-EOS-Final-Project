@@ -10,6 +10,14 @@ all: server.c authentication.c create_table.c translate.c costimizer.c parser.c 
 	gcc user_client_mode.c -o user_client_mode
 	gcc user_client_emergency.c -o user_client_emergency
 	gcc user_client_control.c -o user_client_control
+	gcc user_client_preference.c -o user_client_preference
+	gcc user_client_set_watt_n_time.c -o user_client_set_watt_n_time
+	gcc user_client_reservation.c -o user_client_reservation
+	gcc user_client_duration.c -o user_client_duration
+	gcc user_client_check.c -o user_client_check
+	gcc user_client_delete.c -o user_client_delete
+	gcc user_register_Brain.c -o user_register_Brain
+
 
 clean:
 	rm user_client
@@ -23,4 +31,11 @@ clean:
 	rm user_client_mode
 	rm user_client_emergency
 	rm user_client_control
+	rm user_client_preference
+	rm user_client_set_watt_n_time
+	rm user_client_reservation
+	rm user_client_duration
+	rm user_client_check
+	rm user_client_delete
+	rm user_register_Brain
 

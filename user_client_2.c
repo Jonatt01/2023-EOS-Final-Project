@@ -355,12 +355,12 @@ int main() {
     // scanf("%s",message); // the temperature of air conditioner
     // write(sockfd,message,msglen+1);
 
-    // //********************set light of bedroom********************//
+    // //********************set light of bathroom********************//
     // memset(buffer,0,MAX_BUFFER_SIZE);
     // read(sockfd, buffer, MAX_BUFFER_SIZE);
     // printf("%s",buffer);
 
-    // scanf("%s",message); // the brightness of air conditioner
+    // scanf("%s",message); // the brightness of air light
     // write(sockfd,message,msglen+1);
     
     // sleep(1);
